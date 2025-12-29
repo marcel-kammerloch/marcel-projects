@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="Type as many digits of &pi; as possible and train your memory while having fun!" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="PI Game" />
+
+    <title>Memory Pi Game - Digits of pi</title>
+
+    <link rel="stylesheet" href="/style.css" />
+    <script defer src="/script.js" type="module"></script>
+    
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+  </head>
+  <body>
+    <header>
+      <div id="header-container"><h1>Memory Pi</h1></div>
+    </header>
+
+    <article id="main-article">
+      <div id="game-container">
+        <h3>Rules</h3>
+        <p>
+          Type as many digits of &pi; as possible to increase your score. <br />
+          You have <span id="timeout-rule-display">3</span> seconds to type each digit.
+          <br />
+          Have fun!
+        </p>
+        <br />
+        <fieldset id="game-fieldset" style="text-align: center">
+          <legend style="text-align: center">Memory Pi Game</legend>
+          <br />
+          <div id="score-container" style="margin-bottom: 2em">
+            <div>
+              <b>Best score:</b>
+              <span id="best-score-digits">0</span> digits<br />
+              <b>Best time:</b> <span id="best-score-time">0:00'000</span>
+            </div>
+            <div>
+              <b>Score:</b> <span id="current-score-digits">0</span> digits<br />
+              <b>Time:</b> <span id="current-score-time">0:00'000</span>
+            </div>
+          </div>
+          <div id="practice-section" style="display: none">
+            <p>
+              Practice from digit number
+              <input
+                class="diginput"
+                style="width: 4.8rem"
+                type="number"
+                id="practice-start-input"
+                value="1"
+              />. Display
+              <input
+                class="diginput"
+                style="width: 3.2rem"
+                type="number"
+                id="practice-digit-count-input"
+                value="50"
+              />
+              first digits:
+            </p>
+            <p id="pi-display-view"></p>
+          </div>
+          <p id="game-input-container" style="margin-top: -1em; display: none">
+            <input
+              style="width: 0; height: 0; padding: 0px; border: 0px; opacity: 0"
+              id="hidden-input-field"
+              type="number"
+            />
+            <br />
+            <span id="pi-digits-output"></span
+            ><span id="cursor-element" class="blinking-cursor"></span>
+          </p>
+          <div id="options-panel" style="display: none">
+            <p>
+              Time out after
+              <input
+                class="diginput"
+                style="width: 1.8rem"
+                type="number"
+                id="timeout-setting-input"
+                value="3"
+              />
+              seconds.
+            </p>
+            <p>
+              Display the digits in groups of
+              <input
+                class="diginput"
+                style="width: 3.2rem"
+                type="number"
+                id="group-size-setting-input"
+                value="2"
+              />.
+            </p>
+          </div>
+          <div id="feedback-container" style="display: none">
+            <div style="display: flex; justify-content: center">
+              <p id="feedback-text"></p>
+            </div>
+          </div>
+          <p id="action-buttons">
+            <input type="submit" id="play-btn" name="jouer" value="Play" />
+            <br />
+            <input
+              type="submit"
+              id="practice-toggle-btn"
+              name="entr"
+              value="Practice"
+            />
+            <br />
+            <input
+              type="submit"
+              id="options-toggle-btn"
+              name="option"
+              value="Options"
+            />
+          </p>
+          <br />
+        </fieldset>
+        <br />
+        <h3>Tips</h3>
+        <p>Press <i>Enter</i> to restart the game.<br />Enjoy the practice mode to learn the digits of π</p>
+      </div>
+    </article>
+
+    <script type="module">
+      if ("serviceWorker" in navigator && location.protocol === "https:") {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then(() => console.log("Service Worker registered"))
+          .catch(console.error);
+      }
+    </script>
+  </body>
+</html>

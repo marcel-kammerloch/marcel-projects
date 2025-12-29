@@ -1,0 +1,14 @@
+{
+  "name": "@repo/auth-middleware",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "cookie": "^1.1.1",
+    "jose": "^6.1.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.26.2"
+}
