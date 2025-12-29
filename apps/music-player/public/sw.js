@@ -49,7 +49,7 @@ self.addEventListener("fetch", (e) => {
         return res;
       } catch (err) {
         console.log("Fetch failed", err);
-        return new Response("Offline", { status: 503 });
+        // return new Response("Offline", { status: 503 });
       }
     })
   );
