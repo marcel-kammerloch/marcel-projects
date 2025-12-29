@@ -19,7 +19,17 @@ export async function validateAuth(
     `https://${scope}.marcel-projects.vercel.app`
   );
 
-  function redirectResponse(deleteAuthCookie = false) {
+  function redirectResponse({
+    deleteAuthCookie = false,
+    notEnoughScopesError,
+  }: {
+    deleteAuthCookie?: boolean;
+    notEnoughScopesError?: boolean;
+  } = {}): Response {
+    if (notEnoughScopesError) {
+      authRedirectUrl.searchParams.set("error", "not_enough_scopes");
+    }
+
     const headers = new Headers();
     headers.set("Location", authRedirectUrl.toString());
 
@@ -47,10 +57,11 @@ export async function validateAuth(
       issuer: authUrl,
     });
 
-    if (payload.isAuthenticated !== true) return redirectResponse(true);
+    if (payload.isAuthenticated !== true)
+      return redirectResponse({ deleteAuthCookie: true });
 
     if (payload.scope !== scope && payload.scope !== "*") {
-      return redirectResponse(true);
+      return redirectResponse({ notEnoughScopesError: true });
     }
 
     const headers = new Headers();
@@ -60,6 +71,6 @@ export async function validateAuth(
     // return null;
   } catch (error) {
     console.error("error verifying jwt", error);
-    return redirectResponse(true);
+    return redirectResponse({ deleteAuthCookie: true });
   }
 }
