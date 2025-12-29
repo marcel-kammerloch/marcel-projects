@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { TRACKS, Track } from "@/data/tracks";
+import { TRACKS, type Track } from "@/data/tracks";
 import { PlayerControls } from "./controls";
 import { ProgressBar } from "./progress-bar";
 import { SongInfo } from "./song-info";
@@ -30,11 +30,11 @@ export function MusicPlayer() {
 
   // -- State: Persistence --
   const [isShuffle, setIsShuffle] = useLocalStorage<boolean>(
-    "music-player-shuffle",
+    "music-player:shuffle",
     false
   );
   const [isRepeat, setIsRepeat] = useLocalStorage<boolean>(
-    "music-player-repeat",
+    "music-player:repeat",
     false
   );
 

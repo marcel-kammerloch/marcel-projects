@@ -9,7 +9,7 @@ export interface Playlist {
 
 export function usePlaylists() {
   const [playlists, setPlaylists] = useLocalStorage<Playlist[]>(
-    "music-player-playlists",
+    "music-player:playlists",
     []
   );
 
