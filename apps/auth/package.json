@@ -10,21 +10,21 @@
     "gen-auth": "node scripts/generate-auth-hash.js"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "jose": "^6.0.11",
-    "next": "15.3.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.1.3",
+    "next": "16.1.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@tailwindcss/postcss": "^4.1.10",
-    "@types/node": "^24.0.3",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "eslint": "^9.29.0",
-    "eslint-config-next": "15.3.3",
-    "tailwindcss": "^4.1.10",
-    "typescript": "^5.8.3"
+    "@eslint/eslintrc": "^3.3.3",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^25.0.3",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "16.1.1",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
   }
 }
