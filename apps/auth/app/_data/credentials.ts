@@ -32,6 +32,9 @@ export function getCredential(identifier: string): Credential | undefined {
   const key = `AUTH_HASH_${toEnvKey(identifier)}`;
   const hash = process.env[key];
 
+  console.log(`Loading credential for ${identifier} using env key ${key}`);
+  console.log(`Hash found: ${hash ? "yes" : "no"}`);
+
   if (!hash || typeof hash !== "string" || hash.trim().length === 0)
     return undefined;
 

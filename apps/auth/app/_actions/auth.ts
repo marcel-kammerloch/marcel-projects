@@ -42,6 +42,8 @@ export async function authenticateUser(formData: FormData) {
     // Load credential hash from environment via loader.
     const credentialData = getCredential(identifier);
 
+    console.log("Credential data retrieved for identifier:", identifier);
+
     // Use a precomputed fake hash to avoid short-circuit timing differences.
     // This hash is only used when a real credential isn't configured.
     const FAKE_HASH =
