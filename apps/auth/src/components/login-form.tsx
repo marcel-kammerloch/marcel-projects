@@ -1,20 +1,23 @@
 "use client";
 
+import styles from "./login-form.module.css";
 import { useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
-import styles from "./login-form.module.css";
-import Alert from "./alert";
-import { authenticateUser } from "../_actions/auth";
-import { validateRedirectUrl } from "../_utils/redirect-validator";
+import { authenticateUser } from "../action";
+import { validateRedirectUrl } from "../redirect-validator";
+import { Alert } from "./alert";
+import { useAlert } from "./use-alert";
 
-export default function LoginForm() {
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertType, setAlertType] = useState<"success" | "error">("success");
-  const [alertMessage, setAlertMessage] = useState("");
+export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
   const redirectParam = searchParams.get("redirect");
   const redirectUrl = validateRedirectUrl(redirectParam);
+
+  const errorParam = searchParams.get("error");
+  const isNotEnoughScopesError = errorParam === "not_enough_scopes";
+
+  const { state: alertState, showSuccess, showError, close } = useAlert();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -25,28 +28,26 @@ export default function LoginForm() {
     try {
       const result = await authenticateUser(formData);
 
-      setIsLoading(false);
-
       if (result.success) {
-        setAlertType("success");
-        setAlertMessage("You have been successfully logged in");
-        setShowAlert(true);
-
-        // Redirect after showing success message
+        showSuccess("Authenticated", "You have been successfully logged in");
+        // redirect after the alert duration
         setTimeout(() => {
           window.location.href = redirectUrl;
         }, 2000);
       } else {
-        setAlertType("error");
-        setAlertMessage(result.message);
-        setShowAlert(true);
+        showError(
+          "Authentication Failed",
+          result?.message ?? "Authentication failed"
+        );
       }
     } catch (error) {
       console.error(error);
+      showError(
+        "Authentication Failed",
+        "An error occurred during authentication"
+      );
+    } finally {
       setIsLoading(false);
-      setAlertType("error");
-      setAlertMessage("An error occurred during authentication");
-      setShowAlert(true);
     }
   };
 
@@ -94,26 +95,33 @@ export default function LoginForm() {
               className={styles.submitButton}
               disabled={isLoading}
             >
-              {isLoading ? <div className={styles.spinner}></div> : "Continue"}
+              {isLoading ? <div className={styles.spinner} /> : "Continue"}
             </button>
           </form>
 
           <div className={styles.note}>
-            <p className={styles.noteText}>
-              Contact administrator for login credentials
+            <p
+              className={styles.noteText}
+              style={{
+                color: isNotEnoughScopesError ? "#ef4444" : "#6b7280",
+                fontStyle: isNotEnoughScopesError ? "normal" : "italic",
+                fontSize: isNotEnoughScopesError ? "14px" : "12px",
+              }}
+            >
+              {isNotEnoughScopesError
+                ? "Please login with other credentials where you have permissions to access this resource"
+                : "Contact administrator for login credentials"}
             </p>
           </div>
         </div>
       </div>
 
       <Alert
-        isVisible={showAlert}
-        title={
-          alertType === "success" ? "Authenticated" : "Authentication Failed"
-        }
-        message={alertMessage}
-        type={alertType}
-        onClose={() => setShowAlert(false)}
+        isVisible={alertState.isVisible}
+        title={alertState.title}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={close}
       />
     </>
   );

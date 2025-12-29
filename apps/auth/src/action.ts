@@ -3,7 +3,7 @@
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
 import { cookies } from "next/headers";
-import { getCredential } from "../_data/credentials";
+import { getCredential } from "./data";
 
 function getJwtSecret(): Uint8Array {
   const secret = process.env.MARCEL_PROJECTS_AUTH_TOKEN_SECRET;
@@ -34,7 +34,7 @@ export async function authenticateUser(formData: FormData) {
     return { success: false, message: "Invalid identifier or password" };
   }
 
-  if (password.length < 6 || password.length > 60) {
+  if (password.length < 4 || password.length > 20) {
     return { success: false, message: "Invalid identifier or password" };
   }
 
