@@ -1,6 +1,6 @@
 export interface Credential {
   identifier: string;
-  password: string; // bcrypt hash
+  passwordHash: string; // bcrypt hash
 }
 
 // List allowed identifiers. Keep identifiers here (no hashes) so the app
@@ -32,11 +32,8 @@ export function getCredential(identifier: string): Credential | undefined {
   const key = `AUTH_HASH_${toEnvKey(identifier)}`;
   const hash = process.env[key];
 
-  console.log(`Loading credential for ${identifier} using env key ${key}`);
-  console.log(`Hash found: ${hash ? "yes" : "no"}`);
-
   if (!hash || typeof hash !== "string" || hash.trim().length === 0)
     return undefined;
 
-  return { identifier, password: hash };
+  return { identifier, passwordHash: hash };
 }
