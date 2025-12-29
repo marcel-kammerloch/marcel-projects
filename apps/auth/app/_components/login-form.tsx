@@ -55,21 +55,20 @@ export default function LoginForm() {
       <div className={styles.container}>
         <div className={styles.formWrapper}>
           <h1 className={styles.title}>Sign In</h1>
-          <p className={styles.subtitle}>Enter your credentials to continue</p>
+          <p className={styles.subtitle}>Enter credentials to continue</p>
 
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.inputGroup}>
-              <label htmlFor="email" className={styles.label}>
-                Email Address
+              <label htmlFor="identifier" className={styles.label}>
+                Identifier
               </label>
               <input
-                type="email"
-                id="email"
-                name="email"
+                type="text"
+                id="identifier"
+                name="identifier"
                 className={styles.input}
-                placeholder="you@example.com"
+                placeholder="Identifier"
                 required
-                autoComplete="email"
                 disabled={isLoading}
               />
             </div>

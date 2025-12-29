@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
 import { cookies } from "next/headers";
+import { getCredential } from "../_data/credentials";
 
 function getJwtSecret(): Uint8Array {
   const secret = process.env.MARCEL_PROJECTS_AUTH_TOKEN_SECRET;
@@ -15,79 +16,90 @@ function getJwtSecret(): Uint8Array {
 }
 
 export async function authenticateUser(formData: FormData) {
-  const email = formData.get("email");
+  const identifier = formData.get("identifier");
   const password = formData.get("password");
 
-  if (!email || !password) {
-    return { success: false, message: "Email and password are required" };
+  if (!identifier || !password) {
+    return { success: false, message: "Identifier and password are required" };
   }
 
-  if (typeof email !== "string" || typeof password !== "string") {
+  if (typeof identifier !== "string" || typeof password !== "string") {
     return { success: false, message: "Invalid input types" };
   }
 
-  if (
-    email.length < 6 ||
-    email.length > 128 ||
-    password.length < 6 ||
-    password.length > 128
-  ) {
-    return { success: false, message: "Invalid input length" };
+  // Validate basic lengths and characters for the identifier and password.
+  // Identifier may include alphanumerics, hyphen and colon for temporary entries.
+  const identifierRegex = /^[A-Za-z0-9:-]{3,30}$/;
+  if (!identifierRegex.test(identifier)) {
+    return { success: false, message: "Invalid identifier or password" };
+  }
+
+  if (password.length < 6 || password.length > 60) {
+    return { success: false, message: "Invalid identifier or password" };
   }
 
   try {
-    // Get credentials from environment variables
-    const validEmail = process.env.AUTH_EMAIL;
-    const validPasswordHash = process.env.AUTH_PASSWORD_HASH;
+    // Load credential hash from environment via loader.
+    const credentialData = getCredential(identifier);
 
-    if (!validEmail || !validPasswordHash) {
-      console.warn("Authentication environment variables not configured");
+    // Use a precomputed fake hash to avoid short-circuit timing differences.
+    // This hash is only used when a real credential isn't configured.
+    const FAKE_HASH =
+      "$2b$10$m27Y7XNRZQ0s7hR.SUICS.vnTZT7DcRbZ4cCuKq/PTbavfe5VR3ya"; // bcrypt.hash("invalid_password_for_timing", 10);
+
+    if (!credentialData) {
+      // Simulate bcrypt comparison to mitigate timing attacks and avoid
+      // revealing whether an identifier exists.
+      await bcrypt.compare(password, FAKE_HASH);
+      return { success: false, message: "Invalid identifier or password" };
+    }
+
+    // Always verify password hash if credential exists.
+    const passwordMatches = await bcrypt.compare(
+      password,
+      credentialData.password
+    );
+
+    if (!passwordMatches)
+      return { success: false, message: "Invalid email or password" };
+
+    // Get and validate JWT secret
+    let JWT_SECRET: Uint8Array;
+    try {
+      JWT_SECRET = getJwtSecret();
+    } catch (e) {
+      console.error(e);
       return {
         success: false,
-        message: "Authentication service unavailable",
+        message: "Authentication service misconfigured",
       };
     }
 
-    const emailMatches = email === validEmail;
+    const isTemp = credentialData.identifier.endsWith(":temp");
+    const id = credentialData.identifier.replace(":temp", "");
 
-    // Always verify password hash even if email doesn't match (prevent timing attacks)
-    const passwordMatches = await bcrypt.compare(password, validPasswordHash);
+    // Determine cookie scope
+    const scope = id === "marcel-projects" ? "*" : id;
 
-    if (emailMatches && passwordMatches) {
-      // Get and validate JWT secret
-      let JWT_SECRET: Uint8Array;
-      try {
-        JWT_SECRET = getJwtSecret();
-      } catch (e) {
-        console.error(e);
-        return {
-          success: false,
-          message: "Authentication service misconfigured",
-        };
-      }
+    // Set secure session cookie
+    const token = await new SignJWT({ isAuthenticated: true, scope })
+      .setProtectedHeader({ alg: "HS256" })
+      .setIssuedAt()
+      .setIssuer("https://auth.marcel-projects.vercel.app")
+      .setExpirationTime(isTemp ? "3d" : "90d")
+      .sign(JWT_SECRET);
 
-      // Set secure session cookie
-      const token = await new SignJWT({ isAuthenticated: true })
-        .setProtectedHeader({ alg: "HS256" })
-        .setIssuedAt()
-        .setIssuer("https://auth.marcel-projects.vercel.app")
-        .setExpirationTime("90d")
-        .sign(JWT_SECRET);
+    const cookieStore = await cookies();
+    cookieStore.set("auth-token", token, {
+      maxAge: (isTemp ? 3 : 90) * 24 * 60 * 60,
+      domain: ".marcel-projects.vercel.app",
+      path: "/",
+      sameSite: "lax",
+      httpOnly: true,
+      secure: true,
+    });
 
-      const cookieStore = await cookies();
-      cookieStore.set("auth-token", token, {
-        maxAge: 90 * 24 * 60 * 60,
-        domain: ".marcel-projects.vercel.app",
-        path: "/",
-        sameSite: "lax",
-        httpOnly: true,
-        secure: true,
-      });
-
-      return { success: true, message: "Authentication successful" };
-    } else {
-      return { success: false, message: "Invalid email or password" };
-    }
+    return { success: true, message: "Authentication successful" };
   } catch (error) {
     console.error("Authentication error:", error);
 

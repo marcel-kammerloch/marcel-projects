@@ -1,8 +1,8 @@
-import { Suspense } from "react";
-import LoginForm from "./_components/login-form";
-import { Geist } from "next/font/google";
-import type { Metadata } from "next";
 import "./globals.css";
+import { Suspense } from "react";
+import { Geist } from "next/font/google";
+import LoginForm from "./_components/login-form";
+import type { Metadata } from "next";
 
 const geistSans = Geist({
   variable: "--font-geist",

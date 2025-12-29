@@ -4,7 +4,7 @@ import { parseCookie } from "cookie";
 const JWT_SECRET = new TextEncoder().encode(
   process.env.MARCEL_PROJECTS_AUTH_TOKEN_SECRET
 );
-// pnpm add @repo/auth-middleware@workspace:* --filter memory-pi-game
+
 export async function validateAuth(
   request: Request,
   scope: string
@@ -48,6 +48,10 @@ export async function validateAuth(
     });
 
     if (payload.isAuthenticated !== true) return redirectResponse(true);
+
+    if (payload.scope !== scope && payload.scope !== "*") {
+      return redirectResponse(true);
+    }
 
     const headers = new Headers();
     headers.set("x-middleware-next", "1");
