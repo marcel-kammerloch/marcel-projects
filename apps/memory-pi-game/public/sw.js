@@ -1,4 +1,4 @@
-const C = "pi-game-cache-v1";
-self.addEventListener("install", (_) => {self.skipWaiting()});
-self.addEventListener("activate", (e) => {e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => {if (k !== C) return caches.delete(k)}))));self.clients.claim()});
-self.addEventListener("fetch", (e) => {const { request: r } = e;(r.method === "GET") && e.respondWith(caches.open(C).then(c => c.match(r).then(d =>  d || fetch(r).then(res => { const d = res.destination; (d === "script" || d === "style" || d === "document") && c.put(r, res.clone()); return res }))))});
+const C="pi-game-cache-v1";
+self.addEventListener("install",e=>self.skipWaiting());
+self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.map(n=>n!==C&&caches.delete(n)))));self.clients.claim()});
+self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET")return;e.respondWith(caches.open(C).then(c=>c.match(r).then(d=>d||fetch(r).then(res=>{if(!res||res.status>=400||res.type!=="basic")return res;const t=r.destination;(t==="script"||t==="style"||t==="document"||r.url.endsWith(".mp3"))&&c.put(r,res.clone());return res}).catch(()=>new Response("",{status:503})))))});
