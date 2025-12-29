@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: [
           {
+            key: "Content-Security-Policy",
+            value:
+              "default-src 'self'; media-src 'self' https://ad0nzrqxbs7k6ri0.public.blob.vercel-storage.com;",
+          },
+          {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
           },
