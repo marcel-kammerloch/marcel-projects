@@ -1,13 +1,10 @@
 {
-  "name": "memory-pi-game",
+  "name": "www",
   "private": true,
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
-  },
-  "dependencies": {
-    "@repo/auth-middleware": "workspace:*"
   },
   "devDependencies": {
     "vite": "^7.3.0"

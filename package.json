@@ -3,11 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "turbo dev",
-    "build": "turbo build",
-    "memory-pi-game:build": "pnpm --filter memory-pi-game build && pnpm --filter memory-pi-game preview",
-    "music-player:build": "pnpm --filter music-player build && pnpm --filter music-player start"
+    "build": "turbo build"
   },
-  "packageManager": "pnpm@10.26.2",
   "devDependencies": {
     "turbo": "^2.7.2"
   }
