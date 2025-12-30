@@ -9,6 +9,9 @@ export async function validateAuth(
   request: Request,
   scope: string
 ): Promise<Response> {
+  if (process.env.NODE_ENV === "development") {
+    return new Response(null, { headers: { "x-middleware-next": "1" } });
+  }
   const authUrl = "https://auth.marcel-projects.vercel.app";
   const cookieName = "auth-token";
   const domain = ".marcel-projects.vercel.app";
