@@ -265,6 +265,7 @@ export function MusicPlayer() {
     <div className="flex flex-col h-dvh w-full bg-black text-white overflow-hidden relative font-sans">
       <audio
         ref={audioRef}
+        crossOrigin="anonymous"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={handleEnded}
