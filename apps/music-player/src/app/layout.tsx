@@ -1,11 +1,9 @@
-import { ServiceWorker } from "@/components/service-worker";
 import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Music Player",
   description: "Music Player PWA",
-  robots: "noindex, nofollow",
   appleWebApp: {
     capable: true,
     title: "Music Player",
@@ -41,8 +39,6 @@ export default function RootLayout({
         <noscript>This App need JavaScript to run. Please enable it.</noscript>
 
         {children}
-
-        <ServiceWorker />
       </body>
     </html>
   );
