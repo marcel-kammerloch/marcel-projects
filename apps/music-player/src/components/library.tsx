@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Track } from "@/data/tracks";
 import { Plus, Music, List, ArrowLeft, Trash2, Play } from "lucide-react";
-import { Playlist as PlaylistType } from "@/hooks/use-playlists";
+import type { Playlist as PlaylistType } from "@/hooks/use-playlists";
 
 interface LibraryProps {
   tracks: Track[];
@@ -203,7 +203,7 @@ export function Library({
                   >
                     <div className="w-8 flex justify-center items-center mr-3 text-zinc-400 group-hover:text-white">
                       {isCurrent && isPlaying ? (
-                        <div className="flex gap-[2px] h-3 items-end">
+                        <div className="flex gap-0.5 h-3 items-end">
                           <span className="w-1 bg-blue-500 animate-bounce h-2"></span>
                           <span className="w-1 bg-blue-500 animate-bounce delay-75 h-3"></span>
                           <span className="w-1 bg-blue-500 animate-bounce delay-150 h-1"></span>

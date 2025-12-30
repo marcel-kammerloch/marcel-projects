@@ -15,7 +15,7 @@ export function ProgressBar({
 
   return (
     <div className="w-full flex items-center gap-3 text-xs font-medium text-zinc-400">
-      <span className="min-w-[40px] text-right">{formatTime(currentTime)}</span>
+      <span className="min-w-10 text-right">{formatTime(currentTime)}</span>
 
       <div className="relative flex-1 group h-4 flex items-center">
         {/* Background track */}
@@ -44,7 +44,7 @@ export function ProgressBar({
         />
       </div>
 
-      <span className="min-w-[40px]">{formatTime(duration)}</span>
+      <span className="min-w-10">{formatTime(duration)}</span>
     </div>
   );
 }
