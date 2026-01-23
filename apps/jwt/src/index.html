@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="Parse a JWT-Token from a Text" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>JWT Parser</title>
+
+    <link rel="stylesheet" href="/style.css" />
+    <script defer src="/script.js" type="module"></script>
+
+    <link rel="icon" type="image/png" href="/images/favicon-76x76.png" sizes="76x76" />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+  </head>
+  <body>
+     <div class="container">
+        <h1>JWT Parser</h1>
+        
+        <div class="content">
+            <div class="panel">
+                <div class="panel-title">ENCODED TEXT</div>
+                <div class="encoded-container">
+                    <div id="encodedHighlight"></div>
+                    <textarea id="encodedTextarea" placeholder="Paste your JWT token here..." spellcheck="false"></textarea>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="decoded-section">
+                    <div class="panel-title">DECODED HEADER</div>
+                    <div class="decode-box">
+                        <button class="copy-btn" id="copyHeaderBtn">COPY</button>
+                        <div class="json-content" id="headerContent"></div>
+                    </div>
+                </div>
+
+                <div class="decoded-section">
+                    <div class="panel-title">DECODED PAYLOAD</div>
+                    <div class="decode-box">
+                        <button class="copy-btn" id="copyPayloadBtn">COPY</button>
+                        <div class="json-content" id="payloadContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </body>
+</html>
