@@ -1,7 +1,7 @@
 import { validateAuth } from "@repo/auth-middleware";
 
 export default async function middleware(request) {
-  return await validateAuth(request, "memory-pi-game");
+  return await validateAuth(request, "jwt");
 }
 
 export const config = {
