@@ -17,6 +17,13 @@ export interface Track {
 
 export const TRACKS: Track[] = [
   {
+    id: "dvorak_8",
+    title: "Symphony No. 8",
+    artist: "Dvorak",
+    src: "https://ad0nzrqxbs7k6ri0.public.blob.vercel-storage.com/dvorak-8_symphony.mp3",
+    genre: "Classical",
+  },
+  {
     id: "heart_of_courage",
     title: "Heart of Courage",
     artist: "Two Steps From Hell",
