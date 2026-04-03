@@ -5,7 +5,8 @@ import { upload } from "@vercel/blob/client";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
 import { createSong } from "@/actions/song";
-import { X, Upload, Loader2, Music } from "lucide-react";
+import { X, Upload, Loader2, Music, Play } from "lucide-react";
+import { usePlayerStore } from "@/store/usePlayerStore";
 
 const Genre = {
   FILM_SCORE: "FILM_SCORE",
@@ -40,6 +41,8 @@ export default function UploadModal({
 
   const ffmpegRef = useRef<FFmpeg | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { setIsPlaying: setMainIsPlaying } = usePlayerStore();
+  const snippetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     ffmpegRef.current = new FFmpeg();
@@ -48,11 +51,24 @@ export default function UploadModal({
         audioRef.current.pause();
         audioRef.current = null;
       }
+      if (snippetTimeoutRef.current) clearTimeout(snippetTimeoutRef.current);
     };
   }, []);
 
+  useEffect(() => {
+    if (!isOpen && audioRef.current) {
+      audioRef.current.pause();
+      setIsPlayingPreview(false);
+      if (snippetTimeoutRef.current) clearTimeout(snippetTimeoutRef.current);
+    } else if (isOpen) {
+      setMainIsPlaying(false);
+    }
+  }, [isOpen, setMainIsPlaying]);
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      // Pause main player and existing preview
+      setMainIsPlaying(false);
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
@@ -80,6 +96,7 @@ export default function UploadModal({
     if (isPlayingPreview) {
       audioRef.current?.pause();
       setIsPlayingPreview(false);
+      if (snippetTimeoutRef.current) clearTimeout(snippetTimeoutRef.current);
       return;
     }
 
@@ -101,6 +118,28 @@ export default function UploadModal({
 
     audio.play();
     setIsPlayingPreview(true);
+  };
+
+  const playSnippet = (seekTime: number, durationLimit: number = 5) => {
+    if (!file) return;
+
+    if (snippetTimeoutRef.current) clearTimeout(snippetTimeoutRef.current);
+
+    if (!audioRef.current) {
+      audioRef.current = new Audio(URL.createObjectURL(file));
+      audioRef.current.addEventListener("timeupdate", syncTime);
+      audioRef.current.onended = () => setIsPlayingPreview(false);
+    }
+
+    const audio = audioRef.current;
+    audio.currentTime = seekTime;
+    audio.play();
+    setIsPlayingPreview(true);
+
+    snippetTimeoutRef.current = setTimeout(() => {
+      audio.pause();
+      setIsPlayingPreview(false);
+    }, durationLimit * 1000);
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,8 +272,14 @@ export default function UploadModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-zinc-800">
+    <div
+      className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-zinc-800"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center p-4 border-b border-zinc-800">
           <h2 className="text-xl font-bold flex items-center gap-2"></h2>
           <button
@@ -300,7 +345,7 @@ export default function UploadModal({
                 </select>
               </div>
 
-              <div>
+              <div className="relative">
                 <label className="text-xs text-zinc-400 font-medium mb-1 block">
                   Start Time (sec)
                 </label>
@@ -308,14 +353,24 @@ export default function UploadModal({
                   type="number"
                   placeholder="0"
                   min={0}
-                  max={duration || undefined}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                  max={endTime || duration || undefined}
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   value={startTime || ""}
                   onChange={(e) => setStartTime(e.target.value)}
                 />
+                {file && (
+                  <button
+                    type="button"
+                    onClick={() => playSnippet(parseInt(startTime) || 0)}
+                    className="absolute right-2 top-[30px] p-1.5 text-blue-400 hover:text-blue-300 transition"
+                    title="Play 5s from start"
+                  >
+                    <Play className="w-4 h-4 fill-current" />
+                  </button>
+                )}
               </div>
 
-              <div>
+              <div className="relative">
                 <label className="text-xs text-zinc-400 font-medium mb-1 block">
                   End Time (sec)
                 </label>
@@ -323,13 +378,28 @@ export default function UploadModal({
                   <input
                     type="number"
                     placeholder={duration > 0 ? duration.toString() : ""}
-                    className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                    className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     value={endTime || ""}
-                    min={0}
+                    min={startTime || 0}
                     max={duration || undefined}
                     onChange={(e) => setEndTime(e.target.value)}
                   />
                 </div>
+                {file && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      playSnippet(
+                        Math.max(0, (parseInt(endTime) || duration) - 5),
+                        5,
+                      )
+                    }
+                    className="absolute right-2 top-[30px] p-1.5 text-blue-400 hover:text-blue-300 transition"
+                    title="Play last 5s until end"
+                  >
+                    <Play className="w-4 h-4 fill-current" />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -343,7 +413,7 @@ export default function UploadModal({
                   <div className="absolute inset-x-0 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                     {/* Selected Range Highlight */}
                     <div
-                      className="absolute h-full bg-blue-500/20"
+                      className="absolute h-full bg-blue-500/50"
                       style={{
                         left: `${((parseInt(startTime) || 0) / duration) * 100}%`,
                         right: `${100 - ((parseInt(endTime) || duration) / duration) * 100}%`,
