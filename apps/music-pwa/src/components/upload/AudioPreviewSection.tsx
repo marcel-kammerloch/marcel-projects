@@ -118,6 +118,9 @@ export default function AudioPreviewSection({
             value={currentTime}
             onChange={handleSeek}
             className="absolute inset-x-0 w-full h-1.5 bg-transparent appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg"
+            style={{
+              background: `linear-gradient(to right, #3b82f6 ${(currentTime / (duration || 1)) * 100}%, transparent ${(currentTime / (duration || 1)) * 100}%)`,
+            }}
           />
         </div>
         <div className="flex gap-2">

@@ -287,6 +287,9 @@ export default function Player() {
               value={progress}
               onChange={handleSeek}
               className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              style={{
+                background: `linear-gradient(to right, #3b82f6 ${(progress / (currentSong.duration || 1)) * 100}%, #27272a ${(progress / (currentSong.duration || 1)) * 100}%)`,
+              }}
             />
             <div className="flex justify-between text-xs text-zinc-500 font-medium mt-2">
               <span>{formatTime(progress)}</span>
@@ -376,6 +379,30 @@ export default function Player() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="mb-6 pt-4 border-t border-zinc-800">
+              <label className="text-sm text-zinc-400 block mb-3 font-medium">
+                Maintenance
+              </label>
+              <button
+                onClick={async () => {
+                  if (confirm("Are you sure you want to clear all offline songs and reset settings?")) {
+                    try {
+                      const keys = await caches.keys();
+                      await Promise.all(keys.map((key) => caches.delete(key)));
+                      localStorage.clear();
+                      window.location.href = "/";
+                    } catch (e) {
+                      console.error("Reset failed", e);
+                      alert("Reset failed: " + String(e));
+                    }
+                  }
+                }}
+                className="w-full bg-red-600/10 hover:bg-red-600/20 text-red-500 border border-red-500/20 font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"
+              >
+                Reset App & Clear Cache
+              </button>
             </div>
 
             <button
