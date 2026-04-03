@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Playlist, Song } from "@db/client";
+import type { Playlist, Song } from "@db/client";
 import { createPlaylist } from "@/actions/playlist";
 import {
   Play,

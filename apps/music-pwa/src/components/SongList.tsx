@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Song, Playlist } from "@db/client";
+import type { Song, Playlist } from "@db/client";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import {
   Play,
