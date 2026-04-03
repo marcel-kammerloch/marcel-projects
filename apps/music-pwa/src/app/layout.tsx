@@ -14,9 +14,32 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Music Player App",
+  title: "Music Player",
   description: "A simple and modern music player",
-  manifest: "/manifest.json",
+  applicationName: "Music",
+  icons: {
+    shortcut: {
+      url: "/favicon.ico",
+      type: "image/x-icon",
+    },
+    icon: [
+      {
+        url: "/icons/favicon-96x96.png",
+        sizes: "96x96",
+        type: "image/png",
+      },
+      {
+        url: "/icons/favicon.svg",
+        type: "image/svg+xml",
+      },
+    ],
+    apple: {
+      url: "/icons/apple-touch-icon.png",
+      sizes: "180x180",
+      type: "image/png",
+    },
+  },
+  manifest: "/site.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
