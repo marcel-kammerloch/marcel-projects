@@ -1,0 +1,39 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Song {
+  id       String  @id @default(cuid())
+  title    String
+  artist   String?
+  genre    Genre // Restricted genres
+  duration Int // in seconds
+  url      String // Vercel Blob URL
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  playlists Playlist[]
+}
+
+enum Genre {
+  FILM_SCORE
+  PIANO
+  CLASSICAL
+  POP
+  VIOLIN
+}
+
+model Playlist {
+  id   String @id @default(cuid())
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  songs Song[]
+}
