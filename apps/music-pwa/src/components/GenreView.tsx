@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Song, Genre } from "../../prisma/generated/client";
+import type { Song, Genre } from "@db/client";
 import { Music, Play, ArrowLeft, Grid } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 

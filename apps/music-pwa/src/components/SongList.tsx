@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Song, Playlist } from "@prisma/client";
+import { Song, Playlist } from "@db/client";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import {
   Play,
@@ -49,11 +49,9 @@ export default function SongList({ initialSongs }: { initialSongs: Song[] }) {
       try {
         const cache = await caches.open("offline-songs");
         const keys = await cache.keys();
-        const cachedUrls = new Set(keys.map(k => k.url));
+        const cachedUrls = new Set(keys.map((k) => k.url));
         const cachedIds = new Set(
-          initialSongs
-            .filter(s => cachedUrls.has(s.url))
-            .map(s => s.id)
+          initialSongs.filter((s) => cachedUrls.has(s.url)).map((s) => s.id),
         );
         setOfflineSongs(cachedIds);
       } catch (e) {
@@ -148,9 +146,9 @@ export default function SongList({ initialSongs }: { initialSongs: Song[] }) {
     }
   };
 
-  const displayedSongs = isOnline 
-    ? initialSongs 
-    : initialSongs.filter(s => offlineSongs.has(s.id));
+  const displayedSongs = isOnline
+    ? initialSongs
+    : initialSongs.filter((s) => offlineSongs.has(s.id));
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -338,7 +336,9 @@ export default function SongList({ initialSongs }: { initialSongs: Song[] }) {
               </button>
               <button
                 onClick={() =>
-                  handleToggleOffline(initialSongs.find((s) => s.id === activeMenu)!)
+                  handleToggleOffline(
+                    initialSongs.find((s) => s.id === activeMenu)!,
+                  )
                 }
                 className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center gap-3"
               >

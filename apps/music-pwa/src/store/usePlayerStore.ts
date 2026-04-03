@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Song } from "@prisma/client";
+import { Song } from "@db/client";
 
 export type Settings = {
   skipDuration: number;
