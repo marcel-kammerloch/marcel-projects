@@ -14,6 +14,7 @@
     "@ffmpeg/util": "^0.12.2",
     "@prisma/adapter-neon": "^7.6.0",
     "@prisma/client": "^7.6.0",
+    "@prisma/client-runtime-utils": "^7.6.0",
     "@repo/auth-middleware": "workspace:*",
     "@vercel/blob": "^2.3.3",
     "lucide-react": "^1.7.0",
