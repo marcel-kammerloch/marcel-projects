@@ -1,10 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { Song } from "@prisma/client";
 import { updateSong } from "@/actions/song";
-import { Genre } from "@prisma/client";
 import { X, Save, Music, Loader2 } from "lucide-react";
+
+const Genre = {
+  FILM_SCORE: "FILM_SCORE",
+  PIANO: "PIANO",
+  CLASSICAL: "CLASSICAL",
+  POP: "POP",
+  VIOLIN: "VIOLIN",
+} as const;
+type Genre = (typeof Genre)[keyof typeof Genre];
+
+type Song = {
+  id: string;
+  title: string;
+  artist: string | null;
+  genre: Genre;
+  duration: number;
+  url: string;
+  createdAt: Date;
+};
 
 export default function EditSongModal({
   song,
@@ -17,7 +34,7 @@ export default function EditSongModal({
 }) {
   const [title, setTitle] = useState(song.title);
   const [artist, setArtist] = useState(song.artist || "");
-  const [genre, setGenre] = useState<Genre>(song.genre || Genre.POP);
+  const [genre, setGenre] = useState<Genre>(song.genre || "POP");
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {

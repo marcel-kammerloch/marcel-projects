@@ -6,6 +6,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Genre {
+  FILM_SCORE
+  PIANO
+  CLASSICAL
+  POP
+  VIOLIN
+}
+
 model Song {
   id       String  @id @default(cuid())
   title    String
@@ -18,14 +26,6 @@ model Song {
   updatedAt DateTime @updatedAt
 
   playlists Playlist[]
-}
-
-enum Genre {
-  FILM_SCORE
-  PIANO
-  CLASSICAL
-  POP
-  VIOLIN
 }
 
 model Playlist {

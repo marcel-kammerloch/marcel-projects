@@ -5,8 +5,17 @@ import { upload } from "@vercel/blob/client";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
 import { createSong } from "@/actions/song";
-import { Genre } from "@prisma/client";
 import { X, Upload, Loader2, Music } from "lucide-react";
+
+const Genre = {
+  FILM_SCORE: "FILM_SCORE",
+  PIANO: "PIANO",
+  CLASSICAL: "CLASSICAL",
+  POP: "POP",
+  VIOLIN: "VIOLIN",
+} as const;
+
+type Genre = (typeof Genre)[keyof typeof Genre];
 
 export default function UploadModal({
   isOpen,
@@ -84,12 +93,12 @@ export default function UploadModal({
 
     const start = startTime !== "" ? parseInt(startTime) : 0;
     const audio = audioRef.current;
-    
+
     // Only seek to start if we're essentially at 0 or far from the start
     if (Math.abs(audio.currentTime - start) > 1 && audio.currentTime < start) {
       audio.currentTime = start;
     }
-    
+
     audio.play();
     setIsPlayingPreview(true);
   };
@@ -151,7 +160,8 @@ export default function UploadModal({
     if (start > 0) {
       args.push("-ss", start.toString());
     }
-    if (end > 0 && end < 1000000) { // arbitrary large number for 'not specified'
+    if (end > 0 && end < 1000000) {
+      // arbitrary large number for 'not specified'
       args.push("-t", duration.toString());
     }
 
@@ -226,8 +236,7 @@ export default function UploadModal({
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
       <div className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-zinc-800">
         <div className="flex justify-between items-center p-4 border-b border-zinc-800">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-          </h2>
+          <h2 className="text-xl font-bold flex items-center gap-2"></h2>
           <button
             onClick={onClose}
             className="text-zinc-400 hover:text-white transition"
@@ -336,8 +345,8 @@ export default function UploadModal({
                     <div
                       className="absolute h-full bg-blue-500/20"
                       style={{
-                        left: `${(parseInt(startTime) || 0) / duration * 100}%`,
-                        right: `${100 - (parseInt(endTime) || duration) / duration * 100}%`
+                        left: `${((parseInt(startTime) || 0) / duration) * 100}%`,
+                        right: `${100 - ((parseInt(endTime) || duration) / duration) * 100}%`,
                       }}
                     />
                   </div>
