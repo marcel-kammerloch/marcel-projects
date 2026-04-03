@@ -67,7 +67,11 @@ export default function Player() {
         artist: currentSong.artist || "Unknown Artist",
         album: currentSong.genre || "",
         artwork: [
-          { src: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+          {
+            src: "/icons/icon-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
         ],
       });
 
@@ -112,7 +116,7 @@ export default function Player() {
     if (touchStartY.current === null) return;
     const touchEndY = e.changedTouches[0].clientY;
     const deltaY = touchEndY - touchStartY.current;
-    
+
     // Swipe sensitivity (min 50px)
     if (Math.abs(deltaY) > 50) {
       if (deltaY < 0 && !isFullView) {
@@ -129,7 +133,9 @@ export default function Player() {
   const handleEnded = () => {
     if (settings.loop && audioRef.current) {
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(e => console.error("Loop replay failed", e));
+      audioRef.current
+        .play()
+        .catch((e) => console.error("Loop replay failed", e));
     } else {
       playNext();
     }
