@@ -1,14 +1,16 @@
 const CACHE_NAME = "music-pwa-cache-v1";
 const OFFLINE_URL = "/offline";
+const APP_SHELL = "/";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll([
+        APP_SHELL,
         OFFLINE_URL,
-        // Optional basic shell resources
         "/icons/icon-192x192.png",
         "/icons/icon-512x512.png",
+        "/site.webmanifest",
       ]);
     }),
   );
@@ -31,22 +33,36 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // Handle navigation fallback
+  // Handle navigation requests: Stale-While-Revalidate for the App Shell
   if (event.request.mode === "navigate") {
     event.respondWith(
-      fetch(event.request).catch(async () => {
+      (async () => {
         const cache = await caches.open(CACHE_NAME);
-        return (
-          cache.match(OFFLINE_URL) ||
-          new Response("Offline", {
-            status: 503,
-            statusText: "Service Unavailable",
+        const cachedResponse = await cache.match(APP_SHELL);
+
+        // Fetch from network to update cache in background
+        const networkFetch = fetch(event.request)
+          .then((response) => {
+            if (response.ok) {
+              cache.put(APP_SHELL, response.clone());
+            }
+            return response;
           })
+          .catch(() => null);
+
+        // Return cached shell immediately if available, 
+        // fall back to network, and finally to the offline page if both fail.
+        return (
+          cachedResponse ||
+          (await networkFetch) ||
+          (await cache.match(OFFLINE_URL)) ||
+          new Response("Offline", { status: 503 })
         );
-      }),
+      })(),
     );
     return;
   }
+
 
   // Handle media requests from Vercel Blob or common audio file extensions
   const isVercelBlob = url.hostname.includes("public.blob.vercel-storage.com");
@@ -64,3 +80,4 @@ self.addEventListener("fetch", (event) => {
     );
   }
 });
+
