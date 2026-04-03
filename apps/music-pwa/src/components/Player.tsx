@@ -176,6 +176,7 @@ export default function Player() {
       {!isFullView && (
         <div
           className="fixed bottom-0 left-0 right-0 h-16 sm:h-20 bg-zinc-900/95 backdrop-blur-lg border-t border-zinc-800 px-4 flex items-center justify-between cursor-pointer z-40 transition-transform duration-300"
+          style={{ touchAction: "none" }}
           onClick={() => setIsFullView(true)}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
@@ -229,6 +230,7 @@ export default function Player() {
       {/* Full Screen Player */}
       <div
         className={`fixed inset-0 bg-zinc-950 z-50 flex flex-col transition-transform duration-500 ease-out ${isFullView ? "translate-y-0" : "translate-y-full"}`}
+        style={{ touchAction: "none" }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
