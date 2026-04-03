@@ -7,16 +7,10 @@ import { fetchFile } from "@ffmpeg/util";
 import { createSong } from "@/actions/song";
 import { X, Upload, Loader2, Music, Play } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import type { Genre } from "@db/client";
 
-const Genre = {
-  FILM_SCORE: "FILM_SCORE",
-  PIANO: "PIANO",
-  CLASSICAL: "CLASSICAL",
-  POP: "POP",
-  VIOLIN: "VIOLIN",
-} as const;
-
-type Genre = (typeof Genre)[keyof typeof Genre];
+import SongMetadataForm from "./upload/SongMetadataForm";
+import AudioPreviewSection from "./upload/AudioPreviewSection";
 
 export default function UploadModal({
   isOpen,
@@ -67,7 +61,6 @@ export default function UploadModal({
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      // Pause main player and existing preview
       setMainIsPlaying(false);
       if (audioRef.current) {
         audioRef.current.pause();
@@ -78,7 +71,6 @@ export default function UploadModal({
       setFile(selectedFile);
       setTitle(selectedFile.name.replace(/\.[^/.]+$/, ""));
       setCurrentTime(0);
-      // Create a temporary audio element to get duration
       const audio = new Audio(URL.createObjectURL(selectedFile));
       audio.onloadedmetadata = () => {
         setDuration(Math.floor(audio.duration));
@@ -111,7 +103,6 @@ export default function UploadModal({
     const start = startTime !== "" ? parseInt(startTime) : 0;
     const audio = audioRef.current;
 
-    // Only seek to start if we're essentially at 0 or far from the start
     if (Math.abs(audio.currentTime - start) > 1 && audio.currentTime < start) {
       audio.currentTime = start;
     }
@@ -162,12 +153,6 @@ export default function UploadModal({
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
   const processAudio = async (
     inputBlob: Blob,
     start: number,
@@ -178,7 +163,6 @@ export default function UploadModal({
     const ffmpeg = ffmpegRef.current;
     if (!ffmpeg) throw new Error("FFmpeg not initialized");
 
-    // Load ffmpeg if not loaded
     if (!ffmpeg.loaded) {
       await ffmpeg.load({
         coreURL:
@@ -200,11 +184,9 @@ export default function UploadModal({
       args.push("-ss", start.toString());
     }
     if (end > 0 && end < 1000000) {
-      // arbitrary large number for 'not specified'
       args.push("-t", duration.toString());
     }
 
-    // Convert to mp3 with good quality (VBR 2 or ~192k)
     args.push("-c:a", "libmp3lame", "-q:a", "2", "output.mp3");
 
     await ffmpeg.exec(args);
@@ -302,151 +284,28 @@ export default function UploadModal({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <label className="text-xs text-zinc-400 font-medium mb-1 block">
-                  Title *
-                </label>
-                <input
-                  type="text"
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-                  value={title || ""}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
-              </div>
+            <SongMetadataForm
+              title={title}
+              setTitle={setTitle}
+              artist={artist}
+              setArtist={setArtist}
+              genre={genre}
+              setGenre={setGenre}
+            />
 
-              <div>
-                <label className="text-xs text-zinc-400 font-medium mb-1 block">
-                  Artist
-                </label>
-                <input
-                  type="text"
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-                  value={artist || ""}
-                  onChange={(e) => setArtist(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="text-xs text-zinc-400 font-medium mb-1 block">
-                  Genre
-                </label>
-                <select
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 appearance-none"
-                  value={genre}
-                  onChange={(e) => setGenre(e.target.value as Genre)}
-                >
-                  <option value={Genre.FILM_SCORE}>Film Score</option>
-                  <option value={Genre.PIANO}>Piano</option>
-                  <option value={Genre.CLASSICAL}>Classical</option>
-                  <option value={Genre.POP}>Pop</option>
-                  <option value={Genre.VIOLIN}>Violin</option>
-                </select>
-              </div>
-
-              <div className="relative">
-                <label className="text-xs text-zinc-400 font-medium mb-1 block">
-                  Start Time (sec)
-                </label>
-                <input
-                  type="number"
-                  placeholder="0"
-                  min={0}
-                  max={endTime || duration || undefined}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  value={startTime || ""}
-                  onChange={(e) => setStartTime(e.target.value)}
-                />
-                {file && (
-                  <button
-                    type="button"
-                    onClick={() => playSnippet(parseInt(startTime) || 0)}
-                    className="absolute right-2 top-[30px] p-1.5 text-blue-400 hover:text-blue-300 transition"
-                    title="Play 5s from start"
-                  >
-                    <Play className="w-4 h-4 fill-current" />
-                  </button>
-                )}
-              </div>
-
-              <div className="relative">
-                <label className="text-xs text-zinc-400 font-medium mb-1 block">
-                  End Time (sec)
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    placeholder={duration > 0 ? duration.toString() : ""}
-                    className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    value={endTime || ""}
-                    min={startTime || 0}
-                    max={duration || undefined}
-                    onChange={(e) => setEndTime(e.target.value)}
-                  />
-                </div>
-                {file && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      playSnippet(
-                        Math.max(0, (parseInt(endTime) || duration) - 5),
-                        5,
-                      )
-                    }
-                    className="absolute right-2 top-[30px] p-1.5 text-blue-400 hover:text-blue-300 transition"
-                    title="Play last 5s until end"
-                  >
-                    <Play className="w-4 h-4 fill-current" />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {file && (
-              <div className="space-y-2 py-2">
-                <div className="flex justify-between items-center text-xs text-zinc-400 px-1">
-                  <span>{formatTime(currentTime)}</span>
-                  <span>{formatTime(duration)}</span>
-                </div>
-                <div className="relative h-6 flex items-center">
-                  <div className="absolute inset-x-0 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                    {/* Selected Range Highlight */}
-                    <div
-                      className="absolute h-full bg-blue-500/50"
-                      style={{
-                        left: `${((parseInt(startTime) || 0) / duration) * 100}%`,
-                        right: `${100 - ((parseInt(endTime) || duration) / duration) * 100}%`,
-                      }}
-                    />
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max={duration}
-                    value={currentTime}
-                    onChange={handleSeek}
-                    className="absolute inset-x-0 w-full h-1.5 bg-transparent appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={handleSetStart}
-                    className="flex-1 py-1.5 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-blue-400 rounded-md transition border border-blue-500/10"
-                  >
-                    Set Start
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSetEnd}
-                    className="flex-1 py-1.5 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-blue-400 rounded-md transition border border-blue-500/10"
-                  >
-                    Set End
-                  </button>
-                </div>
-              </div>
-            )}
+            <AudioPreviewSection
+              duration={duration}
+              currentTime={currentTime}
+              startTime={startTime}
+              endTime={endTime}
+              setStartTime={setStartTime}
+              setEndTime={setEndTime}
+              handleSeek={handleSeek}
+              handleSetStart={handleSetStart}
+              handleSetEnd={handleSetEnd}
+              playSnippet={playSnippet}
+              fileSelected={!!file}
+            />
 
             <div className="pt-4 flex gap-3">
               <button
