@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { del } from "@vercel/blob";
-import type { Genre } from "@prisma/client";
+import type { Genre } from "../../prisma/generated/client";
 
 export async function getSongs() {
   try {
