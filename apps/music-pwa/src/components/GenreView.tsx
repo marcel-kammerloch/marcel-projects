@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Song, Genre } from "@prisma/client";
+import type { Song, Genre } from "../../prisma/generated/client";
 import { Music, Play, ArrowLeft, Grid } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 
@@ -25,11 +25,15 @@ export default function GenreView({ allSongs }: { allSongs: Song[] }) {
   const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
   const { playSong } = usePlayerStore();
 
-  const genreSongs = selectedGenre ? allSongs.filter((s) => s.genre === selectedGenre) : [];
+  const genreSongs = selectedGenre
+    ? allSongs.filter((s) => s.genre === selectedGenre)
+    : [];
 
   const handlePlayGenre = (songs: Song[], startSong?: Song) => {
     if (songs.length === 0) return;
-    const startIndex = startSong ? songs.findIndex(s => s.id === startSong.id) : 0;
+    const startIndex = startSong
+      ? songs.findIndex((s) => s.id === startSong.id)
+      : 0;
     const queue = songs.slice(startIndex >= 0 ? startIndex : 0);
     playSong(queue[0], songs);
   };
@@ -45,8 +49,12 @@ export default function GenreView({ allSongs }: { allSongs: Song[] }) {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h2 className="text-2xl font-bold text-white">{GENRE_LABELS[selectedGenre]}</h2>
-            <p className="text-zinc-500 text-sm mt-1">{genreSongs.length} songs in this genre</p>
+            <h2 className="text-2xl font-bold text-white">
+              {GENRE_LABELS[selectedGenre]}
+            </h2>
+            <p className="text-zinc-500 text-sm mt-1">
+              {genreSongs.length} songs in this genre
+            </p>
           </div>
         </div>
 
@@ -61,7 +69,9 @@ export default function GenreView({ allSongs }: { allSongs: Song[] }) {
 
         <div className="flex flex-col divide-y divide-zinc-800/50">
           {genreSongs.length === 0 ? (
-            <p className="text-zinc-500 text-center py-12">No songs in this genre yet.</p>
+            <p className="text-zinc-500 text-center py-12">
+              No songs in this genre yet.
+            </p>
           ) : (
             genreSongs.map((song, index) => (
               <div
@@ -76,11 +86,16 @@ export default function GenreView({ allSongs }: { allSongs: Song[] }) {
                   <Play className="w-4 h-4 text-blue-400" fill="currentColor" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-medium truncate">{song.title}</p>
-                  <p className="text-zinc-500 text-sm truncate">{song.artist || "Unknown Artist"}</p>
+                  <p className="text-white font-medium truncate">
+                    {song.title}
+                  </p>
+                  <p className="text-zinc-500 text-sm truncate">
+                    {song.artist || "Unknown Artist"}
+                  </p>
                 </div>
                 <div className="text-zinc-500 text-sm tabular-nums">
-                  {Math.floor(song.duration / 60)}:{String(song.duration % 60).padStart(2, "0")}
+                  {Math.floor(song.duration / 60)}:
+                  {String(song.duration % 60).padStart(2, "0")}
                 </div>
               </div>
             ))
@@ -96,7 +111,7 @@ export default function GenreView({ allSongs }: { allSongs: Song[] }) {
         <Grid className="w-5 h-5 text-blue-500" />
         Explore Genres
       </h2>
-      
+
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {(Object.keys(GENRE_LABELS) as Genre[]).map((genre) => {
           const count = allSongs.filter((s) => s.genre === genre).length;
