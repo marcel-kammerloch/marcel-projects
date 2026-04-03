@@ -291,7 +291,7 @@ export default function SongList({ initialSongs }: { initialSongs: Song[] }) {
                   Back
                 </button>
               </div>
-              <div className="max-h-60 overflow-y-auto pt-1">
+              <div className="max-h-60 pt-1">
                 {isLoadingPlaylists ? (
                   <div className="p-4 flex justify-center">
                     <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
