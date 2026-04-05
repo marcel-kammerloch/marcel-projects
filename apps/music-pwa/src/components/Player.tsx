@@ -20,13 +20,14 @@ export default function Player() {
     playNext,
     playPrevious,
     setIsPlaying,
+    isFullView,
+    setIsFullView,
     settings,
     setSettings,
   } = usePlayerStore();
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const [isFullView, setIsFullView] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -181,7 +182,7 @@ export default function Player() {
       {/* Persistent Bottom Bar */}
       {!isFullView && (
         <div
-          className="fixed bottom-0 left-0 right-0 h-16 sm:h-20 bg-zinc-900/95 backdrop-blur-lg border-t border-zinc-800 px-4 flex items-center justify-between cursor-pointer z-40 transition-transform duration-300"
+          className="fixed bottom-16 sm:bottom-16 left-0 right-0 h-16 sm:h-20 bg-zinc-900/95 backdrop-blur-lg border-t border-zinc-800 px-4 flex items-center justify-between cursor-pointer z-40 transition-transform duration-300"
           style={{ touchAction: "none" }}
           onClick={() => setIsFullView(true)}
           onTouchStart={handleTouchStart}
