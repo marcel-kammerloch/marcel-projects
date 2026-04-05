@@ -77,3 +77,16 @@ export async function removeSongFromPlaylist(playlistId: string, songId: string)
     return { data: null, error: error.message };
   }
 }
+
+export async function deletePlaylist(id: string) {
+  try {
+    const playlist = await prisma.playlist.delete({
+      where: { id },
+    });
+    revalidatePath("/");
+    revalidatePath("/playlists");
+    return { data: playlist, error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message };
+  }
+}
