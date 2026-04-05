@@ -12,9 +12,11 @@ interface PlayerState {
   currentSong: Song | null;
   queue: Song[];
   isPlaying: boolean;
+  isFullView: boolean;
   settings: Settings;
 
   // Actions
+  setIsFullView: (isFullView: boolean) => void;
   setSettings: (settings: Partial<Settings>) => void;
   playSong: (song: Song, queue?: Song[]) => void;
   playNext: () => void;
@@ -29,6 +31,7 @@ export const usePlayerStore = create<PlayerState>()(
       currentSong: null,
       queue: [],
       isPlaying: false,
+      isFullView: false,
       settings: {
         skipDuration: 15,
         loop: false,
@@ -84,6 +87,8 @@ export const usePlayerStore = create<PlayerState>()(
       },
 
       setIsPlaying: (isPlaying) => set({ isPlaying }),
+
+      setIsFullView: (isFullView) => set({ isFullView }),
 
       setQueue: (queue) => set({ queue }),
     }),
