@@ -16,7 +16,6 @@ export async function POST(request: Request): Promise<NextResponse> {
             "audio/wav",
             "audio/ogg",
             "audio/webm",
-            "video/mp4",
           ],
           tokenPayload: JSON.stringify({}),
           // addRandomSuffix: true,
