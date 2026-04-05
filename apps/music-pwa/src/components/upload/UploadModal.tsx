@@ -9,8 +9,8 @@ import { X, Upload, Loader2, Music, Play } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import type { Genre } from "@db/client";
 
-import SongMetadataForm from "./upload/SongMetadataForm";
-import AudioPreviewSection from "./upload/AudioPreviewSection";
+import SongMetadataForm from "./SongMetadataForm";
+import AudioPreviewSection from "./AudioPreviewSection";
 
 export default function UploadModal({
   isOpen,

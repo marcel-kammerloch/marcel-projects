@@ -3,14 +3,17 @@
 import type { Song } from "@db/client";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { Play, MoreVertical, CheckCircle } from "lucide-react";
+import { useState } from "react";
+import SongContextMenu, { SongMenuActions } from "./SongContextMenu";
 
 interface SongItemProps {
   song: Song;
   index: number;
   isOffline: boolean;
   onPlay: (song: Song) => void;
-  onMenuClick: (e: React.MouseEvent, songId: string) => void;
+  onMenuClick: (songId: string) => void;
   activeMenuId: string | null;
+  actions: SongMenuActions;
 }
 
 export default function SongItem({
@@ -20,9 +23,12 @@ export default function SongItem({
   onPlay,
   onMenuClick,
   activeMenuId,
+  actions,
 }: SongItemProps) {
   const { currentSong, isPlaying } = usePlayerStore();
   const isCurrent = currentSong?.id === song.id;
+  const isOpen = activeMenuId === song.id;
+  const [openUpwards, setOpenUpwards] = useState(false);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -89,14 +95,27 @@ export default function SongItem({
       <div className="w-10 flex justify-end relative">
         <button
           className={`p-2 hover:text-white transition-opacity focus:opacity-100 ${
-            activeMenuId === song.id
+            isOpen
               ? "text-white"
               : "text-zinc-500 opacity-0 group-hover:opacity-100"
           }`}
-          onClick={(e) => onMenuClick(e, song.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            const rect = e.currentTarget.getBoundingClientRect();
+            setOpenUpwards(rect.bottom + 300 > window.innerHeight);
+            onMenuClick(song.id);
+          }}
         >
           <MoreVertical className="w-4 h-4" />
         </button>
+        <SongContextMenu
+          song={song}
+          isOffline={isOffline}
+          isOpen={isOpen}
+          onClose={() => onMenuClick("")}
+          actions={actions}
+          openUpwards={openUpwards}
+        />
       </div>
     </div>
   );

@@ -1,8 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import type { Song, Genre as GenreType } from "@db/client";
-import { Music } from "lucide-react";
+import type { Genre as GenreType } from "@db/client";
+import {
+  type LucideIcon,
+  Clapperboard,
+  Disc3,
+  Guitar,
+  Music,
+  Piano,
+} from "lucide-react";
 
 const GENRE_LABELS: Record<GenreType, string> = {
   FILM_SCORE: "Film Score",
@@ -20,6 +27,14 @@ const GENRE_COLORS: Record<GenreType, string> = {
   VIOLIN: "bg-rose-500/20 text-rose-400 border-rose-500/50",
 };
 
+const GENRE_ICONS: Record<GenreType, LucideIcon> = {
+  FILM_SCORE: Clapperboard,
+  PIANO: Piano,
+  CLASSICAL: Disc3,
+  POP: Music,
+  VIOLIN: Guitar,
+};
+
 export default function GenreCard({
   genre,
   count,
@@ -27,12 +42,13 @@ export default function GenreCard({
   genre: GenreType;
   count: number;
 }) {
+  const Icon = GENRE_ICONS[genre];
   return (
     <Link
       href={`/genre/${genre.toLowerCase()}`}
       className={`flex flex-col p-4 rounded-xl border text-left transition hover:scale-[1.02] active:scale-[0.98] min-w-[140px] ${GENRE_COLORS[genre]}`}
     >
-      <Music className="w-6 h-6 mb-3" />
+      <Icon className="w-6 h-6 mb-3" />
       <span className="font-bold text-lg">{GENRE_LABELS[genre]}</span>
       <span className="text-sm opacity-70">{count} songs</span>
     </Link>
