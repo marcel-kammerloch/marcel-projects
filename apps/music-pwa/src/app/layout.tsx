@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Player from "@/components/Player";
 import BottomNav from "@/components/BottomNav";
 import PWARegister from "@/components/PWARegister";
+import { ClientProviders } from "@/components/ClientProviders";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -70,11 +71,13 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col pb-36 text-zinc-100">
-        <PWARegister />
-        {children}
-        <Player />
-        <BottomNav />
+      <body className="min-h-full flex flex-col pb-36 transition-colors duration-300">
+        <ClientProviders>
+          <PWARegister />
+          {children}
+          <Player />
+          <BottomNav />
+        </ClientProviders>
       </body>
     </html>
   );
