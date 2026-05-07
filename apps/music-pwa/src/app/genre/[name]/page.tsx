@@ -2,8 +2,15 @@ import { getSongs } from "@/actions/song";
 import SongListBase from "@/components/song/SongListBase";
 import BackButton from "@/components/BackButton";
 import { notFound } from "next/navigation";
-import { Music } from "lucide-react";
-import type { Genre } from "@db/client";
+import type { Genre as GenreType } from "@db/client";
+import {
+  type LucideIcon,
+  Clapperboard,
+  Disc3,
+  Guitar,
+  Music,
+  Piano,
+} from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +20,7 @@ const GENRE_LABELS: Record<string, string> = {
   classical: "Classical",
   pop: "Pop",
   violin: "Violin",
-};
+} as const;
 
 const GENRE_COLORS: Record<string, string> = {
   film_score: "from-purple-600/20 to-purple-900/40 border-purple-500/20",
@@ -21,6 +28,14 @@ const GENRE_COLORS: Record<string, string> = {
   classical: "from-emerald-600/20 to-emerald-900/40 border-emerald-500/20",
   pop: "from-blue-600/20 to-blue-900/40 border-blue-500/20",
   violin: "from-rose-600/20 to-rose-900/40 border-rose-500/20",
+};
+
+const GENRE_ICONS: Record<GenreType, LucideIcon> = {
+  FILM_SCORE: Clapperboard,
+  PIANO: Piano,
+  CLASSICAL: Disc3,
+  POP: Music,
+  VIOLIN: Guitar,
 };
 
 export default async function GenrePage({
@@ -43,6 +58,8 @@ export default async function GenrePage({
 
   const genreSongs = songs.filter((s) => s.genre.toLowerCase() === genreKey);
 
+  const Icon = GENRE_ICONS[genreKey.toUpperCase() as GenreType];
+
   return (
     <main className="flex-1 pb-24 w-full max-w-2xl mx-auto px-4 mt-8">
       <BackButton />
@@ -52,7 +69,7 @@ export default async function GenrePage({
       >
         <div className="flex items-center gap-4 relative z-10">
           <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-md">
-            <Music className="w-8 h-8 text-white" />
+            <Icon className="w-8 h-8 text-white" />
           </div>
           <div>
             <p className="text-white/60 text-xs font-bold uppercase tracking-[0.2em] mb-1">
