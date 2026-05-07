@@ -22,11 +22,12 @@ model Song {
   genre    Genre // Restricted genres
   duration Int // in seconds
   url      String // Vercel Blob URL
+  order    Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  playlists Playlist[]
+  playlists PlaylistSong[]
 }
 
 model Playlist {
@@ -36,5 +37,16 @@ model Playlist {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  songs Song[]
+  songs PlaylistSong[]
+}
+
+model PlaylistSong {
+  playlistId String
+  songId     String
+  order      Int     @default(0)
+
+  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  song     Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@id([playlistId, songId])
 }

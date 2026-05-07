@@ -8,7 +8,7 @@ import type { Genre } from "@db/client";
 export async function getSongs() {
   try {
     const songs = await prisma.song.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: { order: "asc" },
     });
     return { data: songs, error: null };
   } catch (error: unknown) {
@@ -27,9 +27,15 @@ export async function createSong(data: {
   url: string; // Vercel Blob URL
 }) {
   try {
+    const currentMax = await prisma.song.aggregate({
+      _max: { order: true },
+    });
+    const nextOrder = (currentMax._max.order ?? -1) + 1;
+
     const song = await prisma.song.create({
       data: {
         ...data,
+        order: nextOrder,
       },
     });
     revalidatePath("/");
