@@ -23,17 +23,11 @@ export default function GenreView({ allSongs }: { allSongs: Song[] }) {
       </h2>
 
       <div className="relative -mx-4">
-        <div className="flex gap-4 overflow-x-auto px-4 pb-4 no-scrollbar snap-x scroll-smooth">
+        <div className="flex flex-col gap-5 px-4 pb-4">
           {(Object.keys(GENRE_LABELS) as Genre[]).map((genre) => {
             const count = allSongs.filter((s) => s.genre === genre).length;
-            return (
-              <div key={genre} className="snap-start last:pr-4">
-                <GenreCard genre={genre} count={count} />
-              </div>
-            );
+            return <GenreCard key={genre} genre={genre} count={count} />;
           })}
-          {/* Fading Edge */}
-          <div className="absolute right-0 top-0 bottom-4 w-12 bg-linear-to-l from-black to-transparent pointer-events-none opacity-50"></div>
         </div>
       </div>
     </div>

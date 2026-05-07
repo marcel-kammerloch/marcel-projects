@@ -46,10 +46,12 @@ export default function GenreCard({
   return (
     <Link
       href={`/genre/${genre.toLowerCase()}`}
-      className={`flex flex-col p-4 rounded-xl border text-left transition hover:scale-[1.02] active:scale-[0.98] min-w-[140px] ${GENRE_COLORS[genre]}`}
+      className={`flex p-4 rounded-xl border justify-between items-center transition hover:scale-[1.02] active:scale-[0.98] min-w-[140px] ${GENRE_COLORS[genre]}`}
     >
-      <Icon className="w-6 h-6 mb-3" />
-      <span className="font-bold text-lg">{GENRE_LABELS[genre]}</span>
+      <div className="flex items-center gap-2">
+        <Icon className="w-6 h-6" />
+        <span className="font-bold text-lg">{GENRE_LABELS[genre]}</span>
+      </div>
       <span className="text-sm opacity-70">{count} songs</span>
     </Link>
   );
