@@ -2,12 +2,12 @@ import { jwtVerify } from "jose";
 import { parseCookie } from "cookie";
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.MARCEL_PROJECTS_AUTH_TOKEN_SECRET
+  process.env.MARCEL_PROJECTS_AUTH_TOKEN_SECRET,
 );
 
 export async function validateAuth(
   request: Request,
-  scope: string
+  scope: string,
 ): Promise<Response> {
   if (process.env.NODE_ENV === "development") {
     return new Response(null, { headers: { "x-middleware-next": "1" } });
@@ -19,7 +19,7 @@ export async function validateAuth(
   const authRedirectUrl = new URL(authUrl);
   authRedirectUrl.searchParams.set(
     "redirect",
-    `https://${scope}.marcel-projects.vercel.app`
+    `https://${scope}.marcel-projects.vercel.app`,
   );
 
   function redirectResponse({
@@ -39,7 +39,7 @@ export async function validateAuth(
     if (deleteAuthCookie) {
       headers.set(
         "Set-Cookie",
-        `${cookieName}=deleted; domain=${domain}; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`
+        `${cookieName}=deleted; domain=${domain}; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`,
       );
     }
 
