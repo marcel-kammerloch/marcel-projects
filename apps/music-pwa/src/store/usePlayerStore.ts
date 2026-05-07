@@ -6,6 +6,7 @@ export type Settings = {
   skipDuration: number;
   loop: boolean;
   shuffle: boolean;
+  highContrast: boolean;
 };
 
 interface PlayerState {
@@ -36,6 +37,7 @@ export const usePlayerStore = create<PlayerState>()(
         skipDuration: 15,
         loop: false,
         shuffle: false,
+        highContrast: false,
       },
 
       setSettings: (newSettings) =>
