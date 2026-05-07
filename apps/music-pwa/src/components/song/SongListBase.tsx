@@ -1,14 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Song } from "@db/client";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { Clock, WifiOff, Music } from "lucide-react";
 import { deleteSong } from "@/actions/song";
 import { addSongToPlaylist, removeSongFromPlaylist } from "@/actions/playlist";
+import { reorderSongs, reorderPlaylistSongs } from "@/actions/order";
 import { useOfflineSongs } from "@/hooks/useOfflineSongs";
 import EditSongModal from "./EditSongModal";
 import SongItem from "./SongItem";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 interface SongListBaseProps {
   songs: Song[];
@@ -26,8 +42,41 @@ export default function SongListBase({
   const { playSong } = usePlayerStore();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [editingSong, setEditingSong] = useState<Song | null>(null);
+  const [localSongs, setLocalSongs] = useState(songs);
   const { isOnline, offlineSongs, handleToggleOffline } =
-    useOfflineSongs(songs);
+    useOfflineSongs(localSongs);
+
+  useEffect(() => {
+    setLocalSongs(songs);
+  }, [songs]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = localSongs.findIndex((s) => s.id === active.id);
+      const newIndex = localSongs.findIndex((s) => s.id === over.id);
+
+      const newSongs = arrayMove(localSongs, oldIndex, newIndex);
+      setLocalSongs(newSongs);
+
+      if (playlistId) {
+        await reorderPlaylistSongs(playlistId, newSongs.map((s) => s.id));
+      } else {
+        await reorderSongs(newSongs.map((s) => s.id));
+      }
+    }
+  };
 
   const handlePlay = (song: Song) => {
     playSong(song, songs);
@@ -120,27 +169,38 @@ export default function SongListBase({
         <div className="w-10"></div>
       </div>
 
-      {displayedSongs.map((song, index) => (
-        <SongItem
-          key={song.id}
-          song={song}
-          index={index}
-          isOffline={offlineSongs.has(song.id)}
-          onPlay={handlePlay}
-          onMenuClick={toggleMenu}
-          activeMenuId={activeMenu}
-          actions={{
-            onEdit: () => setEditingSong(song),
-            onToggleOffline: () => handleToggleOffline(song),
-            onDelete: () => handleDelete(song.id),
-            onAddSongToPlaylist: (plId) =>
-              handleAddSongToPlaylist(plId, song.id),
-            onRemoveFromPlaylist: playlistId
-              ? () => handleRemoveFromPlaylist(song.id)
-              : undefined,
-          }}
-        />
-      ))}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={displayedSongs.map((s) => s.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {displayedSongs.map((song, index) => (
+            <SongItem
+              key={song.id}
+              song={song}
+              index={index}
+              isOffline={offlineSongs.has(song.id)}
+              onPlay={handlePlay}
+              onMenuClick={toggleMenu}
+              activeMenuId={activeMenu}
+              actions={{
+                onEdit: () => setEditingSong(song),
+                onToggleOffline: () => handleToggleOffline(song),
+                onDelete: () => handleDelete(song.id),
+                onAddSongToPlaylist: (plId) =>
+                  handleAddSongToPlaylist(plId, song.id),
+                onRemoveFromPlaylist: playlistId
+                  ? () => handleRemoveFromPlaylist(song.id)
+                  : undefined,
+              }}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
 
       {editingSong && (
         <EditSongModal
