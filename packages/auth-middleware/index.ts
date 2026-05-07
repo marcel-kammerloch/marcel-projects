@@ -7,7 +7,7 @@ const JWT_SECRET = new TextEncoder().encode(
 
 export async function validateAuth(
   request: Request,
-  scope: string,
+  subdomain: string | null, // e.g. "music-pwa" or "memory-pi-game"
 ): Promise<Response> {
   if (process.env.NODE_ENV === "development") {
     return new Response(null, { headers: { "x-middleware-next": "1" } });
@@ -19,20 +19,14 @@ export async function validateAuth(
   const authRedirectUrl = new URL(authUrl);
   authRedirectUrl.searchParams.set(
     "redirect",
-    `https://${scope}.marcel-projects.vercel.app`,
+    `https://${subdomain ? `${subdomain}.` : ""}marcel-projects.vercel.app`,
   );
 
   function redirectResponse({
     deleteAuthCookie = false,
-    notEnoughScopesError,
   }: {
     deleteAuthCookie?: boolean;
-    notEnoughScopesError?: boolean;
   } = {}): Response {
-    if (notEnoughScopesError) {
-      authRedirectUrl.searchParams.set("error", "not_enough_scopes");
-    }
-
     const headers = new Headers();
     headers.set("Location", authRedirectUrl.toString());
 
@@ -62,10 +56,6 @@ export async function validateAuth(
 
     if (payload.isAuthenticated !== true)
       return redirectResponse({ deleteAuthCookie: true });
-
-    if (payload.scope !== scope && payload.scope !== "*") {
-      return redirectResponse({ notEnoughScopesError: true });
-    }
 
     const headers = new Headers();
     headers.set("x-middleware-next", "1");

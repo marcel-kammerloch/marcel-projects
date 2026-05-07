@@ -9,7 +9,7 @@ function getJwtSecret(): Uint8Array {
   const secret = process.env.MARCEL_PROJECTS_AUTH_TOKEN_SECRET;
   if (!secret || secret.trim().length === 0) {
     throw new Error(
-      "JWT secret is not set. Please set MARCEL_PROJECTS_AUTH_TOKEN_SECRET in your environment variables."
+      "JWT secret is not set. Please set MARCEL_PROJECTS_AUTH_TOKEN_SECRET in your environment variables.",
     );
   }
   return new TextEncoder().encode(secret);
@@ -57,7 +57,7 @@ export async function authenticateUser(formData: FormData) {
     // Always verify password hash if credential exists.
     const passwordMatches = await bcrypt.compare(
       password,
-      credentialData.passwordHash
+      credentialData.passwordHash,
     );
 
     if (!passwordMatches)
@@ -76,17 +76,13 @@ export async function authenticateUser(formData: FormData) {
     }
 
     const isTemp = credentialData.identifier.endsWith(":temp");
-    const id = credentialData.identifier.replace(":temp", "");
-
-    // Determine cookie scope
-    const scope = id === "marcel-projects" ? "*" : id;
 
     // Set secure session cookie
-    const token = await new SignJWT({ isAuthenticated: true, scope })
+    const token = await new SignJWT({ isAuthenticated: true })
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
       .setIssuer("https://auth.marcel-projects.vercel.app")
-      .setExpirationTime(isTemp ? "3d" : "90d")
+      .setExpirationTime(isTemp ? "1d" : "90d")
       .sign(JWT_SECRET);
 
     const cookieStore = await cookies();

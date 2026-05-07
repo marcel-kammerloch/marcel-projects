@@ -3,20 +3,7 @@ export interface Credential {
   passwordHash: string; // bcrypt hash
 }
 
-// List allowed identifiers. Keep identifiers here (no hashes) so the app
-// knows which identifiers are valid. Password hashes MUST be supplied via
-// environment variables to avoid committing secrets in source control.
-export const validIdentifiers = [
-  // global scope
-  "marcel-projects",
-  "marcel-projects:temp",
-
-  // individual projects
-  "memory-pi-game",
-  "memory-pi-game:temp",
-  "music-player",
-  "music-player:temp",
-];
+export const validIdentifiers = ["marcel-projects", "marcel-projects:temp"];
 
 function toEnvKey(identifier: string) {
   // Normalize identifier into a safe env var name fragment
