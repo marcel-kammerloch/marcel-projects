@@ -11,7 +11,6 @@ import SongContextMenu, { SongMenuActions } from "./SongContextMenu";
 interface SongItemProps {
   song: Song;
   index: number;
-  isOffline: boolean;
   onPlay: (song: Song) => void;
   onMenuClick: (songId: string) => void;
   activeMenuId: string | null;
@@ -21,7 +20,6 @@ interface SongItemProps {
 export default function SongItem({
   song,
   index,
-  isOffline,
   onPlay,
   onMenuClick,
   activeMenuId,
@@ -62,15 +60,15 @@ export default function SongItem({
           : "hover:bg-zinc-800/50 text-zinc-300"
       } ${isDragging ? "opacity-50 z-50 bg-zinc-800" : ""}`}
     >
-      <div 
-        {...attributes} 
-        {...listeners} 
+      <div
+        {...attributes}
+        {...listeners}
         className="w-10 flex items-center justify-center cursor-grab active:cursor-grabbing text-zinc-600 hover:text-white"
       >
         <GripVertical className="w-5 h-5" />
       </div>
 
-      <div 
+      <div
         className="w-10 flex items-center text-sm font-medium text-zinc-500 group-hover:text-blue-400 cursor-pointer"
         onClick={() => onPlay(song)}
       >
@@ -94,7 +92,10 @@ export default function SongItem({
         )}
       </div>
 
-      <div className="flex-1 min-w-0 pr-4 cursor-pointer" onClick={() => onPlay(song)}>
+      <div
+        className="flex-1 min-w-0 pr-4 cursor-pointer"
+        onClick={() => onPlay(song)}
+      >
         <div className="flex items-center gap-2">
           <p
             className={`text-base font-medium truncate ${
@@ -103,20 +104,23 @@ export default function SongItem({
           >
             {song.title}
           </p>
-          {isOffline && (
-            <CheckCircle className="w-3.5 h-3.5 text-blue-500 fill-blue-500/10 shrink-0" />
-          )}
         </div>
         <p className="text-sm text-zinc-500 truncate sm:hidden">
           {song.artist || "Unknown"}
         </p>
       </div>
 
-      <div className="hidden sm:block flex-1 min-w-0 text-sm text-zinc-500 pr-4 truncate cursor-pointer" onClick={() => onPlay(song)}>
+      <div
+        className="hidden sm:block flex-1 min-w-0 text-sm text-zinc-500 pr-4 truncate cursor-pointer"
+        onClick={() => onPlay(song)}
+      >
         {song.artist || "Unknown Artist"}
       </div>
 
-      <div className="w-16 flex justify-end text-sm text-zinc-500 tabular-nums cursor-pointer" onClick={() => onPlay(song)}>
+      <div
+        className="w-16 flex justify-end text-sm text-zinc-500 tabular-nums cursor-pointer"
+        onClick={() => onPlay(song)}
+      >
         {formatTime(song.duration)}
       </div>
 
@@ -138,7 +142,6 @@ export default function SongItem({
         </button>
         <SongContextMenu
           song={song}
-          isOffline={isOffline}
           isOpen={isOpen}
           onClose={() => onMenuClick("")}
           actions={actions}

@@ -3,13 +3,16 @@
 import { ThemeProvider } from "next-themes";
 import { useEffect, useState } from "react";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import OfflinePage from "@/app/offline/page";
 
 export function ClientProviders({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
   const { settings } = usePlayerStore();
 
   useEffect(() => {
     setMounted(true);
+    setIsOnline(typeof navigator !== "undefined" ? navigator.onLine : true);
   }, []);
 
   useEffect(() => {
@@ -22,9 +25,52 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
     }
   }, [mounted, settings.highContrast]);
 
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .getRegistrations()
+        .then((registrations) =>
+          Promise.all(
+            registrations.map((registration) => registration.unregister()),
+          ),
+        )
+        .catch((error) =>
+          console.error("Failed to unregister service workers", error),
+        );
+    }
+
+    if ("caches" in window) {
+      caches
+        .keys()
+        .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        .catch((error) => console.error("Failed to clear caches", error));
+    }
+  }, []);
+
   // To prevent hydration mismatch, you could return null before mount,
   // but next-themes handles hydration natively.
   // The highContrast class is handled purely on client after mount.
+
+  if (!mounted) {
+    return null;
+  }
+
+  if (!isOnline) {
+    return <OfflinePage />;
+  }
 
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>

@@ -10,14 +10,8 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
 
   const handleReset = async () => {
-    if (
-      confirm(
-        "Are you sure you want to clear all offline songs and reset settings?",
-      )
-    ) {
+    if (confirm("Are you sure you want to reset settings?")) {
       try {
-        const keys = await caches.keys();
-        await Promise.all(keys.map((key) => caches.delete(key)));
         localStorage.clear();
         window.location.href = "/";
       } catch (e) {
@@ -36,9 +30,9 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold text-zinc-100">Settings</h1>
       </div>
 
-      <div className="space-y-8 mt-4">
+      <div className="gap-8 my-4 flex items-center flex-col overflow-y-scroll">
         {/* Playback Settings */}
-        <section>
+        <section className="w-full max-w-4xl">
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">
             Playback
           </h2>
@@ -65,7 +59,7 @@ export default function SettingsPage() {
         </section>
 
         {/* Appearance Settings */}
-        <section>
+        <section className="w-full max-w-4xl">
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">
             Appearance
           </h2>
@@ -125,7 +119,7 @@ export default function SettingsPage() {
         </section>
 
         {/* Data Management */}
-        <section>
+        <section className="w-full max-w-4xl mb-16">
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">
             Data Management
           </h2>
@@ -135,11 +129,10 @@ export default function SettingsPage() {
               className="w-full bg-red-50 hover:bg-red-100 dark:bg-red-600/10 dark:hover:bg-red-600/20 text-red-600 dark:text-red-500 border border-red-200 dark:border-red-500/20 font-semibold py-4 rounded-xl transition flex items-center justify-center gap-2"
             >
               <Trash2 className="w-5 h-5" />
-              Reset App & Clear Cache
+              Reset App
             </button>
             <p className="text-xs text-center text-zinc-500 mt-4">
-              This will remove all your locally downloaded songs and reset your
-              preferences.
+              This will reset your preferences.
             </p>
           </div>
         </section>

@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Player from "@/components/Player";
 import BottomNav from "@/components/BottomNav";
-import PWARegister from "@/components/PWARegister";
 import { ClientProviders } from "@/components/ClientProviders";
 import "./globals.css";
 
@@ -73,7 +72,6 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col pb-36 transition-colors duration-300">
         <ClientProviders>
-          <PWARegister />
           {children}
           <Player />
           <BottomNav />
@@ -82,4 +80,3 @@ export default function RootLayout({
     </html>
   );
 }
-

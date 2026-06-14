@@ -3,11 +3,10 @@
 import { useState, useEffect } from "react";
 import type { Song } from "@db/client";
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { Clock, WifiOff, Music } from "lucide-react";
+import { Clock, Music } from "lucide-react";
 import { deleteSong } from "@/actions/song";
 import { addSongToPlaylist, removeSongFromPlaylist } from "@/actions/playlist";
 import { reorderSongs, reorderPlaylistSongs } from "@/actions/order";
-import { useOfflineSongs } from "@/hooks/useOfflineSongs";
 import EditSongModal from "./EditSongModal";
 import SongItem from "./SongItem";
 import {
@@ -43,8 +42,6 @@ export default function SongListBase({
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [editingSong, setEditingSong] = useState<Song | null>(null);
   const [localSongs, setLocalSongs] = useState(songs);
-  const { isOnline, offlineSongs, handleToggleOffline } =
-    useOfflineSongs(localSongs);
 
   useEffect(() => {
     setLocalSongs(songs);
@@ -125,24 +122,13 @@ export default function SongListBase({
     setActiveMenu(activeMenu === songId ? null : songId);
   };
 
-  const displayedSongs = isOnline
-    ? songs
-    : songs.filter((s) => offlineSongs.has(s.id));
+  const displayedSongs = localSongs;
 
   if (displayedSongs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
-        {!isOnline ? (
-          <>
-            <WifiOff className="w-12 h-12 mb-4 opacity-50" />
-            <p>You&apos;re offline. No songs available offline.</p>
-          </>
-        ) : (
-          <>
-            <Music className="w-12 h-12 mb-4 opacity-50" />
-            <p>No songs found.</p>
-          </>
-        )}
+        <Music className="w-12 h-12 mb-4 opacity-50" />
+        <p>No songs found.</p>
       </div>
     );
   }
@@ -183,13 +169,11 @@ export default function SongListBase({
               key={song.id}
               song={song}
               index={index}
-              isOffline={offlineSongs.has(song.id)}
               onPlay={handlePlay}
               onMenuClick={toggleMenu}
               activeMenuId={activeMenu}
               actions={{
                 onEdit: () => setEditingSong(song),
-                onToggleOffline: () => handleToggleOffline(song),
                 onDelete: () => handleDelete(song.id),
                 onAddSongToPlaylist: (plId) =>
                   handleAddSongToPlaylist(plId, song.id),

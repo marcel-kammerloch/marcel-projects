@@ -3,11 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import type { Playlist, Song } from "@db/client";
 import { getPlaylists } from "@/actions/playlist";
-import { Trash2, Edit, ListPlus, Loader2, Download } from "lucide-react";
+import { Trash2, Edit, ListPlus, Loader2 } from "lucide-react";
 
 export interface SongMenuActions {
   onEdit: () => void;
-  onToggleOffline: () => void;
   onDelete: () => void;
   onRemoveFromPlaylist?: () => void;
   onAddSongToPlaylist: (playlistId: string) => void;
@@ -15,7 +14,6 @@ export interface SongMenuActions {
 
 interface SongContextMenuProps {
   song: Song;
-  isOffline: boolean;
   isOpen: boolean;
   onClose: () => void;
   actions: SongMenuActions;
@@ -23,7 +21,6 @@ interface SongContextMenuProps {
 }
 
 export default function SongContextMenu({
-  isOffline,
   isOpen,
   onClose,
   actions,
@@ -131,24 +128,6 @@ export default function SongContextMenu({
           >
             <ListPlus className="w-4 h-4" /> Add to Playlist
           </button>
-          <button
-            onClick={() => {
-              actions.onToggleOffline();
-              onClose();
-            }}
-            className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center gap-3"
-          >
-            {isOffline ? (
-              <>
-                <Trash2 className="w-4 h-4" /> Remove from Offline
-              </>
-            ) : (
-              <>
-                <Download className="w-4 h-4" /> Make Available Offline
-              </>
-            )}
-          </button>
-          <div className="h-px bg-zinc-800 my-1 mx-2"></div>
           {actions.onRemoveFromPlaylist && (
             <button
               onClick={() => {
