@@ -23,7 +23,7 @@ export default function UploadModal({
 
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
-  const [genre, setGenre] = useState<Genre>("POP");
+  const [genre, setGenre] = useState<Genre>("CLASSICAL");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [duration, setDuration] = useState(0);
@@ -227,7 +227,7 @@ export default function UploadModal({
         finalDuration = end - start;
       }
 
-      setUploadStatus("Uploading to Vercel Blob...");
+      setUploadStatus("Uploading to Blob Storage...");
       const blobResult = await upload(filename, finalBlob, {
         access: "public",
         handleUploadUrl: "/api/upload",
@@ -277,7 +277,7 @@ export default function UploadModal({
             <div>
               <input
                 type="file"
-                accept=".mp3,audio/mpeg,audio/mp3,.m4a,audio/x-m4a,audio/m4a"
+                accept=".mp3,audio/mpeg,audio/mp3,.m4a,audio/x-m4a,audio/m4a,audio/mp4"
                 onChange={handleFileUpload}
                 className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-600/20 file:text-blue-400 hover:file:bg-blue-600/30 transition cursor-pointer"
                 required
