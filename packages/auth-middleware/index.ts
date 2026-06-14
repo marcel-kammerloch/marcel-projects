@@ -9,7 +9,7 @@ export async function validateAuth(
   request: Request,
   subdomain: string | null, // e.g. "music-pwa" or "memory-pi-game"
 ): Promise<Response> {
-  if (process.env.NODE_ENV === "development") {
+  if (!process.env.VERCEL) {
     return new Response(null, { headers: { "x-middleware-next": "1" } });
   }
   const authUrl = "https://auth.marcel-projects.vercel.app";

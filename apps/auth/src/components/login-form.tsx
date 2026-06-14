@@ -30,21 +30,21 @@ export function LoginForm() {
 
       if (result.success) {
         showSuccess("Authenticated", "You have been successfully logged in");
-        // redirect after the alert duration
+        // redirect 200ms before end of the alert duration
         setTimeout(() => {
           window.location.href = redirectUrl;
-        }, 2000);
+        }, 2000 - 200);
       } else {
         showError(
           "Authentication Failed",
-          result?.message ?? "Authentication failed"
+          result?.message ?? "Authentication failed",
         );
       }
     } catch (error) {
       console.error(error);
       showError(
         "Authentication Failed",
-        "An error occurred during authentication"
+        "An error occurred during authentication",
       );
     } finally {
       setIsLoading(false);
