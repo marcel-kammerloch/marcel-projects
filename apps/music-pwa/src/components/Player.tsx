@@ -189,7 +189,7 @@ export default function Player() {
           onTouchEnd={handleTouchEnd}
         >
           {/* Progress bar line for bottom view */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-zinc-800">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-zinc-800">
             <div
               className="h-full bg-blue-500 transition-all duration-100"
               style={{
@@ -295,7 +295,7 @@ export default function Player() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between mb-8 max-w-[300px] w-full mx-auto">
+          <div className="flex items-center justify-between mb-8 max-w-75 w-full mx-auto">
             <button
               onClick={() => setSettings({ shuffle: !settings.shuffle })}
               className={`p-2 rounded-full transition ${settings.shuffle ? "text-blue-500 hc:bg-blue-500/20 hc:ring-2 hc:ring-blue-500/50 hc:text-blue-400" : "text-zinc-500 hover:text-white hc:text-zinc-400"}`}
@@ -354,7 +354,6 @@ export default function Player() {
           </div>
         </div>
       </div>
-
     </>
   );
 }

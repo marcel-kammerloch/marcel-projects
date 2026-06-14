@@ -14,6 +14,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -55,7 +56,12 @@ export default function SongListBase({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
   );
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -68,7 +74,10 @@ export default function SongListBase({
       setLocalSongs(newSongs);
 
       if (playlistId) {
-        await reorderPlaylistSongs(playlistId, newSongs.map((s) => s.id));
+        await reorderPlaylistSongs(
+          playlistId,
+          newSongs.map((s) => s.id),
+        );
       } else {
         await reorderSongs(newSongs.map((s) => s.id));
       }
@@ -134,7 +143,7 @@ export default function SongListBase({
   }
 
   return (
-    <div className="flex flex-col gap-2 pb-24">
+    <div className="flex flex-col gap-2 pb-24 touch-manipulation">
       {(title || subtitle) && (
         <div className="mb-4 mt-4">
           {title && (
