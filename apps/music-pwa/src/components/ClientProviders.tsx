@@ -27,7 +27,6 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
   // The highContrast class is handled purely on client after mount.
 
   return (
-    // @ts-expect-error - next-themes ThemeProvider types are missing children in React 19
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       {children}
     </ThemeProvider>
