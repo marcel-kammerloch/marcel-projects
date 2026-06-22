@@ -59,6 +59,21 @@ export async function createPlaylist(name: string) {
   }
 }
 
+export async function renamePlaylist(id: string, name: string) {
+  try {
+    const playlist = await prisma.playlist.update({
+      where: { id },
+      data: { name },
+    });
+    revalidatePath("/");
+    revalidatePath("/playlists");
+    revalidatePath(`/playlist/${id}`);
+    return { data: playlist, error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message };
+  }
+}
+
 export async function addSongToPlaylist(playlistId: string, songId: string) {
   try {
     const currentMax = await prisma.playlistSong.aggregate({
