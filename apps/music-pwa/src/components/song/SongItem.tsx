@@ -56,14 +56,14 @@ export default function SongItem({
       style={style}
       className={`group flex items-center px-4 py-3 rounded-xl transition-colors ${
         isCurrent
-          ? "bg-blue-900/30 text-blue-400"
-          : "hover:bg-zinc-800/50 text-zinc-300"
-      } ${isDragging ? "opacity-50 z-50 bg-zinc-800" : ""}`}
+          ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+          : "hover:bg-zinc-100 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300"
+      } ${isDragging ? "opacity-50 z-50 bg-white dark:bg-zinc-800" : ""}`}
     >
       <div
         {...attributes}
         {...listeners}
-        className="w-10 flex items-center justify-center cursor-grab active:cursor-grabbing text-zinc-600 hover:text-white"
+        className="touch-none w-10 flex items-center justify-center cursor-grab active:cursor-grabbing text-zinc-400 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-white"
       >
         <GripVertical className="w-5 h-5" />
       </div>
@@ -99,7 +99,7 @@ export default function SongItem({
         <div className="flex items-center gap-2">
           <p
             className={`text-base font-medium truncate ${
-              isCurrent ? "text-white" : "group-hover:text-white"
+              isCurrent ? "text-zinc-900 dark:text-white" : "group-hover:text-zinc-900 dark:group-hover:text-white"
             }`}
           >
             {song.title}
@@ -126,10 +126,10 @@ export default function SongItem({
 
       <div className="w-10 flex justify-end relative">
         <button
-          className={`p-2 hover:text-white transition-opacity focus:opacity-100 ${
+          className={`p-2 hover:text-zinc-900 dark:hover:text-white transition-opacity focus:opacity-100 ${
             isOpen
-              ? "text-white"
-              : "text-zinc-500 opacity-0 group-hover:opacity-100"
+              ? "text-zinc-900 dark:text-white"
+              : "text-zinc-400 dark:text-zinc-500 opacity-0 group-hover:opacity-100"
           }`}
           onClick={(e) => {
             e.stopPropagation();
