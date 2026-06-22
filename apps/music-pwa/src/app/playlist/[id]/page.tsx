@@ -2,8 +2,10 @@ import { getPlaylist } from "@/actions/playlist";
 import SongListBase from "@/components/song/SongListBase";
 import BackButton from "@/components/BackButton";
 import { notFound } from "next/navigation";
-import { ListMusic, Play } from "lucide-react";
+import { ListMusic } from "lucide-react";
 import DeletePlaylistButton from "@/components/playlist/DeletePlaylistButton";
+import RenamePlaylistButton from "@/components/playlist/RenamePlaylistButton";
+import AddSongButton from "@/components/playlist/AddSongButton";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +21,12 @@ export default async function PlaylistPage({
     notFound();
   }
 
+  const formattedDate = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(playlist.createdAt));
+
   return (
     <main className="flex-1 pb-24 w-full max-w-2xl mx-auto px-4 mt-8">
       <BackButton />
@@ -33,23 +41,32 @@ export default async function PlaylistPage({
           <p className="text-blue-500 font-semibold text-sm uppercase tracking-wider mb-1">
             Playlist
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 truncate">
-            {playlist.name}
-          </h1>
+          <div className="flex items-center gap-2 mb-2">
+            <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white truncate">
+              {playlist.name}
+            </h1>
+            <RenamePlaylistButton playlistId={id} initialName={playlist.name} />
+          </div>
           <div className="flex items-center gap-2 text-zinc-400 text-sm">
             <span>{playlist.songs.length} songs</span>
             <span>•</span>
-            <span>
-              Created {new Date(playlist.createdAt).toLocaleDateString()}
-            </span>
+            <span>Created {formattedDate}</span>
           </div>
         </div>
-        <div className="shrink-0">
+        <div className="shrink-0 flex items-center gap-2">
+          <AddSongButton
+            playlistId={id}
+            existingSongIds={playlist.songs.map((s) => s.id)}
+          />
           <DeletePlaylistButton playlistId={id} />
         </div>
       </div>
 
-      <SongListBase songs={playlist.songs} playlistId={id} />
+      <SongListBase
+        songs={playlist.songs}
+        playlistId={id}
+        title={playlist.name}
+      />
     </main>
   );
 }
