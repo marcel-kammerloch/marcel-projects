@@ -9,6 +9,8 @@ import { addSongToPlaylist, removeSongFromPlaylist } from "@/actions/playlist";
 import { reorderSongs, reorderPlaylistSongs } from "@/actions/order";
 import EditSongModal from "./EditSongModal";
 import SongItem from "./SongItem";
+import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import { toast } from "sonner";
 import {
   DndContext,
   closestCenter,
@@ -42,6 +44,7 @@ export default function SongListBase({
   const { playSong } = usePlayerStore();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [editingSong, setEditingSong] = useState<Song | null>(null);
+  const [songToDelete, setSongToDelete] = useState<string | null>(null);
   const [localSongs, setLocalSongs] = useState(songs);
 
   useEffect(() => {
@@ -85,21 +88,24 @@ export default function SongListBase({
   };
 
   const handlePlay = (song: Song) => {
-    playSong(song, songs);
+    playSong(song, songs, playlistId && title ? title : null);
   };
 
-  const handleDelete = async (songId: string) => {
-    const song = songs.find((s) => s.id === songId);
-    if (!song) return;
+  const handleDeleteRequest = (songId: string) => {
+    setSongToDelete(songId);
+    setActiveMenu(null);
+  };
 
-    if (confirm(`Are you sure you want to delete "${song.title}"?`)) {
-      try {
-        await deleteSong(song.id);
-        setActiveMenu(null);
-      } catch (error) {
-        console.error(error);
-        alert("Failed to delete song");
-      }
+  const handleConfirmDelete = async () => {
+    if (!songToDelete) return;
+
+    try {
+      await deleteSong(songToDelete);
+      toast.success("Song deleted");
+      setSongToDelete(null);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete song");
     }
   };
 
@@ -109,10 +115,10 @@ export default function SongListBase({
   ) => {
     try {
       await addSongToPlaylist(playlistId, songId);
-      alert("Added to playlist!");
+      toast.success("Added to playlist!");
     } catch (error) {
       console.error(error);
-      alert("Failed to add to playlist");
+      toast.error("Failed to add to playlist");
     }
   };
 
@@ -120,10 +126,11 @@ export default function SongListBase({
     if (!playlistId) return;
     try {
       await removeSongFromPlaylist(playlistId, songId);
+      toast.success("Removed from playlist");
       setActiveMenu(null);
     } catch (error) {
       console.error(error);
-      alert("Failed to remove from playlist");
+      toast.error("Failed to remove from playlist");
     }
   };
 
@@ -147,7 +154,9 @@ export default function SongListBase({
       {(title || subtitle) && (
         <div className="mb-4 mt-4">
           {title && (
-            <h2 className="text-2xl font-bold text-white mb-1">{title}</h2>
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-1">
+              {title}
+            </h2>
           )}
           {subtitle && <p className="text-zinc-500 text-sm">{subtitle}</p>}
         </div>
@@ -156,8 +165,9 @@ export default function SongListBase({
       {/* Column Headers */}
       <div className="flex px-4 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
         <div className="w-10"></div>
-        <div className="flex-1">Title</div>
-        <div className="hidden sm:block flex-1">Artist</div>
+        <div className="w-10 flex items-center justify-start">#</div>
+        <div className="flex-1 pr-4">Title</div>
+        <div className="hidden sm:block flex-1 pr-4">Artist</div>
         <div className="w-16 flex justify-end">
           <Clock className="w-4 h-4" />
         </div>
@@ -183,7 +193,7 @@ export default function SongListBase({
               activeMenuId={activeMenu}
               actions={{
                 onEdit: () => setEditingSong(song),
-                onDelete: () => handleDelete(song.id),
+                onDelete: () => handleDeleteRequest(song.id),
                 onAddSongToPlaylist: (plId) =>
                   handleAddSongToPlaylist(plId, song.id),
                 onRemoveFromPlaylist: playlistId
@@ -205,6 +215,16 @@ export default function SongListBase({
           }}
         />
       )}
+
+      <ConfirmModal
+        isOpen={!!songToDelete}
+        onOpenChange={(open) => !open && setSongToDelete(null)}
+        title="Delete Song"
+        description="Are you sure you want to delete this song? This action cannot be undone."
+        onConfirm={handleConfirmDelete}
+        confirmText="Delete"
+        isDestructive={true}
+      />
     </div>
   );
 }
