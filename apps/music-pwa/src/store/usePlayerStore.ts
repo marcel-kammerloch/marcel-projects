@@ -12,6 +12,7 @@ export type Settings = {
 interface PlayerState {
   currentSong: Song | null;
   queue: Song[];
+  playlistName: string | null;
   isPlaying: boolean;
   isFullView: boolean;
   settings: Settings;
@@ -19,7 +20,7 @@ interface PlayerState {
   // Actions
   setIsFullView: (isFullView: boolean) => void;
   setSettings: (settings: Partial<Settings>) => void;
-  playSong: (song: Song, queue?: Song[]) => void;
+  playSong: (song: Song, queue?: Song[], playlistName?: string | null) => void;
   playNext: () => void;
   playPrevious: () => void;
   setIsPlaying: (isPlaying: boolean) => void;
@@ -31,6 +32,7 @@ export const usePlayerStore = create<PlayerState>()(
     (set, get) => ({
       currentSong: null,
       queue: [],
+      playlistName: null,
       isPlaying: false,
       isFullView: false,
       settings: {
@@ -45,11 +47,13 @@ export const usePlayerStore = create<PlayerState>()(
           settings: { ...state.settings, ...newSettings },
         })),
 
-      playSong: (song, queue) =>
+      playSong: (song, queue, playlistName = null) =>
         set((state) => ({
           currentSong: song,
           isPlaying: true,
           queue: queue ?? state.queue,
+          playlistName:
+            playlistName !== undefined ? playlistName : state.playlistName,
         })),
 
       playNext: () => {
