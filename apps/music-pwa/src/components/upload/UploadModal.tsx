@@ -259,14 +259,14 @@ export default function UploadModal({
       onClick={onClose}
     >
       <div
-        className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-zinc-800"
+        className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-zinc-200 dark:border-zinc-800"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center p-4 border-b border-zinc-800">
-          <h2 className="text-xl font-bold flex items-center gap-2"></h2>
+        <div className="flex justify-between items-center p-4 border-b border-zinc-200 dark:border-zinc-800">
+          <h2 className="text-xl font-bold flex items-center gap-2 text-zinc-900 dark:text-white">Upload Audio</h2>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-white transition"
+            className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition"
           >
             <X className="w-6 h-6" />
           </button>
@@ -275,11 +275,13 @@ export default function UploadModal({
         <div className="p-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
+              <label htmlFor="audio-upload" className="sr-only">Upload Audio File</label>
               <input
+                id="audio-upload"
                 type="file"
                 accept=".mp3,audio/mpeg,audio/mp3,.m4a,audio/x-m4a,audio/m4a,audio/mp4"
                 onChange={handleFileUpload}
-                className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-600/20 file:text-blue-400 hover:file:bg-blue-600/30 transition cursor-pointer"
+                className="block w-full text-sm text-zinc-500 dark:text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-600/20 file:text-blue-600 dark:file:text-blue-400 hover:file:bg-blue-600/30 transition cursor-pointer"
                 required
               />
             </div>
