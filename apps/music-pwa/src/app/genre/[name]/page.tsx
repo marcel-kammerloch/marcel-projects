@@ -61,7 +61,7 @@ export default async function GenrePage({
   const Icon = GENRE_ICONS[genreKey.toUpperCase() as GenreType];
 
   return (
-    <main className="flex-1 pb-24 w-full max-w-2xl mx-auto px-4 mt-8">
+    <main className="flex-1 w-full max-w-2xl mx-auto px-4 mt-8">
       <BackButton />
 
       <div

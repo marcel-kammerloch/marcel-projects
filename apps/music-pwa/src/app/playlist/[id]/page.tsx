@@ -28,7 +28,7 @@ export default async function PlaylistPage({
   }).format(new Date(playlist.createdAt));
 
   return (
-    <main className="flex-1 pb-24 w-full max-w-2xl mx-auto px-4 mt-8">
+    <main className="flex-1 w-full max-w-2xl mx-auto px-4 mt-8">
       <BackButton />
 
       <div className="flex items-center gap-6 mb-8 mt-2">

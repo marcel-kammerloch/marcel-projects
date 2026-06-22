@@ -150,7 +150,7 @@ export default function SongListBase({
   }
 
   return (
-    <div className="flex flex-col gap-2 pb-24 touch-manipulation">
+    <div className="flex flex-col gap-2 pb-6 touch-manipulation">
       {(title || subtitle) && (
         <div className="mb-4 mt-4">
           {title && (

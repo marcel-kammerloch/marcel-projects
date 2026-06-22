@@ -22,7 +22,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen px-4 pb-24">
+    <div className="flex flex-col min-h-screen px-4">
       <div className="flex items-center gap-4 py-6">
         <Link href="/" className="p-2 -ml-2 rounded-full hover:bg-zinc-800/50">
           <ArrowLeft className="w-6 h-6 text-zinc-100" />
