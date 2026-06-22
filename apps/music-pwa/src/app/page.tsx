@@ -8,9 +8,9 @@ export default async function Home() {
   const { data: songs } = await getSongs();
 
   return (
-    <main className="flex-1 pb-24 w-full max-w-2xl mx-auto px-4 mt-8">
+    <main className="flex-1 w-full max-w-2xl mx-auto px-4 mt-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-white tracking-tight">
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">
           Music Library
         </h1>
         <UploadModalBtn />
