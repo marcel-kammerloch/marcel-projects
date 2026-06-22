@@ -3,15 +3,33 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { del } from "@vercel/blob";
-import type { Genre } from "@db/client";
+import type { Genre, Prisma, Song } from "@db/client";
 
-export async function getSongs() {
+type MinimalSong = Pick<Song, "id" | "title" | "artist">;
+
+export async function getSongs(options: {
+  min: true;
+}): Promise<{ data: MinimalSong[] | null; error: string | null }>;
+export async function getSongs(options?: {
+  min?: false;
+}): Promise<{ data: Song[] | null; error: string | null }>;
+export async function getSongs({ min = false }: { min?: boolean } = {}) {
   try {
     const songs = await prisma.song.findMany({
       orderBy: { order: "asc" },
+      ...(min
+        ? {
+            select: {
+              id: true,
+              title: true,
+              artist: true,
+            },
+          }
+        : {}),
     });
+
     return { data: songs, error: null };
-  } catch (error: unknown) {
+  } catch (error) {
     return {
       data: null,
       error: error instanceof Error ? error.message : "Unknown error",
