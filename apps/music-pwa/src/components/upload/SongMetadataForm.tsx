@@ -30,12 +30,13 @@ export default function SongMetadataForm({
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="col-span-2">
-        <label className="text-xs text-zinc-400 font-medium mb-1 block">
+        <label htmlFor="song-title" className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-1 block">
           Title *
         </label>
         <input
+          id="song-title"
           type="text"
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+          className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-zinc-900 dark:text-white focus:outline-none focus:border-blue-500"
           value={title || ""}
           onChange={(e) => setTitle(e.target.value)}
           required
@@ -43,23 +44,25 @@ export default function SongMetadataForm({
       </div>
 
       <div>
-        <label className="text-xs text-zinc-400 font-medium mb-1 block">
+        <label htmlFor="song-artist" className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-1 block">
           Artist
         </label>
         <input
+          id="song-artist"
           type="text"
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+          className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-zinc-900 dark:text-white focus:outline-none focus:border-blue-500"
           value={artist || ""}
           onChange={(e) => setArtist(e.target.value)}
         />
       </div>
 
       <div>
-        <label className="text-xs text-zinc-400 font-medium mb-1 block">
+        <label htmlFor="song-genre" className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-1 block">
           Genre
         </label>
         <select
-          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 appearance-none"
+          id="song-genre"
+          className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-zinc-900 dark:text-white focus:outline-none focus:border-blue-500 appearance-none"
           value={genre}
           onChange={(e) => setGenre(e.target.value as GenreType)}
         >
