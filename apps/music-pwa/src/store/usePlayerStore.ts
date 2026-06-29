@@ -13,6 +13,8 @@ interface PlayerState {
   currentSong: Song | null;
   queue: Song[];
   playlistName: string | null;
+  playbackSourceType: "playlist" | "genre" | null;
+  playbackSourceName: string | null;
   isPlaying: boolean;
   isFullView: boolean;
   settings: Settings;
@@ -20,7 +22,13 @@ interface PlayerState {
   // Actions
   setIsFullView: (isFullView: boolean) => void;
   setSettings: (settings: Partial<Settings>) => void;
-  playSong: (song: Song, queue?: Song[], playlistName?: string | null) => void;
+  playSong: (
+    song: Song,
+    queue?: Song[],
+    playlistName?: string | null,
+    playbackSourceType?: "playlist" | "genre" | null,
+    playbackSourceName?: string | null,
+  ) => void;
   playNext: () => void;
   playPrevious: () => void;
   setIsPlaying: (isPlaying: boolean) => void;
@@ -33,6 +41,8 @@ export const usePlayerStore = create<PlayerState>()(
       currentSong: null,
       queue: [],
       playlistName: null,
+      playbackSourceType: null,
+      playbackSourceName: null,
       isPlaying: false,
       isFullView: false,
       settings: {
@@ -47,13 +57,27 @@ export const usePlayerStore = create<PlayerState>()(
           settings: { ...state.settings, ...newSettings },
         })),
 
-      playSong: (song, queue, playlistName = null) =>
+      playSong: (
+        song,
+        queue,
+        playlistName = null,
+        playbackSourceType = null,
+        playbackSourceName = null,
+      ) =>
         set((state) => ({
           currentSong: song,
           isPlaying: true,
           queue: queue ?? state.queue,
           playlistName:
             playlistName !== undefined ? playlistName : state.playlistName,
+          playbackSourceType:
+            playbackSourceType !== undefined
+              ? playbackSourceType
+              : state.playbackSourceType,
+          playbackSourceName:
+            playbackSourceName !== undefined
+              ? playbackSourceName
+              : state.playbackSourceName,
         })),
 
       playNext: () => {
@@ -104,6 +128,9 @@ export const usePlayerStore = create<PlayerState>()(
         settings: state.settings,
         currentSong: state.currentSong,
         queue: state.queue,
+        playlistName: state.playlistName,
+        playbackSourceType: state.playbackSourceType,
+        playbackSourceName: state.playbackSourceName,
       }),
     },
   ),

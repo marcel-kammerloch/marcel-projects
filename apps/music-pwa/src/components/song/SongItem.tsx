@@ -15,6 +15,7 @@ interface SongItemProps {
   onMenuClick: (songId: string) => void;
   activeMenuId: string | null;
   actions: SongMenuActions;
+  dragDisabled?: boolean;
 }
 
 export default function SongItem({
@@ -24,6 +25,7 @@ export default function SongItem({
   onMenuClick,
   activeMenuId,
   actions,
+  dragDisabled = false,
 }: SongItemProps) {
   const { currentSong, isPlaying } = usePlayerStore();
   const isCurrent = currentSong?.id === song.id;
@@ -43,7 +45,7 @@ export default function SongItem({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: song.id });
+  } = useSortable({ id: song.id, disabled: dragDisabled });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -60,20 +62,22 @@ export default function SongItem({
           : "hover:bg-zinc-100 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300"
       } ${isDragging ? "opacity-50 z-50 bg-white dark:bg-zinc-800" : ""}`}
     >
-      <div
-        {...attributes}
-        {...listeners}
-        className="touch-none w-10 flex items-center justify-center cursor-grab active:cursor-grabbing text-zinc-400 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-white"
-      >
-        <GripVertical className="w-5 h-5" />
-      </div>
+      {!dragDisabled && (
+        <div
+          {...attributes}
+          {...listeners}
+          className="touch-none w-10 flex items-center justify-center cursor-grab active:cursor-grabbing text-zinc-400 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-white"
+        >
+          <GripVertical className="w-5 h-5" />
+        </div>
+      )}
 
       <div
         className="w-10 flex items-center text-sm font-medium text-zinc-500 group-hover:text-blue-400 cursor-pointer"
         onClick={() => onPlay(song)}
       >
         {isCurrent && isPlaying ? (
-          <div className="flex items-end gap-[2px] h-4">
+          <div className="flex items-end gap-0.5 h-4">
             <div className="w-1 bg-blue-500 animate-[bounce_1s_infinite_0ms] h-full"></div>
             <div className="w-1 bg-blue-500 animate-[bounce_1s_infinite_200ms] h-2/3"></div>
             <div className="w-1 bg-blue-500 animate-[bounce_1s_infinite_400ms] h-full"></div>
@@ -99,7 +103,9 @@ export default function SongItem({
         <div className="flex items-center gap-2">
           <p
             className={`text-base font-medium truncate ${
-              isCurrent ? "text-zinc-900 dark:text-white" : "group-hover:text-zinc-900 dark:group-hover:text-white"
+              isCurrent
+                ? "text-zinc-900 dark:text-white"
+                : "group-hover:text-zinc-900 dark:group-hover:text-white"
             }`}
           >
             {song.title}

@@ -1,23 +1,30 @@
 "use client";
 
+import { useState } from "react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useTheme } from "next-themes";
 import { ArrowLeft, Monitor, Moon, Sun, Trash2, Contrast } from "lucide-react";
 import Link from "next/link";
+import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import { toast } from "sonner";
 
 export default function SettingsPage() {
   const { settings, setSettings } = usePlayerStore();
   const { theme, setTheme } = useTheme();
 
-  const handleReset = async () => {
-    if (confirm("Are you sure you want to reset settings?")) {
-      try {
-        localStorage.clear();
-        window.location.href = "/";
-      } catch (e) {
-        console.error("Reset failed", e);
-        alert("Reset failed: " + String(e));
-      }
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const handleReset = () => {
+    setShowResetConfirm(true);
+  };
+
+  const confirmReset = async () => {
+    try {
+      localStorage.clear();
+      window.location.href = "/";
+    } catch (e) {
+      console.error("Reset failed", e);
+      toast.error("Reset failed: " + String(e));
     }
   };
 
@@ -137,6 +144,16 @@ export default function SettingsPage() {
           </div>
         </section>
       </div>
+
+      <ConfirmModal
+        isOpen={showResetConfirm}
+        onOpenChange={setShowResetConfirm}
+        title="Reset Settings"
+        description="Are you sure you want to reset settings? This action will clear all local data and preferences."
+        onConfirm={confirmReset}
+        confirmText="Reset"
+        isDestructive={true}
+      />
     </div>
   );
 }

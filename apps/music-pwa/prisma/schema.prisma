@@ -27,7 +27,18 @@ model Song {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  playlists PlaylistSong[]
+  playlists  PlaylistSong[]
+  genreSongs GenreSong[]
+}
+
+model GenreSong {
+  genre  Genre
+  songId String
+  order  Int    @default(0)
+
+  song Song @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@id([genre, songId])
 }
 
 model Playlist {
@@ -43,7 +54,7 @@ model Playlist {
 model PlaylistSong {
   playlistId String
   songId     String
-  order      Int     @default(0)
+  order      Int    @default(0)
 
   playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
   song     Song     @relation(fields: [songId], references: [id], onDelete: Cascade)

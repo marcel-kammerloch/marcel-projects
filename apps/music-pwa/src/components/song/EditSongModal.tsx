@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { updateSong } from "@/actions/song";
 import { X, Save, Music, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const Genre = {
   FILM_SCORE: "FILM_SCORE",
@@ -47,7 +48,7 @@ export default function EditSongModal({
       onClose();
     } catch (error) {
       console.error(error);
-      alert("Failed to update song");
+      toast.error("Failed to update song");
     } finally {
       setIsUpdating(false);
     }

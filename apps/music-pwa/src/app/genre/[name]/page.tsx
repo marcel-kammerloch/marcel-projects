@@ -1,4 +1,4 @@
-import { getSongs } from "@/actions/song";
+import { getGenreSongs } from "@/actions/genre";
 import SongListBase from "@/components/song/SongListBase";
 import BackButton from "@/components/BackButton";
 import { notFound } from "next/navigation";
@@ -50,15 +50,14 @@ export default async function GenrePage({
     notFound();
   }
 
-  const { data: songs, error } = await getSongs();
+  const genreEnum = genreKey.toUpperCase() as GenreType;
+  const { data: genreSongs, error } = await getGenreSongs(genreEnum);
 
-  if (error || !songs) {
+  if (error || !genreSongs) {
     return <div>Error loading songs</div>;
   }
 
-  const genreSongs = songs.filter((s) => s.genre.toLowerCase() === genreKey);
-
-  const Icon = GENRE_ICONS[genreKey.toUpperCase() as GenreType];
+  const Icon = GENRE_ICONS[genreEnum];
 
   return (
     <main className="flex-1 w-full max-w-2xl mx-auto px-4 mt-8">
@@ -91,7 +90,12 @@ export default async function GenrePage({
         <div className="absolute -left-16 -bottom-16 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
       </div>
 
-      <SongListBase songs={genreSongs} />
+      <SongListBase
+        songs={genreSongs}
+        genreKey={genreEnum}
+        playbackSourceType="genre"
+        playbackSourceName={GENRE_LABELS[genreKey]}
+      />
     </main>
   );
 }

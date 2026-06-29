@@ -2,10 +2,10 @@ import { getPlaylist } from "@/actions/playlist";
 import SongListBase from "@/components/song/SongListBase";
 import BackButton from "@/components/BackButton";
 import { notFound } from "next/navigation";
-import { ListMusic } from "lucide-react";
 import DeletePlaylistButton from "@/components/playlist/DeletePlaylistButton";
 import RenamePlaylistButton from "@/components/playlist/RenamePlaylistButton";
 import AddSongButton from "@/components/playlist/AddSongButton";
+import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 
 export const dynamic = "force-dynamic";
 
@@ -31,29 +31,36 @@ export default async function PlaylistPage({
     <main className="flex-1 w-full max-w-2xl mx-auto px-4 mt-8">
       <BackButton />
 
-      <div className="flex items-center gap-6 mb-8 mt-2">
-        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-zinc-800 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden relative group">
-          <ListMusic className="w-12 h-12 text-zinc-600 group-hover:text-blue-500 transition" />
-          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/40 to-transparent"></div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8 mt-2 w-full">
+        {/* Cover Art and Metadata Container */}
+        <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto flex-1 min-w-0">
+          <div className="w-24 h-24">
+            <PlaylistCard playlist={playlist} />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-blue-500 font-semibold text-xs sm:text-sm uppercase tracking-wider mb-1">
+              Playlist
+            </p>
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <h1 className="text-2xl sm:text-4xl font-bold text-zinc-900 dark:text-white wrap-break-word">
+                {playlist.name}
+              </h1>
+              <RenamePlaylistButton
+                playlistId={id}
+                initialName={playlist.name}
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-zinc-400 text-xs sm:text-sm">
+              <span>{playlist.songs.length} songs</span>
+              <span>•</span>
+              <span>Created {formattedDate}</span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex-1 min-w-0">
-          <p className="text-blue-500 font-semibold text-sm uppercase tracking-wider mb-1">
-            Playlist
-          </p>
-          <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white truncate">
-              {playlist.name}
-            </h1>
-            <RenamePlaylistButton playlistId={id} initialName={playlist.name} />
-          </div>
-          <div className="flex items-center gap-2 text-zinc-400 text-sm">
-            <span>{playlist.songs.length} songs</span>
-            <span>•</span>
-            <span>Created {formattedDate}</span>
-          </div>
-        </div>
-        <div className="shrink-0 flex items-center gap-2">
+        {/* Action Buttons */}
+        <div className="w-full sm:w-auto shrink-0 flex items-center gap-2 justify-start sm:justify-end mt-4 sm:mt-0">
           <AddSongButton
             playlistId={id}
             existingSongIds={playlist.songs.map((s) => s.id)}
@@ -66,6 +73,8 @@ export default async function PlaylistPage({
         songs={playlist.songs}
         playlistId={id}
         title={playlist.name}
+        playbackSourceType="playlist"
+        playbackSourceName={playlist.name}
       />
     </main>
   );

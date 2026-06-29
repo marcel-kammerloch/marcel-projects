@@ -8,6 +8,7 @@ import { createSong } from "@/actions/song";
 import { X, Upload, Loader2, Music, Play } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import type { Genre } from "@db/client";
+import { toast } from "sonner";
 
 import SongMetadataForm from "./SongMetadataForm";
 import AudioPreviewSection from "./AudioPreviewSection";
@@ -198,7 +199,10 @@ export default function UploadModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title) return alert("Title is required");
+    if (!title) {
+      toast.error("Title is required");
+      return;
+    }
 
     setIsUploading(true);
     if (audioRef.current) {
@@ -244,7 +248,7 @@ export default function UploadModal({
 
       onClose();
     } catch (error) {
-      alert("Error: " + String(error));
+      toast.error("Error: " + String(error));
     } finally {
       setIsUploading(false);
       setUploadStatus("");
@@ -263,7 +267,9 @@ export default function UploadModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center p-4 border-b border-zinc-200 dark:border-zinc-800">
-          <h2 className="text-xl font-bold flex items-center gap-2 text-zinc-900 dark:text-white">Upload Audio</h2>
+          <h2 className="text-xl font-bold flex items-center gap-2 text-zinc-900 dark:text-white">
+            Upload Audio
+          </h2>
           <button
             onClick={onClose}
             className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition"
@@ -275,7 +281,9 @@ export default function UploadModal({
         <div className="p-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="audio-upload" className="sr-only">Upload Audio File</label>
+              <label htmlFor="audio-upload" className="sr-only">
+                Upload Audio File
+              </label>
               <input
                 id="audio-upload"
                 type="file"

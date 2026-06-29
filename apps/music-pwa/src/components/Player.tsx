@@ -28,6 +28,8 @@ export default function Player() {
   const {
     currentSong,
     playlistName,
+    playbackSourceType,
+    playbackSourceName,
     isPlaying,
     playNext,
     playPrevious,
@@ -40,10 +42,17 @@ export default function Player() {
 
   const [playbackRate, setPlaybackRate] = useState(1);
   const [volume, setVolume] = useState(1);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const [progress, setProgress] = useState(0);
+
+  // Reset volume and playback speed when the song changes
+  useEffect(() => {
+    setPlaybackRate(1);
+    setVolume(1);
+  }, [currentSong?.id]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -141,8 +150,9 @@ export default function Player() {
         // Swipe up
         setIsFullView(true);
       } else if (deltaY > 0 && isFullView) {
-        // Swipe down
+        // Swipe down — also close the menu
         setIsFullView(false);
+        setMenuOpen(false);
       }
     }
     touchStartY.current = null;
@@ -261,17 +271,23 @@ export default function Player() {
         <div className="flex-1 flex flex-col p-6 max-w-md mx-auto w-full">
           <div className="flex justify-between items-center mb-8 pt-4">
             <button
-              onClick={() => setIsFullView(false)}
+              onClick={() => { setIsFullView(false); setMenuOpen(false); }}
               className="text-zinc-900 dark:text-white p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition"
             >
               <ChevronDown className="w-8 h-8" />
             </button>
-            <span className="text-xs font-semibold tracking-widest text-zinc-500 dark:text-zinc-400 uppercase truncate px-4 text-center">
-              {playlistName
-                ? `Playing from playlist ${playlistName}`
-                : "Now Playing"}
-            </span>
-            <DropdownMenu>
+            <div className="flex-1 min-w-0 px-2 text-center">
+              <p className="text-[10px] font-bold tracking-widest text-zinc-400 dark:text-zinc-500 uppercase">
+                Now Playing
+              </p>
+              {playbackSourceType && playbackSourceName && (
+                <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-0.5 break-words line-clamp-2 px-1">
+                  Playing from {playbackSourceType} &ldquo;{playbackSourceName}
+                  &rdquo;
+                </p>
+              )}
+            </div>
+            <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
               <DropdownMenuTrigger
                 render={(props, state) => (
                   <button

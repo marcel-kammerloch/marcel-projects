@@ -1,14 +1,21 @@
 "use client";
 
 import type { Genre as GenreType } from "@db/client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const Genre = {
-  FILM_SCORE: "FILM_SCORE",
-  PIANO: "PIANO",
-  CLASSICAL: "CLASSICAL",
-  POP: "POP",
-  VIOLIN: "VIOLIN",
-} as const;
+const GENRE_OPTIONS: { value: GenreType; label: string }[] = [
+  { value: "FILM_SCORE", label: "Film Score" },
+  { value: "PIANO", label: "Piano" },
+  { value: "CLASSICAL", label: "Classical" },
+  { value: "POP", label: "Pop" },
+  { value: "VIOLIN", label: "Violin" },
+];
 
 interface SongMetadataFormProps {
   title: string;
@@ -57,21 +64,21 @@ export default function SongMetadataForm({
       </div>
 
       <div>
-        <label htmlFor="song-genre" className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-1 block">
+        <label className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-1 block">
           Genre
         </label>
-        <select
-          id="song-genre"
-          className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-zinc-900 dark:text-white focus:outline-none focus:border-blue-500 appearance-none"
-          value={genre}
-          onChange={(e) => setGenre(e.target.value as GenreType)}
-        >
-          <option value={Genre.FILM_SCORE}>Film Score</option>
-          <option value={Genre.PIANO}>Piano</option>
-          <option value={Genre.CLASSICAL}>Classical</option>
-          <option value={Genre.POP}>Pop</option>
-          <option value={Genre.VIOLIN}>Violin</option>
-        </select>
+        <Select value={genre} onValueChange={(value) => setGenre(value as GenreType)}>
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {GENRE_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

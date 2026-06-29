@@ -1,16 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { Song } from "@db/client";
+import type { Song, Genre } from "@db/client";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { Clock, Music } from "lucide-react";
 import { deleteSong } from "@/actions/song";
 import { addSongToPlaylist, removeSongFromPlaylist } from "@/actions/playlist";
 import { reorderSongs, reorderPlaylistSongs } from "@/actions/order";
+import { reorderGenreSongs } from "@/actions/genre";
 import EditSongModal from "./EditSongModal";
 import SongItem from "./SongItem";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   DndContext,
   closestCenter,
@@ -28,11 +36,16 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
+type SortMode = "custom" | "date" | "name" | "duration";
+
 interface SongListBaseProps {
   songs: Song[];
   title?: string;
   subtitle?: string;
   playlistId?: string;
+  genreKey?: Genre;
+  playbackSourceType?: "playlist" | "genre" | null;
+  playbackSourceName?: string | null;
 }
 
 export default function SongListBase({
@@ -40,6 +53,9 @@ export default function SongListBase({
   title,
   subtitle,
   playlistId,
+  genreKey,
+  playbackSourceType,
+  playbackSourceName,
 }: SongListBaseProps) {
   const { playSong } = usePlayerStore();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -76,11 +92,11 @@ export default function SongListBase({
       const newSongs = arrayMove(localSongs, oldIndex, newIndex);
       setLocalSongs(newSongs);
 
-      if (playlistId) {
-        await reorderPlaylistSongs(
-          playlistId,
-          newSongs.map((s) => s.id),
-        );
+      if (genreKey) {
+        // Genre-specific order — does NOT touch Song.order
+        await reorderGenreSongs(genreKey, newSongs.map((s) => s.id));
+      } else if (playlistId) {
+        await reorderPlaylistSongs(playlistId, newSongs.map((s) => s.id));
       } else {
         await reorderSongs(newSongs.map((s) => s.id));
       }
@@ -88,7 +104,13 @@ export default function SongListBase({
   };
 
   const handlePlay = (song: Song) => {
-    playSong(song, songs, playlistId && title ? title : null);
+    playSong(
+      song,
+      songs,
+      playlistId && title ? title : null,
+      playbackSourceType,
+      playbackSourceName,
+    );
   };
 
   const handleDeleteRequest = (songId: string) => {
@@ -138,7 +160,23 @@ export default function SongListBase({
     setActiveMenu(activeMenu === songId ? null : songId);
   };
 
-  const displayedSongs = localSongs;
+  const [sortBy, setSortBy] = useState<SortMode>("custom");
+
+  // Whether to show the sort selector (playlist or genre pages)
+  const showSortSelector = !!(playlistId || genreKey);
+
+  const displayedSongs = [...localSongs].sort((a, b) => {
+    if (sortBy === "name") {
+      return a.title.localeCompare(b.title);
+    }
+    if (sortBy === "date") {
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    }
+    if (sortBy === "duration") {
+      return a.duration - b.duration;
+    }
+    return 0;
+  });
 
   if (displayedSongs.length === 0) {
     return (
@@ -151,20 +189,44 @@ export default function SongListBase({
 
   return (
     <div className="flex flex-col gap-2 pb-6 touch-manipulation">
-      {(title || subtitle) && (
-        <div className="mb-4 mt-4">
-          {title && (
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-1">
-              {title}
-            </h2>
+      {(title || subtitle || showSortSelector) && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 mt-4">
+          <div>
+            {title && (
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-1">
+                {title}
+              </h2>
+            )}
+            {subtitle && <p className="text-zinc-500 text-sm">{subtitle}</p>}
+          </div>
+
+          {showSortSelector && (
+            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+              <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                Sort:
+              </span>
+              <Select
+                value={sortBy}
+                onValueChange={(value) => setSortBy(value as SortMode)}
+              >
+                <SelectTrigger size="sm" className="min-w-[130px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="custom">Custom Order</SelectItem>
+                  <SelectItem value="date">Date Added</SelectItem>
+                  <SelectItem value="name">Name (A–Z)</SelectItem>
+                  <SelectItem value="duration">Duration</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           )}
-          {subtitle && <p className="text-zinc-500 text-sm">{subtitle}</p>}
         </div>
       )}
 
       {/* Column Headers */}
       <div className="flex px-4 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
-        <div className="w-10"></div>
+        {sortBy === "custom" && <div className="w-10"></div>}
         <div className="w-10 flex items-center justify-start">#</div>
         <div className="flex-1 pr-4">Title</div>
         <div className="hidden sm:block flex-1 pr-4">Artist</div>
@@ -191,6 +253,7 @@ export default function SongListBase({
               onPlay={handlePlay}
               onMenuClick={toggleMenu}
               activeMenuId={activeMenu}
+              dragDisabled={sortBy !== "custom"}
               actions={{
                 onEdit: () => setEditingSong(song),
                 onDelete: () => handleDeleteRequest(song.id),

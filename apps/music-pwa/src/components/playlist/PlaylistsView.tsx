@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Playlist, Song } from "@db/client";
 import { createPlaylist } from "@/actions/playlist";
 import { ListMusic, Plus, Loader2 } from "lucide-react";
-import PlaylistCard from "./PlaylistCard";
+import PlaylistCardLink from "./PlaylistCard";
 
 type PlaylistWithSongs = Playlist & { songs: Song[] };
 
@@ -77,12 +77,12 @@ export default function PlaylistsView({
           ) : (
             playlists.map((playlist) => (
               <div key={playlist.id} className="snap-start last:pr-4">
-                <PlaylistCard playlist={playlist} />
+                <PlaylistCardLink playlist={playlist} />
               </div>
             ))
           )}
           {/* Fading Edge */}
-          <div className="absolute right-0 top-0 bottom-4 w-12 bg-linear-to-l from-black to-transparent pointer-events-none opacity-50"></div>
+          {/* <div className="absolute right-0 top-0 bottom-4 w-12 bg-linear-to-l from-black to-transparent pointer-events-none opacity-50"></div> */}
         </div>
       </div>
     </div>
