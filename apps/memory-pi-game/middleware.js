@@ -1,4 +1,4 @@
-import { validateAuth } from "@repo/auth-middleware";
+import { validateAuth } from "@repo/auth";
 
 export default async function middleware(request) {
   return await validateAuth(request, "memory-pi-game");

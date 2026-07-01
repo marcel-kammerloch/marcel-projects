@@ -1,5 +1,5 @@
 {
-  "name": "@repo/auth-middleware",
+  "name": "@repo/auth",
   "private": true,
   "type": "module",
   "dependencies": {

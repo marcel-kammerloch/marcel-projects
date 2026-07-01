@@ -1,4 +1,4 @@
-import { validateAuth } from "@repo/auth-middleware";
+import { validateAuth } from "@repo/auth";
 import type { NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
