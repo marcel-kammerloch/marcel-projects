@@ -9,10 +9,12 @@
     "incremental": false,
     "isolatedModules": true,
     "lib": ["es2022", "DOM", "DOM.Iterable"],
-    "module": "esnext",
+    "module": "ESNext",
     "moduleDetection": "force",
     "moduleResolution": "bundler",
+    "outDir": "dist",
     "resolveJsonModule": true,
+    "rootDir": ".",
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022",
@@ -20,5 +22,5 @@
     "types": ["node"]
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["dist", "node_modules"]
 }
