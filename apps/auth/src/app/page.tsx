@@ -25,10 +25,14 @@ export default function AuthPage() {
         callbackURL = `https://${redirectScope}.${BASE_DOMAIN}`;
       }
 
-      await authClient.signIn.social({
+      const { error } = await authClient.signIn.social({
         provider: "google",
         callbackURL,
       });
+
+      if (error) {
+        showError("Authentication Failed", error.message);
+      }
     } catch (error) {
       console.error(error);
       showError(
