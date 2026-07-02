@@ -1,8 +1,7 @@
 import "./globals.css";
 import { Geist } from "next/font/google";
-import { Suspense } from "react";
-import { LoginForm } from "../components/login-form";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist",
@@ -10,18 +9,15 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Login to access all marcel-projects",
-  description:
-    "Login to get access to all marcel-projects.vercel.app subdomains",
+  title: "Sign In – Marcel Projects",
+  description: "Sign in to access all Marcel Projects applications.",
 };
 
-export default function RootLayout() {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} antialiased`}>
-        <Suspense fallback={<div>Please enable Javascript.</div>}>
-          <LoginForm />
-        </Suspense>
+        {children}
       </body>
     </html>
   );

@@ -6,25 +6,24 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "gen-auth": "node scripts/generate-auth-hash.js"
+    "lint": "next lint"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "jose": "^6.2.3",
-    "next": "16.2.9",
+    "@repo/auth": "workspace:*",
+    "@repo/utils": "workspace:*",
+    "next": "16.2.10",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
-    "@tailwindcss/postcss": "^4.3.1",
-    "@types/node": "^25.9.3",
+    "@tailwindcss/postcss": "^4.3.2",
+    "@types/node": "^26.1.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "eslint": "^10.5.0",
-    "eslint-config-next": "16.2.9",
-    "tailwindcss": "^4.3.1",
+    "eslint": "^10.6.0",
+    "eslint-config-next": "16.2.10",
+    "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3"
   }
 }
