@@ -1,7 +1,7 @@
-import { validateAuth } from "@repo/auth";
+import { validateAccessMiddleware } from "@repo/auth";
 
 export default async function middleware(request) {
-  return await validateAuth(request, "jwt");
+  return await validateAccessMiddleware(request, { scope: "jwt" });
 }
 
 export const config = {
