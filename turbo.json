@@ -16,7 +16,8 @@
         "DATABASE_URL",
         "BLOB_STORAGE_URL",
         "BLOB_READ_WRITE_TOKEN"
-      ]
+      ],
+      "cache": true
     }
   }
 }
