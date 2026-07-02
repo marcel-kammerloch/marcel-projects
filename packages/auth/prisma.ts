@@ -1,5 +1,5 @@
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { PrismaClient } from "./generated/client.js";
+import { PrismaClient } from "./generated/client";
 
 const connectionString = process.env.MARCEL_PROJECTS_DATABASE_URL!;
 

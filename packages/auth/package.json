@@ -3,29 +3,13 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./index.ts",
-      "import": "./dist/index.js"
-    },
-    "./api": {
-      "types": "./api.ts",
-      "import": "./dist/api.js"
-    },
-    "./actions": {
-      "types": "./actions.ts",
-      "import": "./dist/actions.js"
-    },
-    "./client": {
-      "types": "./client.ts",
-      "import": "./dist/client.js"
-    },
-    "./prisma": {
-      "types": "./prisma.ts",
-      "import": "./dist/prisma.js"
-    }
+    ".": "./index.ts",
+    "./api": "./api.ts",
+    "./actions": "./actions.ts",
+    "./client": "./client.ts",
+    "./prisma": "./prisma.ts"
   },
   "scripts": {
-    "build": "tsc",
     "db:gen": "pnpx prisma generate --no-hints"
   },
   "dependencies": {

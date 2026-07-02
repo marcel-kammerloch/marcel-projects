@@ -1,9 +1,9 @@
 {
   "name": "memory-pi-game",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "pnpm --filter @repo/auth... build",
     "build": "vite build",
     "preview": "vite preview"
   },

@@ -12,9 +12,7 @@
     "module": "ESNext",
     "moduleDetection": "force",
     "moduleResolution": "bundler",
-    "outDir": "dist",
     "resolveJsonModule": true,
-    "rootDir": ".",
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022",
@@ -22,5 +20,5 @@
     "types": ["node"]
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["node_modules"]
 }

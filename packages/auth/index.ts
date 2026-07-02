@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { NextResponse } from "next/server";
-import { prisma } from "./prisma.js";
+import { prisma } from "./prisma";
 import { AUTH_URL, ALL_SCOPES, BASE_DOMAIN } from "@repo/utils";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { headers } from "next/headers";

@@ -1,7 +1,7 @@
 "use server";
 
-import { validateAccess } from "./index.js";
-import { prisma } from "./prisma.js";
+import { validateAccess } from "./index";
+import { prisma } from "./prisma";
 
 export async function getUsers() {
   await validateAccess({ admin: true });
