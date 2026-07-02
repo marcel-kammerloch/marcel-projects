@@ -9,8 +9,8 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"],
       "env": [
-        "MARCEL_PROJECTS_AUTH_TOKEN_SECRET",
-        "DATABASE_URL",
+        "MARCEL_PROJECTS_AUTH_SECRET",
+        "MARCEL_PROJECTS_DATABASE_URL",
         "BLOB_STORAGE_URL",
         "BLOB_READ_WRITE_TOKEN"
       ]
