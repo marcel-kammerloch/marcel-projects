@@ -9,4 +9,5 @@ export const config = {
     // Skip images and all static files, unless found in search params
     "/((?!images|[^?]*\\.(?:png|svg|ico|webmanifest)).*)",
   ],
+  runtime: "nodejs",
 };
