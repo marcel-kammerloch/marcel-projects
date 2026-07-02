@@ -3,7 +3,7 @@ import { admin } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { NextResponse } from "next/server";
 import { prisma } from "./prisma";
-import { AUTH_URL, ALL_SCOPES } from "@repo/utils";
+import { AUTH_URL, ALL_SCOPES, BASE_DOMAIN } from "@repo/utils";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { headers } from "next/headers";
 import { cache } from "react";
@@ -14,6 +14,13 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: BASE_DOMAIN,
+    },
+    cookiePrefix: "auth",
+  },
   secret: process.env.MARCEL_PROJECTS_AUTH_SECRET,
   plugins: [admin(), nextCookies()],
   socialProviders: {
