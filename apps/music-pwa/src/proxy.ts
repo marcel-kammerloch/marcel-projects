@@ -1,8 +1,8 @@
-import { validateAuth } from "@repo/auth";
+import { validateAccessMiddleware } from "@repo/auth";
 import type { NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
-  return await validateAuth(request, "music-pwa");
+  return await validateAccessMiddleware(request, { scope: "music-pwa" });
 }
 
 export const config = {
