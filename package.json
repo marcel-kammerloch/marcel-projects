@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "postinstall": "cd packages/database && pnpm prisma generate"
+    "postinstall": "cd packages/auth && pnpm prisma generate"
   },
   "devDependencies": {
     "turbo": "^2.10.2"
