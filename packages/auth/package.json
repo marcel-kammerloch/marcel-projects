@@ -2,11 +2,17 @@
   "name": "@repo/auth",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./api": "./api.ts",
+    "./actions": "./actions.ts",
+    "./client": "./client.ts",
+    "./prisma": "./prisma.ts"
+  },
   "scripts": {
     "db:gen": "pnpx prisma generate --no-hints"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.1.0",
     "@prisma/adapter-neon": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@repo/utils": "workspace:*",
