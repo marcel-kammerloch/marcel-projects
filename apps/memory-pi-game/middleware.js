@@ -1,7 +1,7 @@
-import { validateAuth } from "@repo/auth";
+import { validateAccessMiddleware } from "@repo/auth";
 
 export default async function middleware(request) {
-  return await validateAuth(request, "memory-pi-game");
+  return await validateAccessMiddleware(request, { scope: "memory-pi-game" });
 }
 
 export const config = {
