@@ -2,12 +2,23 @@
   "name": "@repo/auth",
   "private": true,
   "type": "module",
+  "scripts": {
+    "db:gen": "pnpx prisma generate --no-hints"
+  },
   "dependencies": {
-    "cookie": "^1.1.1",
-    "jose": "^6.2.3"
+    "@neondatabase/serverless": "^1.1.0",
+    "@prisma/adapter-neon": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "@repo/utils": "workspace:*",
+    "better-auth": "^1.6.23",
+    "next": "^16.2.10",
+    "react": "^19.2.7"
   },
   "devDependencies": {
     "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "dotenv": "^17.4.2",
+    "prisma": "^7.8.0",
     "typescript": "^6.0.3"
   }
 }
