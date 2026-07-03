@@ -1,12 +1,12 @@
-import { betterAuth } from "better-auth/minimal";
-import { admin } from "better-auth/plugins";
+import { betterAuth, BetterAuthOptions } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "./drizzle";
 import { AUTH_URL, BASE_DOMAIN } from "@repo/utils";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import * as schema from "./schema";
+import { customSession } from "better-auth/plugins";
 
-export const auth = betterAuth({
+export const config = {
   advanced: {
     crossSubDomainCookies: {
       enabled: true,
@@ -42,7 +42,7 @@ export const auth = betterAuth({
   //     },
   //   },
   // },
-  plugins: [admin(), nextCookies()],
+  plugins: [nextCookies()],
   secret: process.env.MARCEL_PROJECTS_AUTH_SECRET,
   session: {
     freshAge: 0, // disabled
@@ -75,6 +75,15 @@ export const auth = betterAuth({
         defaultValue: [],
         input: false,
       },
+      role: {
+        type: "string",
+        defaultValue: "user",
+        input: false,
+      },
     },
   },
-});
+} satisfies BetterAuthOptions;
+
+export const auth = betterAuth(config) as ReturnType<
+  typeof betterAuth<typeof config>
+>;
