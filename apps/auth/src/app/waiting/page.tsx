@@ -1,6 +1,23 @@
+import { redirect } from "next/navigation";
 import { SignOutButton } from "./page-client";
+import { headers } from "next/headers";
+import { auth } from "@repo/auth";
 
-export default function WaitingPage() {
+export default async function WaitingPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/");
+  }
+
+  const user = session.user;
+
+  if (user.isApproved) {
+    redirect("/denied");
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white p-4">
       <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 p-8 rounded-2xl text-center shadow-xl">
