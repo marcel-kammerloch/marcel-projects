@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
-import { validateAccessMiddleware } from "@repo/auth";
+import { validateAccessProxy } from "@repo/auth";
 
 export async function proxy(request: NextRequest) {
-  return await validateAccessMiddleware(request, { admin: true });
+  return await validateAccessProxy(request, { admin: true });
 }
 
 export const config = {

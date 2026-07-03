@@ -1,6 +1,6 @@
 "use server";
 
-import { validateAccess } from "./index";
+import { validateAccess } from "./helpers";
 import { prisma } from "./prisma";
 
 export async function getUsers() {
