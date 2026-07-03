@@ -1,9 +1,10 @@
 import { betterAuth } from "better-auth/minimal";
 import { admin } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
-import { prisma } from "./prisma";
+import { db } from "./drizzle";
 import { AUTH_URL, BASE_DOMAIN } from "@repo/utils";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import * as schema from "./schema";
 
 export const auth = betterAuth({
   advanced: {
@@ -14,8 +15,9 @@ export const auth = betterAuth({
     cookiePrefix: "auth",
   },
   baseURL: AUTH_URL,
-  database: drizzleAdapter(prisma, {
+  database: drizzleAdapter(db, {
     provider: "pg",
+    schema,
   }),
   // databaseHooks: {
   //   session: {

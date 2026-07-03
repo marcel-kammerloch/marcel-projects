@@ -7,16 +7,18 @@
     "./api": "./api.ts",
     "./actions": "./actions.ts",
     "./client": "./client.ts",
-    "./prisma": "./prisma.ts"
+    "./drizzle": "./drizzle.ts",
+    "./schema": "./schema.ts"
   },
   "scripts": {
-    "db:gen": "pnpx prisma generate --no-hints"
+    "db:generate": "pnpx drizzle-kit generate",
+    "db:migrate": "pnpx drizzle-kit migrate"
   },
   "dependencies": {
-    "@prisma/adapter-neon": "^7.8.0",
-    "@prisma/client": "^7.8.0",
+    "@neondatabase/serverless": "^1.1.0",
     "@repo/utils": "workspace:*",
     "better-auth": "^1.6.23",
+    "drizzle-orm": "1.0.0-rc.4",
     "next": "^16.2.10",
     "react": "^19.2.7"
   },
@@ -24,7 +26,7 @@
     "@types/node": "^26.1.0",
     "@types/react": "^19.2.17",
     "dotenv": "^17.4.2",
-    "prisma": "^7.8.0",
+    "drizzle-kit": "1.0.0-rc.4",
     "typescript": "^6.0.3"
   }
 }
