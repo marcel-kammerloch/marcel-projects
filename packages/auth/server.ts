@@ -62,6 +62,7 @@ export const auth = betterAuth({
       accessType: "offline",
     },
   },
+  trustedOrigins: [`https://*.${BASE_DOMAIN}`],
   user: {
     additionalFields: {
       isApproved: {
