@@ -159,10 +159,11 @@ export async function validateAccess(
       return redir ? redirect(`${AUTH_URL}/waiting`) : false;
     }
 
-    if (user.role !== "admin") {
-      if (admin || (scope && !user.scopes.includes(scope))) {
-        return redir ? redirect(`${AUTH_URL}/denied`) : false;
-      }
+    if (
+      user.role !== "admin" &&
+      (admin || (scope && !user.scopes.includes(scope)))
+    ) {
+      return redir ? redirect(`${AUTH_URL}/denied`) : false;
     }
 
     if (!redir) return true;
