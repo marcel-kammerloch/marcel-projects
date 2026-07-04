@@ -47,9 +47,11 @@ export const auth = betterAuth({
       return {
         user: {
           ...user,
-          isApproved: "isApproved" in user ? user.isApproved : false,
-          scopes: "scopes" in user ? user.scopes : [],
-          role: "role" in user ? user.role : "user",
+          isApproved: ("isApproved" in user
+            ? user.isApproved
+            : false) as boolean,
+          scopes: ("scopes" in user ? user.scopes : []) as string[],
+          role: ("role" in user ? user.role : "user") as string,
         },
         session,
       };
