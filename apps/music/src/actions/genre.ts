@@ -12,7 +12,7 @@ import { validateAccess } from "@repo/auth";
  * their current ordering context.
  */
 export async function getGenreSongs(genre: Genre) {
-  const hasAccess = await validateAccess({ scope: "music-pwa" });
+  const hasAccess = await validateAccess({ scope: "music" });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 

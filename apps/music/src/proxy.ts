@@ -2,7 +2,7 @@ import { validateAccessProxy } from "@repo/auth";
 import type { NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
-  return await validateAccessProxy(request, { scope: "music-pwa" });
+  return await validateAccessProxy(request, { scope: "music" });
 }
 
 export const config = {

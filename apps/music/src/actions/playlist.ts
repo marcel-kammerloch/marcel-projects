@@ -5,7 +5,7 @@ import { validateAccess } from "@repo/auth";
 import { revalidatePath } from "next/cache";
 
 export async function getPlaylists() {
-  const hasAccess = await validateAccess({ scope: "music-pwa" });
+  const hasAccess = await validateAccess({ scope: "music" });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
@@ -30,7 +30,7 @@ export async function getPlaylists() {
 }
 
 export async function getPlaylist(id: string) {
-  const hasAccess = await validateAccess({ scope: "music-pwa" });
+  const hasAccess = await validateAccess({ scope: "music" });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 

@@ -15,7 +15,7 @@ export async function getSongs(options?: {
   min?: false;
 }): Promise<{ data: Song[] | null; error: string | null }>;
 export async function getSongs({ min = false }: { min?: boolean } = {}) {
-  const hasAccess = await validateAccess({ scope: "music-pwa" });
+  const hasAccess = await validateAccess({ scope: "music" });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
