@@ -3,8 +3,8 @@
 import { authClient } from "@repo/auth/client";
 import { useState } from "react";
 import { ALL_SCOPES, BASE_DOMAIN } from "@repo/utils";
-import { Alert } from "@/components/alert";
-import { useAlert } from "@/components/use-alert";
+import { Alert } from "@/components/alert/alert";
+import { useAlert } from "@/components/alert/use-alert";
 import { PROVIDERS } from "./providers";
 
 export default function AuthPage() {

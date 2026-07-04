@@ -1,3 +1,4 @@
+import { SignOutButton } from "@/components/sign-out-button";
 import { auth } from "@repo/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -18,7 +19,7 @@ export default async function DeniedPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white p-4">
+    <div className="min-h-dvh flex items-center justify-center bg-zinc-950 text-white p-4">
       <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 p-8 rounded-2xl text-center shadow-xl">
         <div className="w-16 h-16 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
           <svg
@@ -62,6 +63,8 @@ export default async function DeniedPage() {
             </p>
           </div>
         )}
+
+        <SignOutButton />
       </div>
     </div>
   );
