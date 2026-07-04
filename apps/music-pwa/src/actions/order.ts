@@ -1,9 +1,14 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { validateAccess } from "@repo/auth";
 import { revalidatePath } from "next/cache";
 
 export async function reorderSongs(songIds: string[]) {
+  const hasAccess = validateAccess({ admin: true });
+
+  if (!hasAccess) return { success: false, error: "Forbidden" };
+
   try {
     // Transaction to update all songs with their new order
     await prisma.$transaction(
@@ -26,6 +31,10 @@ export async function reorderPlaylistSongs(
   playlistId: string,
   songIds: string[],
 ) {
+  const hasAccess = validateAccess({ admin: true });
+
+  if (!hasAccess) return { success: false, error: "Forbidden" };
+
   try {
     // Transaction to update all playlist songs with their new order
     await prisma.$transaction(

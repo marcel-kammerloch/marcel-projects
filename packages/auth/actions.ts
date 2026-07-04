@@ -6,17 +6,22 @@ import { db } from "./drizzle";
 import { user } from "./schema";
 
 export async function getUsers() {
-  await validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
+  if (!hasAccess) return null;
+
   return await db.select().from(user).orderBy(desc(user.createdAt));
 }
 
 export async function approveUser(userId: string) {
-  await validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
+  if (!hasAccess) return null;
+
   await db.update(user).set({ isApproved: true }).where(eq(user.id, userId));
 }
 
 export async function updateUserRole(userId: string, role: string) {
-  await validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
+  if (!hasAccess) return null;
 
   const existingUser = await db
     .select()
@@ -31,6 +36,8 @@ export async function updateUserRole(userId: string, role: string) {
 }
 
 export async function updateUserScopes(userId: string, scopes: string[]) {
-  await validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
+  if (!hasAccess) return null;
+
   await db.update(user).set({ scopes }).where(eq(user.id, userId));
 }

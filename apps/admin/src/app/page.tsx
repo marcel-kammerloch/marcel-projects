@@ -3,9 +3,11 @@ import { getUsers } from "@repo/auth/actions";
 import UserRow from "./user-row";
 
 export default async function AdminDashboard() {
-  await validateAccess({ admin: true });
+  await validateAccess({ admin: true, redirect: true });
 
   const users = await getUsers();
+
+  if (!users) return null;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white p-8">

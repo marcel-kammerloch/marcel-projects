@@ -1,9 +1,14 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { validateAccess } from "@repo/auth";
 import { revalidatePath } from "next/cache";
 
 export async function getPlaylists() {
+  const hasAccess = validateAccess({ scope: "music-pwa" });
+
+  if (!hasAccess) return { data: null, error: "Forbidden" };
+
   try {
     const playlists = await prisma.playlist.findMany({
       include: {
@@ -25,6 +30,10 @@ export async function getPlaylists() {
 }
 
 export async function getPlaylist(id: string) {
+  const hasAccess = validateAccess({ scope: "music-pwa" });
+
+  if (!hasAccess) return { data: null, error: "Forbidden" };
+
   try {
     const playlist = await prisma.playlist.findUnique({
       where: { id },
@@ -47,6 +56,10 @@ export async function getPlaylist(id: string) {
 }
 
 export async function createPlaylist(name: string) {
+  const hasAccess = validateAccess({ admin: true });
+
+  if (!hasAccess) return { data: null, error: "Forbidden" };
+
   try {
     const playlist = await prisma.playlist.create({
       data: { name },
@@ -60,6 +73,10 @@ export async function createPlaylist(name: string) {
 }
 
 export async function renamePlaylist(id: string, name: string) {
+  const hasAccess = validateAccess({ admin: true });
+
+  if (!hasAccess) return { data: null, error: "Forbidden" };
+
   try {
     const playlist = await prisma.playlist.update({
       where: { id },
@@ -75,6 +92,10 @@ export async function renamePlaylist(id: string, name: string) {
 }
 
 export async function addSongToPlaylist(playlistId: string, songId: string) {
+  const hasAccess = validateAccess({ admin: true });
+
+  if (!hasAccess) return { data: null, error: "Forbidden" };
+
   try {
     const currentMax = await prisma.playlistSong.aggregate({
       where: { playlistId },
@@ -102,6 +123,10 @@ export async function removeSongFromPlaylist(
   playlistId: string,
   songId: string,
 ) {
+  const hasAccess = validateAccess({ admin: true });
+
+  if (!hasAccess) return { data: null, error: "Forbidden" };
+
   try {
     await prisma.playlistSong.delete({
       where: {
@@ -121,6 +146,10 @@ export async function removeSongFromPlaylist(
 }
 
 export async function deletePlaylist(id: string) {
+  const hasAccess = validateAccess({ admin: true });
+
+  if (!hasAccess) return { data: null, error: "Forbidden" };
+
   try {
     const playlist = await prisma.playlist.delete({
       where: { id },

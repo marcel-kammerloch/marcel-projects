@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import type { Genre } from "@db/client";
+import { validateAccess } from "@repo/auth";
 
 /**
  * Fetches songs for a given genre, ordered by GenreSong.order.
@@ -11,6 +12,10 @@ import type { Genre } from "@db/client";
  * their current ordering context.
  */
 export async function getGenreSongs(genre: Genre) {
+  const hasAccess = validateAccess({ scope: "music-pwa" });
+
+  if (!hasAccess) return { data: null, error: "Forbidden" };
+
   try {
     // Find all songs of this genre
     const allSongs = await prisma.song.findMany({
@@ -62,6 +67,10 @@ export async function getGenreSongs(genre: Genre) {
  * Does NOT modify Song.order (the global songs-page order).
  */
 export async function reorderGenreSongs(genre: Genre, songIds: string[]) {
+  const hasAccess = validateAccess({ admin: true });
+
+  if (!hasAccess) return { data: null, error: "Forbidden" };
+
   try {
     await prisma.$transaction(
       songIds.map((id, index) =>

@@ -131,34 +131,43 @@ export async function validateAccessProxy(
 }
 
 export async function validateAccess(
-  options: AuthHelperOptions,
-): Promise<void> {
+  options: AuthHelperOptions & { redirect: true },
+): Promise<void>;
+
+export async function validateAccess(
+  options?: AuthHelperOptions & { redirect?: false },
+): Promise<boolean>;
+
+export async function validateAccess(
+  options: AuthHelperOptions & { redirect?: boolean } = {},
+): Promise<void | boolean> {
   if (!process.env.VERCEL) return;
+
+  const { admin, redirect: redir, scope } = options;
 
   try {
     const headersList = await headers();
     const session = (await getSession(headersList)) as AuthSession | null;
 
     if (!session) {
-      return redirect(`${AUTH_URL}/?redirect=${options.scope}`);
+      return redir ? redirect(`${AUTH_URL}/?redirect=${scope}`) : false;
     }
 
     const user = session.user;
 
     if (!user.isApproved) {
-      return redirect(`${AUTH_URL}/waiting`);
+      return redir ? redirect(`${AUTH_URL}/waiting`) : false;
     }
 
     if (user.role !== "admin") {
-      if (
-        options.admin ||
-        (options.scope && !user.scopes.includes(options.scope))
-      ) {
-        return redirect(`${AUTH_URL}/denied`);
+      if (admin || (scope && !user.scopes.includes(scope))) {
+        return redir ? redirect(`${AUTH_URL}/denied`) : false;
       }
     }
+
+    if (!redir) return true;
   } catch (error) {
     console.error("[validateAccess] error:", error);
-    return redirect(`${AUTH_URL}/?redirect=${options.scope}`);
+    return redir ? redirect(`${AUTH_URL}/?redirect=${scope}`) : false;
   }
 }
