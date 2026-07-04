@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ALL_SCOPES } from "@repo/utils";
+import { useRouter } from "next/navigation";
 
 const ROLES = ["user", "admin"];
 
@@ -32,6 +33,7 @@ type User = {
 export default function UserRow({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const [selectedScopes, setSelectedScopes] = useState<string[]>(user.scopes);
   const [selectedRole, setSelectedRole] = useState<string>(user.role ?? "user");
@@ -49,12 +51,14 @@ export default function UserRow({ user }: { user: User }) {
       }
       await updateUserScopes(user.id, selectedScopes);
       setOpen(false);
+      router.refresh();
     });
   };
 
   const handleApprove = () => {
     startTransition(async () => {
       await approveUser(user.id);
+      router.refresh();
     });
   };
 
