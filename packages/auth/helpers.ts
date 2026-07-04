@@ -141,7 +141,7 @@ export async function validateAccess(
 export async function validateAccess(
   options: AuthHelperOptions & { redirect?: boolean } = {},
 ): Promise<void | boolean> {
-  if (!process.env.VERCEL) return;
+  if (!process.env.VERCEL) return options.redirect ? undefined : true;
 
   const { admin, redirect: redir, scope } = options;
 

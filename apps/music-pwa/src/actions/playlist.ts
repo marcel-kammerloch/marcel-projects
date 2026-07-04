@@ -5,7 +5,7 @@ import { validateAccess } from "@repo/auth";
 import { revalidatePath } from "next/cache";
 
 export async function getPlaylists() {
-  const hasAccess = validateAccess({ scope: "music-pwa" });
+  const hasAccess = await validateAccess({ scope: "music-pwa" });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
@@ -30,7 +30,7 @@ export async function getPlaylists() {
 }
 
 export async function getPlaylist(id: string) {
-  const hasAccess = validateAccess({ scope: "music-pwa" });
+  const hasAccess = await validateAccess({ scope: "music-pwa" });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
@@ -56,7 +56,7 @@ export async function getPlaylist(id: string) {
 }
 
 export async function createPlaylist(name: string) {
-  const hasAccess = validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
@@ -73,7 +73,7 @@ export async function createPlaylist(name: string) {
 }
 
 export async function renamePlaylist(id: string, name: string) {
-  const hasAccess = validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
@@ -92,7 +92,7 @@ export async function renamePlaylist(id: string, name: string) {
 }
 
 export async function addSongToPlaylist(playlistId: string, songId: string) {
-  const hasAccess = validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
@@ -123,7 +123,7 @@ export async function removeSongFromPlaylist(
   playlistId: string,
   songId: string,
 ) {
-  const hasAccess = validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
@@ -146,7 +146,7 @@ export async function removeSongFromPlaylist(
 }
 
 export async function deletePlaylist(id: string) {
-  const hasAccess = validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 

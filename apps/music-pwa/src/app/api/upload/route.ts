@@ -3,7 +3,7 @@ import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const hasAccess = validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
 
   if (!hasAccess) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });

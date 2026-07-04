@@ -15,7 +15,7 @@ export async function getSongs(options?: {
   min?: false;
 }): Promise<{ data: Song[] | null; error: string | null }>;
 export async function getSongs({ min = false }: { min?: boolean } = {}) {
-  const hasAccess = validateAccess({ scope: "music-pwa" });
+  const hasAccess = await validateAccess({ scope: "music-pwa" });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
@@ -49,7 +49,7 @@ export async function createSong(data: {
   duration: number; // in seconds
   url: string; // Vercel Blob URL
 }) {
-  const hasAccess = validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
@@ -76,7 +76,7 @@ export async function createSong(data: {
 }
 
 export async function deleteSong(id: string) {
-  const hasAccess = validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
@@ -104,7 +104,7 @@ export async function updateSong(
     genre?: Genre;
   },
 ) {
-  const hasAccess = validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 

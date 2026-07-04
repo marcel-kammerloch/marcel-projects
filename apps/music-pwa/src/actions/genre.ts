@@ -12,7 +12,7 @@ import { validateAccess } from "@repo/auth";
  * their current ordering context.
  */
 export async function getGenreSongs(genre: Genre) {
-  const hasAccess = validateAccess({ scope: "music-pwa" });
+  const hasAccess = await validateAccess({ scope: "music-pwa" });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
@@ -67,7 +67,7 @@ export async function getGenreSongs(genre: Genre) {
  * Does NOT modify Song.order (the global songs-page order).
  */
 export async function reorderGenreSongs(genre: Genre, songIds: string[]) {
-  const hasAccess = validateAccess({ admin: true });
+  const hasAccess = await validateAccess({ admin: true });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
 
