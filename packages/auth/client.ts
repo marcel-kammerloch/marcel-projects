@@ -5,7 +5,7 @@ import {
   customSessionClient,
   inferAdditionalFields,
 } from "better-auth/client/plugins";
-import type { auth } from "./server.js";
+import type { auth } from "./server";
 
 export const authClient: ReactAuthClient<BetterAuthClientOptions> =
   createAuthClient({

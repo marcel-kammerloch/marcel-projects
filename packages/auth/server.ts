@@ -1,13 +1,13 @@
 import type { BetterAuthOptions } from "better-auth";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
-import { db } from "./drizzle.js";
+import { db } from "./drizzle";
 import { AUTH_URL, BASE_DOMAIN } from "@repo/utils";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import * as schema from "./schema.js";
+import * as schema from "./schema";
 import { customSession } from "better-auth/plugins";
 
-const config = {
+export const auth = betterAuth({
   advanced: {
     crossSubDomainCookies: {
       enabled: true,
@@ -101,8 +101,4 @@ const config = {
       },
     },
   },
-} satisfies BetterAuthOptions;
-
-export const auth = betterAuth(config) as ReturnType<
-  typeof betterAuth<typeof config>
->;
+});

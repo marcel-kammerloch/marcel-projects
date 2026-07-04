@@ -1,9 +1,9 @@
-import { headers } from "next/headers.js";
+import { headers } from "next/headers";
 import { cache } from "react";
-import { redirect } from "next/navigation.js";
-import { NextResponse } from "next/server.js";
+import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 import { AUTH_URL, ALL_SCOPES } from "@repo/utils";
-import { auth } from "./server.js";
+import { auth } from "./server";
 
 type AuthUser = {
   id: string;

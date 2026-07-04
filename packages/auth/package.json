@@ -2,44 +2,7 @@
   "name": "@repo/auth",
   "private": true,
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./index.ts",
-      "default": "./dist/index.js"
-    },
-    "./actions": {
-      "types": "./actions.ts",
-      "default": "./dist/actions.js"
-    },
-    "./api": {
-      "types": "./api.ts",
-      "default": "./dist/api.js"
-    },
-    "./client": {
-      "types": "./client.ts",
-      "default": "./dist/client.js"
-    },
-    "./drizzle": {
-      "types": "./drizzle.ts",
-      "default": "./dist/drizzle.js"
-    },
-    "./helpers": {
-      "types": "./helpers.ts",
-      "default": "./dist/helpers.js"
-    },
-    "./schema": {
-      "types": "./schema.ts",
-      "default": "./dist/schema.js"
-    },
-    "./server": {
-      "types": "./server.ts",
-      "default": "./dist/server.js"
-    }
-  },
   "scripts": {
-    "build": "tsup",
     "db:generate": "pnpx drizzle-kit generate",
     "db:migrate": "pnpx drizzle-kit migrate"
   },
@@ -56,8 +19,6 @@
     "@types/react": "^19.2.17",
     "dotenv": "^17.4.2",
     "drizzle-kit": "1.0.0-rc.4",
-    "tsup": "^8.5.1",
-    "typescript": "^6.0.3",
-    "zod": "4.4.3"
+    "typescript": "^6.0.3"
   }
 }
