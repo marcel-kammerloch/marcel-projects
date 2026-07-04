@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
               script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js;
               style-src 'self' 'unsafe-inline';
               img-src 'self';
-              connect-src 'self' https://ad0nzrqxbs7k6ri0.public.blob.vercel-storage.com https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm https://vercel.com/api/blob/;
+              connect-src 'self' https://auth.marcel-projects.vercel.app https://ad0nzrqxbs7k6ri0.public.blob.vercel-storage.com https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm https://vercel.com/api/blob/;
               media-src 'self' blob: https://ad0nzrqxbs7k6ri0.public.blob.vercel-storage.com;`
                 .replace(/\s{2,}/g, " ")
                 .trim(),
