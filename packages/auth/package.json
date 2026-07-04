@@ -4,11 +4,9 @@
   "type": "module",
   "exports": {
     ".": "./index.ts",
-    "./api": "./api.ts",
     "./actions": "./actions.ts",
-    "./client": "./client.ts",
-    "./drizzle": "./drizzle.ts",
-    "./schema": "./schema.ts"
+    "./api": "./api.ts",
+    "./client": "./client.ts"
   },
   "scripts": {
     "db:generate": "pnpx drizzle-kit generate",
