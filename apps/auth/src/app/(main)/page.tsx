@@ -1,11 +1,14 @@
 "use client";
 
 import { authClient } from "@repo/auth/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ALL_SCOPES, BASE_DOMAIN } from "@repo/utils";
 import { Alert } from "@/components/alert/alert";
 import { useAlert } from "@/components/alert/use-alert";
 import { PROVIDERS } from "./providers";
+
+const RECENT_ATTEMPT_TTL_MS = 10 * 60 * 1000;
+const RECENT_ATTEMPT_STORAGE_KEY = "auth:last-sign-in-attempt";
 
 export default function AuthPage() {
   const [loadingProviderId, setLoadingProviderId] = useState<string | null>(
@@ -13,8 +16,39 @@ export default function AuthPage() {
   );
   const { state: alertState, showError, close } = useAlert();
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("error");
+    const storedAttemptAt = window.localStorage.getItem(
+      RECENT_ATTEMPT_STORAGE_KEY,
+    );
+
+    if (!error || !storedAttemptAt) {
+      return;
+    }
+
+    const timestamp = Number(storedAttemptAt);
+    const ageMs = Date.now() - timestamp;
+
+    if (!Number.isFinite(timestamp) || ageMs > RECENT_ATTEMPT_TTL_MS) {
+      window.localStorage.removeItem(RECENT_ATTEMPT_STORAGE_KEY);
+      return;
+    }
+
+    const normalizedError = decodeURIComponent(error).trim();
+    const message =
+      normalizedError || "An unexpected authentication error occurred.";
+
+    showError("Authentication Failed", message);
+    window.localStorage.removeItem(RECENT_ATTEMPT_STORAGE_KEY);
+  }, [showError]);
+
   const handleSignIn = async (provider: (typeof PROVIDERS)[number]["id"]) => {
     setLoadingProviderId(provider);
+    window.localStorage.setItem(
+      RECENT_ATTEMPT_STORAGE_KEY,
+      Date.now().toString(),
+    );
 
     try {
       let callbackURL: string | undefined;

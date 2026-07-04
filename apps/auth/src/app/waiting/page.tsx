@@ -1,49 +1,43 @@
-import { redirect } from "next/navigation";
+import { AuthStatusCard } from "@/components/auth-status-card";
 import { SignOutButton } from "@/components/sign-out-button";
-import { headers } from "next/headers";
-import { auth } from "@repo/auth";
+import { getAuthenticatedUser } from "@/lib/auth-page";
+import { redirect } from "next/navigation";
 
 export default async function WaitingPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-    query: { disableCookieCache: true },
-  });
-
-  if (!session) {
-    redirect("/");
-  }
-
-  const user = session.user;
+  const user = await getAuthenticatedUser();
 
   if (user.isApproved) {
-    redirect("/denied");
+    redirect("/account");
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white p-4">
-      <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 p-8 rounded-2xl text-center shadow-xl">
-        <div className="w-16 h-16 bg-yellow-500/20 text-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg
-            className="w-8 h-8"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-        <h1 className="text-2xl font-bold mb-4">Waiting for Approval</h1>
-        <p className="text-zinc-400 mb-8 leading-relaxed">
-          Your account has been created successfully, but it must be approved by
-          an administrator before you can access any applications.
+    <AuthStatusCard
+      title="Waiting for approval"
+      description="Your account is ready, but it still needs an administrator to approve it before you can access any applications."
+      icon={
+        <svg
+          className="h-8 w-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.8}
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      }
+      accentClassName="bg-amber-500/15 text-amber-400"
+      footer={<SignOutButton />}
+    >
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-5 text-left text-sm text-zinc-400">
+        <p>
+          Once your access has been approved, you will be redirected to your
+          account overview automatically.
         </p>
-        <SignOutButton />
       </div>
-    </div>
+    </AuthStatusCard>
   );
 }
