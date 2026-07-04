@@ -51,3 +51,7 @@ export function proxy(request: NextRequest) {
 
   return response;
 }
+
+export const config = {
+  matcher: ["/api/auth/:path*"],
+};
