@@ -1,4 +1,4 @@
-import { betterAuth, BetterAuthOptions } from "better-auth/minimal";
+import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "./drizzle";
 import { AUTH_URL, BASE_DOMAIN } from "@repo/utils";
@@ -6,7 +6,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import * as schema from "./schema";
 import { customSession } from "better-auth/plugins";
 
-export const config = {
+export const auth = betterAuth({
   advanced: {
     crossSubDomainCookies: {
       enabled: true,
@@ -42,7 +42,20 @@ export const config = {
   //     },
   //   },
   // },
-  plugins: [nextCookies()],
+  plugins: [
+    customSession(async ({ user, session }) => {
+      return {
+        user: {
+          ...user,
+          isApproved: "isApproved" in user ? user.isApproved : false,
+          scopes: "scopes" in user ? user.scopes : [],
+          role: "role" in user ? user.role : "user",
+        },
+        session,
+      };
+    }),
+    nextCookies(),
+  ],
   secret: process.env.MARCEL_PROJECTS_AUTH_SECRET,
   session: {
     freshAge: 0, // disabled
@@ -69,21 +82,20 @@ export const config = {
         type: "boolean",
         defaultValue: false,
         input: false,
+        returned: true,
       },
       scopes: {
         type: "string[]",
         defaultValue: [],
         input: false,
+        returned: true,
       },
       role: {
         type: "string",
         defaultValue: "user",
         input: false,
+        returned: true,
       },
     },
   },
-} satisfies BetterAuthOptions;
-
-export const auth = betterAuth(config) as ReturnType<
-  typeof betterAuth<typeof config>
->;
+});
