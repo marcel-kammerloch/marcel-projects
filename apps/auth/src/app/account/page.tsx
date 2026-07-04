@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 export default async function DeniedPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
+    query: { disableCookieCache: true },
   });
 
   if (!session) {
@@ -58,7 +59,9 @@ export default async function DeniedPage() {
         ) : (
           <div className="text-left bg-zinc-950 p-4 rounded-xl border border-zinc-800">
             <p className="text-zinc-500 text-sm italic">
-              You currently do not have access to any applications.
+              {user.role === "admin"
+                ? "You currently have access to all applications because you are an admin"
+                : "You currently do not have access to any applications."}
             </p>
           </div>
         )}

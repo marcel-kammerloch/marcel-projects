@@ -6,6 +6,7 @@ import { auth } from "@repo/auth";
 export default async function WaitingPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
+    query: { disableCookieCache: true },
   });
 
   if (!session) {
