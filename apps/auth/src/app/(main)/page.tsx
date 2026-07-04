@@ -37,7 +37,10 @@ export default function AuthPage() {
 
     const normalizedError = decodeURIComponent(error).trim();
     const message =
-      normalizedError || "An unexpected authentication error occurred.";
+      normalizedError
+        .split("_")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ") || "An unexpected authentication error occurred.";
 
     showError("Authentication Failed", message);
     window.localStorage.removeItem(RECENT_ATTEMPT_STORAGE_KEY);
