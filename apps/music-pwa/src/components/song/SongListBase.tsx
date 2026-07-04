@@ -35,6 +35,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { useAuth } from "@repo/auth/client";
 
 type SortMode = "custom" | "date" | "name" | "duration";
 
@@ -58,6 +59,7 @@ export default function SongListBase({
   playbackSourceName,
 }: SongListBaseProps) {
   const { playSong } = usePlayerStore();
+  const { isAdmin } = useAuth();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [editingSong, setEditingSong] = useState<Song | null>(null);
   const [songToDelete, setSongToDelete] = useState<string | null>(null);
@@ -94,9 +96,15 @@ export default function SongListBase({
 
       if (genreKey) {
         // Genre-specific order — does NOT touch Song.order
-        await reorderGenreSongs(genreKey, newSongs.map((s) => s.id));
+        await reorderGenreSongs(
+          genreKey,
+          newSongs.map((s) => s.id),
+        );
       } else if (playlistId) {
-        await reorderPlaylistSongs(playlistId, newSongs.map((s) => s.id));
+        await reorderPlaylistSongs(
+          playlistId,
+          newSongs.map((s) => s.id),
+        );
       } else {
         await reorderSongs(newSongs.map((s) => s.id));
       }
@@ -209,7 +217,7 @@ export default function SongListBase({
                 value={sortBy}
                 onValueChange={(value) => setSortBy(value as SortMode)}
               >
-                <SelectTrigger size="sm" className="min-w-[130px]">
+                <SelectTrigger size="sm" className="min-w-32.5">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -226,7 +234,7 @@ export default function SongListBase({
 
       {/* Column Headers */}
       <div className="flex px-4 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
-        {sortBy === "custom" && <div className="w-10"></div>}
+        {sortBy === "custom" && isAdmin && <div className="w-10"></div>}
         <div className="w-10 flex items-center justify-start">#</div>
         <div className="flex-1 pr-4">Title</div>
         <div className="hidden sm:block flex-1 pr-4">Artist</div>
@@ -253,7 +261,7 @@ export default function SongListBase({
               onPlay={handlePlay}
               onMenuClick={toggleMenu}
               activeMenuId={activeMenu}
-              dragDisabled={sortBy !== "custom"}
+              dragDisabled={sortBy !== "custom" || !isAdmin}
               actions={{
                 onEdit: () => setEditingSong(song),
                 onDelete: () => handleDeleteRequest(song.id),

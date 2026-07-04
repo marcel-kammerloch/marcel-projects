@@ -6,6 +6,7 @@ import DeletePlaylistButton from "@/components/playlist/DeletePlaylistButton";
 import RenamePlaylistButton from "@/components/playlist/RenamePlaylistButton";
 import AddSongButton from "@/components/playlist/AddSongButton";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
+import AdminOnly from "@/components/AdminOnly";
 
 export const dynamic = "force-dynamic";
 
@@ -46,10 +47,12 @@ export default async function PlaylistPage({
               <h1 className="text-2xl sm:text-4xl font-bold text-zinc-900 dark:text-white wrap-break-word">
                 {playlist.name}
               </h1>
-              <RenamePlaylistButton
-                playlistId={id}
-                initialName={playlist.name}
-              />
+              <AdminOnly>
+                <RenamePlaylistButton
+                  playlistId={id}
+                  initialName={playlist.name}
+                />
+              </AdminOnly>
             </div>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-zinc-400 text-xs sm:text-sm">
               <span>{playlist.songs.length} songs</span>
@@ -61,11 +64,13 @@ export default async function PlaylistPage({
 
         {/* Action Buttons */}
         <div className="w-full sm:w-auto shrink-0 flex items-center gap-2 justify-start sm:justify-end mt-4 sm:mt-0">
-          <AddSongButton
-            playlistId={id}
-            existingSongIds={playlist.songs.map((s) => s.id)}
-          />
-          <DeletePlaylistButton playlistId={id} />
+          <AdminOnly>
+            <AddSongButton
+              playlistId={id}
+              existingSongIds={playlist.songs.map((s) => s.id)}
+            />
+            <DeletePlaylistButton playlistId={id} />
+          </AdminOnly>
         </div>
       </div>
 
