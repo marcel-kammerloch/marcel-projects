@@ -1,9 +1,9 @@
 "use server";
 
 import { eq, desc } from "drizzle-orm";
-import { validateAccess } from "./helpers";
-import { db } from "./drizzle";
-import { user } from "./schema";
+import { validateAccess } from "./helpers.js";
+import { db } from "./drizzle.js";
+import { user } from "./schema.js";
 
 export async function getUsers() {
   await validateAccess({ admin: true });

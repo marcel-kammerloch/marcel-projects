@@ -1,9 +1,27 @@
-import { headers } from "next/headers";
+import { headers } from "next/headers.js";
 import { cache } from "react";
-import { redirect } from "next/navigation";
-import { NextResponse } from "next/server";
+import { redirect } from "next/navigation.js";
+import { NextResponse } from "next/server.js";
 import { AUTH_URL, ALL_SCOPES } from "@repo/utils";
-import { auth } from "./server";
+import { auth } from "./server.js";
+
+type AuthUser = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  email: string;
+  emailVerified: boolean;
+  name: string;
+  image?: string | null;
+  isApproved: boolean;
+  role: string;
+  scopes: string[];
+};
+
+type AuthSession = {
+  user: AuthUser;
+  session: unknown;
+};
 
 export const getSession = cache(async (headers: Headers) => {
   try {
@@ -46,7 +64,7 @@ export async function validateAccessMiddleware(
   }
 
   try {
-    const session = await getSession(request.headers);
+    const session = (await getSession(request.headers)) as AuthSession | null;
 
     if (!session) {
       return redirectResponse(`/?redirect=${options.scope}`);
@@ -84,7 +102,7 @@ export async function validateAccessProxy(
   }
 
   try {
-    const session = await getSession(request.headers);
+    const session = (await getSession(request.headers)) as AuthSession | null;
 
     if (!session) {
       return NextResponse.redirect(`${AUTH_URL}/?redirect=${options.scope}`);
@@ -119,7 +137,7 @@ export async function validateAccess(
 
   try {
     const headersList = await headers();
-    const session = await getSession(headersList);
+    const session = (await getSession(headersList)) as AuthSession | null;
 
     if (!session) {
       return redirect(`${AUTH_URL}/?redirect=${options.scope}`);

@@ -6,6 +6,7 @@
     "declarationMap": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "ignoreDeprecations": "6.0",
     "incremental": false,
     "isolatedModules": true,
     "lib": ["es2022", "DOM", "DOM.Iterable"],
@@ -17,7 +18,7 @@
     "strict": true,
     "target": "ES2022",
     "strictNullChecks": true,
-    "types": ["node"]
+    "types": ["node", "./node_modules/zod/v4/index.d.ts"]
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
