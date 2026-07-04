@@ -77,6 +77,10 @@ export const auth = betterAuth({
       clientSecret: process.env.MARCEL_PROJECTS_GOOGLE_CLIENT_SECRET ?? "",
       accessType: "offline",
     },
+    github: {
+      clientId: process.env.MARCEL_PROJECTS_GITHUB_CLIENT_ID ?? "",
+      clientSecret: process.env.MARCEL_PROJECTS_GITHUB_CLIENT_SECRET ?? "",
+    },
   },
   trustedOrigins: [`https://*.${BASE_DOMAIN}`],
   user: {
