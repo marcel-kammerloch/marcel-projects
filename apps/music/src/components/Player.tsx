@@ -45,6 +45,7 @@ export default function Player() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
+  const wakeLockRef = useRef<any>(null);
 
   const [progress, setProgress] = useState(0);
 
@@ -177,6 +178,87 @@ export default function Player() {
     }
   };
 
+  const isStandalonePwa = () => {
+    if (typeof window === "undefined") return false;
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true
+    );
+  };
+
+  const requestWakeLock = async () => {
+    if (
+      typeof window === "undefined" ||
+      !("wakeLock" in navigator) ||
+      !settings.keepScreenOn ||
+      !isPlaying ||
+      !isStandalonePwa() ||
+      wakeLockRef.current
+    ) {
+      return;
+    }
+
+    try {
+      wakeLockRef.current = await (navigator as any).wakeLock.request("screen");
+      wakeLockRef.current.addEventListener("release", () => {
+        wakeLockRef.current = null;
+      });
+    } catch (error) {
+      console.error("WakeLock request failed:", error);
+      wakeLockRef.current = null;
+    }
+  };
+
+  const releaseWakeLock = async () => {
+    try {
+      if (wakeLockRef.current) {
+        await wakeLockRef.current.release();
+        wakeLockRef.current = null;
+      }
+    } catch (error) {
+      console.error("WakeLock release failed:", error);
+      wakeLockRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (!settings.keepScreenOn || !isPlaying) {
+      releaseWakeLock();
+      return;
+    }
+
+    if (!("wakeLock" in navigator) || !isStandalonePwa()) return;
+
+    requestWakeLock();
+  }, [isPlaying, settings.keepScreenOn, currentSong]);
+
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (
+        document.visibilityState === "visible" &&
+        isPlaying &&
+        settings.keepScreenOn &&
+        isStandalonePwa() &&
+        "wakeLock" in navigator
+      ) {
+        await requestWakeLock();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isPlaying, settings.keepScreenOn]);
+
+  useEffect(() => {
+    return () => {
+      releaseWakeLock();
+    };
+  }, []);
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -271,7 +353,10 @@ export default function Player() {
         <div className="flex-1 flex flex-col p-6 max-w-md mx-auto w-full">
           <div className="flex justify-between items-center mb-8 pt-4">
             <button
-              onClick={() => { setIsFullView(false); setMenuOpen(false); }}
+              onClick={() => {
+                setIsFullView(false);
+                setMenuOpen(false);
+              }}
               className="text-zinc-900 dark:text-white p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition"
             >
               <ChevronDown className="w-8 h-8" />
@@ -281,7 +366,7 @@ export default function Player() {
                 Now Playing
               </p>
               {playbackSourceType && playbackSourceName && (
-                <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-0.5 break-words line-clamp-2 px-1">
+                <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-0.5 wrap-break-word line-clamp-2 px-1">
                   Playing from {playbackSourceType} &ldquo;{playbackSourceName}
                   &rdquo;
                 </p>

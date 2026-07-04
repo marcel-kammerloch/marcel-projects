@@ -7,6 +7,7 @@ export type Settings = {
   loop: boolean;
   shuffle: boolean;
   highContrast: boolean;
+  keepScreenOn: boolean;
 };
 
 interface PlayerState {
@@ -50,6 +51,7 @@ export const usePlayerStore = create<PlayerState>()(
         loop: false,
         shuffle: false,
         highContrast: false,
+        keepScreenOn: false,
       },
 
       setSettings: (newSettings) =>

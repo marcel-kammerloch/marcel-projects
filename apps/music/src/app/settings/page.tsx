@@ -62,6 +62,29 @@ export default function SettingsPage() {
                 </button>
               ))}
             </div>
+
+            <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-medium text-zinc-900 dark:text-zinc-100 block">
+                  Keep Screen On
+                </h3>
+                <p className="text-sm text-zinc-500 mt-1">
+                  When enabled in the installed app, keep the screen awake while
+                  audio plays.
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={settings.keepScreenOn}
+                  onChange={(e) =>
+                    setSettings({ keepScreenOn: e.target.checked })
+                  }
+                />
+                <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+              </label>
+            </div>
           </div>
         </section>
 
