@@ -36,16 +36,16 @@ export const PROVIDERS = [
       </svg>
     ),
   },
-  {
-    id: "microsoft",
-    label: "Microsoft",
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="2" y="2" width="9" height="9" fill="#F25022" />
-        <rect x="13" y="2" width="9" height="9" fill="#7FBA00" />
-        <rect x="2" y="13" width="9" height="9" fill="#00A4EF" />
-        <rect x="13" y="13" width="9" height="9" fill="#FFB900" />
-      </svg>
-    ),
-  },
+  // {
+  //   id: "microsoft",
+  //   label: "Microsoft",
+  //   icon: (
+  //     <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+  //       <rect x="2" y="2" width="9" height="9" fill="#F25022" />
+  //       <rect x="13" y="2" width="9" height="9" fill="#7FBA00" />
+  //       <rect x="2" y="13" width="9" height="9" fill="#00A4EF" />
+  //       <rect x="13" y="13" width="9" height="9" fill="#FFB900" />
+  //     </svg>
+  //   ),
+  // },
 ] as const;
