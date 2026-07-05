@@ -73,7 +73,7 @@ export async function validateAccessMiddleware(
     const user = session.user;
 
     if (!user.isApproved) {
-      return redirectResponse("/waiting");
+      return redirectResponse("/account");
     }
 
     if (user.role !== "admin") {
@@ -111,7 +111,7 @@ export async function validateAccessProxy(
     const user = session.user;
 
     if (!user.isApproved) {
-      return NextResponse.redirect(`${AUTH_URL}/waiting`);
+      return NextResponse.redirect(`${AUTH_URL}/account`);
     }
 
     if (user.role !== "admin") {
@@ -156,7 +156,7 @@ export async function validateAccess(
     const user = session.user;
 
     if (!user.isApproved) {
-      return redir ? redirect(`${AUTH_URL}/waiting`) : false;
+      return redir ? redirect(`${AUTH_URL}/account`) : false;
     }
 
     if (

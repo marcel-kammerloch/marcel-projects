@@ -1,10 +1,13 @@
 import { AccessGrid } from "@/components/access-grid";
 import { AuthStatusCard } from "@/components/auth-status-card";
 import { SignOutButton } from "@/components/sign-out-button";
-import { getDeniedPageUser } from "@/lib/auth-page";
+import { getAuthenticatedUser } from "@/lib/auth-page";
+import { redirect } from "next/navigation";
 
 export default async function DeniedPage() {
-  const user = await getDeniedPageUser();
+  const user = await getAuthenticatedUser();
+
+  if (!user.isApproved) redirect("/account");
 
   return (
     <AuthStatusCard
