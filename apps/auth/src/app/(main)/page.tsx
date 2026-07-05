@@ -2,7 +2,7 @@
 
 import { authClient } from "@repo/auth/client";
 import { useEffect, useState } from "react";
-import { ALL_SCOPES, BASE_DOMAIN } from "@repo/utils";
+import { ALL_SCOPES, AUTH_URL, BASE_DOMAIN } from "@repo/utils";
 import { Alert } from "@/components/alert/alert";
 import { useAlert } from "@/components/alert/use-alert";
 import { PROVIDERS } from "./providers";
@@ -54,7 +54,7 @@ export default function AuthPage() {
     );
 
     try {
-      let callbackURL: string | undefined;
+      let callbackURL = `${AUTH_URL}/account`;
 
       const params = new URLSearchParams(window.location.search);
       const redirectScope = params.get("redirect")?.toLowerCase();
