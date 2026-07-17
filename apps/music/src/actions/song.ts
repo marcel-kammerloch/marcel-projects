@@ -102,11 +102,24 @@ export async function updateSong(
     title?: string;
     artist?: string;
     genre?: Genre;
+    speed?: number;
   },
 ) {
   const hasAccess = await validateAccess({ admin: true });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
+
+  if (data.speed !== undefined) {
+    if (typeof data.speed !== "number" || isNaN(data.speed)) {
+      return { data: null, error: "Speed must be a number" };
+    }
+    if (data.speed < 0.50 || data.speed > 1.50) {
+      return { data: null, error: "Speed must be between 0.50 and 1.50" };
+    }
+    if (Number(data.speed.toFixed(2)) !== data.speed) {
+      return { data: null, error: "Speed must have at most 2 decimal places" };
+    }
+  }
 
   try {
     const song = await prisma.song.update({

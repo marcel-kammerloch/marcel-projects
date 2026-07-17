@@ -53,7 +53,7 @@ export default function Player() {
 
   // Reset volume and playback speed when the song changes
   useEffect(() => {
-    setPlaybackRate(1);
+    setPlaybackRate(currentSong?.speed ?? 1.0);
     setVolume(1);
     setLoopedOnceForCurrentSong(false);
   }, [currentSong?.id]);
@@ -309,9 +309,19 @@ export default function Player() {
     <>
       <audio
         ref={audioRef}
-        src={currentSong.url}
+        src={getProxiedUrl(currentSong.url)}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
+        onPlay={() => {
+          if (audioRef.current) {
+            audioRef.current.playbackRate = playbackRate;
+          }
+        }}
+        onCanPlay={() => {
+          if (audioRef.current) {
+            audioRef.current.playbackRate = playbackRate;
+          }
+        }}
       />
 
       {/* Persistent Bottom Bar */}
@@ -423,14 +433,14 @@ export default function Player() {
                         <span>Speed</span>
                       </div>
                       <span className="font-medium">
-                        {playbackRate.toFixed(1)}x
+                        {playbackRate.toFixed(2)}x
                       </span>
                     </div>
                     <Slider
                       value={[playbackRate]}
                       min={0.5}
                       max={1.5}
-                      step={0.1}
+                      step={0.05}
                       onValueChange={(value) =>
                         setPlaybackRate(
                           Number(Array.isArray(value) ? value[0] : value),
@@ -596,3 +606,10 @@ const MusicIcon = ({ className }: { className: string }) => (
     <circle cx="18" cy="16" r="3"></circle>
   </svg>
 );
+
+const getProxiedUrl = (url: string) => {
+  return url.replace(
+    "https://ad0nzrqxbs7k6ri0.public.blob.vercel-storage.com/",
+    "/storage/",
+  );
+};

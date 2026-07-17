@@ -22,6 +22,7 @@ type Song = {
   duration: number;
   url: string;
   createdAt: Date;
+  speed?: number;
 };
 
 export default function EditSongModal({
@@ -36,15 +37,27 @@ export default function EditSongModal({
   const [title, setTitle] = useState(song.title);
   const [artist, setArtist] = useState(song.artist || "");
   const [genre, setGenre] = useState<Genre>(song.genre || "POP");
+  const [speed, setSpeed] = useState(song.speed !== undefined ? song.speed.toFixed(2) : "1.00");
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title) return;
+
+    const speedNum = parseFloat(speed);
+    if (isNaN(speedNum) || speedNum < 0.50 || speedNum > 1.50) {
+      toast.error("Speed must be between 0.50 and 1.50");
+      return;
+    }
+    if (Number(speedNum.toFixed(2)) !== speedNum) {
+      toast.error("Speed must have at most 2 decimal places");
+      return;
+    }
+
     setIsUpdating(true);
 
     try {
-      await updateSong(song.id, { title, artist, genre });
+      await updateSong(song.id, { title, artist, genre, speed: speedNum });
       onClose();
     } catch (error) {
       console.error(error);
@@ -112,6 +125,22 @@ export default function EditSongModal({
               <option value={Genre.POP}>Pop</option>
               <option value={Genre.VIOLIN}>Violin</option>
             </select>
+          </div>
+
+          <div>
+            <label className="text-xs text-zinc-400 font-medium mb-1 block">
+              Playback Speed *
+            </label>
+            <input
+              type="number"
+              min="0.50"
+              max="1.50"
+              step="0.01"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+              value={speed}
+              onChange={(e) => setSpeed(e.target.value)}
+              required
+            />
           </div>
 
           <div className="pt-4 flex gap-3">

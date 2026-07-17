@@ -23,6 +23,7 @@ model Song {
   duration Int // in seconds
   url      String // Vercel Blob URL
   order    Int     @default(0)
+  speed    Float   @default(1.00)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
