@@ -35,6 +35,15 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/storage/:path*",
+        destination:
+          "https://ad0nzrqxbs7k6ri0.public.blob.vercel-storage.com/:path*",
+      },
+    ];
+  },
   experimental: {
     useTypeScriptCli: true,
   },
