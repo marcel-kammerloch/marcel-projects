@@ -43,6 +43,8 @@ export default function Player() {
   const [playbackRate, setPlaybackRate] = useState(1);
   const [volume, setVolume] = useState(1);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loopedOnceForCurrentSong, setLoopedOnceForCurrentSong] =
+    useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const wakeLockRef = useRef<any>(null);
@@ -53,7 +55,14 @@ export default function Player() {
   useEffect(() => {
     setPlaybackRate(1);
     setVolume(1);
+    setLoopedOnceForCurrentSong(false);
   }, [currentSong?.id]);
+
+  useEffect(() => {
+    if (settings.loop !== "once") {
+      setLoopedOnceForCurrentSong(false);
+    }
+  }, [settings.loop]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -160,14 +169,31 @@ export default function Player() {
   };
 
   const handleEnded = () => {
-    if (settings.loop && audioRef.current) {
+    if (!audioRef.current) {
+      playNext();
+      return;
+    }
+
+    if (settings.loop === "once") {
+      if (!loopedOnceForCurrentSong) {
+        setLoopedOnceForCurrentSong(true);
+        audioRef.current.currentTime = 0;
+        audioRef.current
+          .play()
+          .catch((e) => console.error("Loop replay failed", e));
+        return;
+      }
+    }
+
+    if (settings.loop === "repeat") {
       audioRef.current.currentTime = 0;
       audioRef.current
         .play()
         .catch((e) => console.error("Loop replay failed", e));
-    } else {
-      playNext();
+      return;
     }
+
+    playNext();
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -513,10 +539,24 @@ export default function Player() {
             </div>
 
             <button
-              onClick={() => setSettings({ loop: !settings.loop })}
-              className={`p-2 rounded-full transition ${settings.loop ? "text-blue-500 hc:bg-blue-500/20 hc:ring-2 hc:ring-blue-500/50 hc:text-blue-400" : "text-zinc-500 hover:text-zinc-900 dark:hover:text-white hc:text-zinc-400"}`}
+              onClick={() => {
+                const nextMode =
+                  settings.loop === "off"
+                    ? "once"
+                    : settings.loop === "once"
+                      ? "repeat"
+                      : "off";
+                setSettings({ loop: nextMode });
+              }}
+              aria-label={`Loop ${settings.loop}`}
+              className={`relative p-2 rounded-full transition ${settings.loop !== "off" ? "text-blue-500 hc:bg-blue-500/20 hc:ring-2 hc:ring-blue-500/50 hc:text-blue-400" : "text-zinc-500 hover:text-zinc-900 dark:hover:text-white hc:text-zinc-400"}`}
             >
               <Repeat className="w-6 h-6" />
+              {settings.loop === "once" && (
+                <span className="absolute top-1/2 left-1/2 text-[10px] font-bold bg-blue-500 text-white rounded-full min-w-4 h-4 flex items-center justify-center px-1">
+                  1
+                </span>
+              )}
             </button>
           </div>
 

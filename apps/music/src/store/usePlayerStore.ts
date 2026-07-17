@@ -2,12 +2,19 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Song } from "@db/client";
 
+export type LoopMode = "off" | "once" | "repeat";
+
 export type Settings = {
   skipDuration: number;
-  loop: boolean;
+  loop: LoopMode;
   shuffle: boolean;
   highContrast: boolean;
   keepScreenOn: boolean;
+};
+
+const normalizeLoopMode = (value: unknown): LoopMode => {
+  if (value === "once" || value === "repeat") return value;
+  return "off";
 };
 
 interface PlayerState {
@@ -48,7 +55,7 @@ export const usePlayerStore = create<PlayerState>()(
       isFullView: false,
       settings: {
         skipDuration: 15,
-        loop: false,
+        loop: "off",
         shuffle: false,
         highContrast: false,
         keepScreenOn: false,
@@ -56,7 +63,11 @@ export const usePlayerStore = create<PlayerState>()(
 
       setSettings: (newSettings) =>
         set((state) => ({
-          settings: { ...state.settings, ...newSettings },
+          settings: {
+            ...state.settings,
+            ...newSettings,
+            loop: normalizeLoopMode(newSettings.loop ?? state.settings.loop),
+          },
         })),
 
       playSong: (
@@ -96,7 +107,7 @@ export const usePlayerStore = create<PlayerState>()(
         if (currentIndex === -1) return;
 
         if (currentIndex === queue.length - 1) {
-          if (settings.loop) {
+          if (settings.loop === "repeat") {
             set({ currentSong: queue[0], isPlaying: true });
           } else {
             set({ isPlaying: false });
@@ -126,6 +137,21 @@ export const usePlayerStore = create<PlayerState>()(
     }),
     {
       name: "music-player-storage",
+      merge: (persistedState, currentState) => {
+        const mergedState = {
+          ...currentState,
+          ...(persistedState as Partial<PlayerState>),
+        } as PlayerState;
+
+        if (mergedState.settings) {
+          mergedState.settings = {
+            ...mergedState.settings,
+            loop: normalizeLoopMode(mergedState.settings.loop),
+          };
+        }
+
+        return mergedState;
+      },
       partialize: (state) => ({
         settings: state.settings,
         currentSong: state.currentSong,
