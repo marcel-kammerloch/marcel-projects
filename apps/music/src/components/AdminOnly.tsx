@@ -1,3 +1,5 @@
+"use client";
+
 import { useAuth } from "@repo/auth/client";
 import type { ReactNode } from "react";
 
