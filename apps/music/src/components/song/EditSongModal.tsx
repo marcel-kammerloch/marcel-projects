@@ -20,7 +20,7 @@ type Song = {
   artist: string | null;
   genre: Genre;
   duration: number;
-  url: string;
+  path: string;
   createdAt: Date;
   speed?: number;
 };
