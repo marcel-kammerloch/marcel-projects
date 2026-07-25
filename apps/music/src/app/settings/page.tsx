@@ -20,7 +20,12 @@ export default function SettingsPage() {
 
   const confirmReset = async () => {
     try {
+      // delete local storage (settings)
       localStorage.clear();
+      // delete cache
+      const keys = await caches.keys();
+      await Promise.all(keys.map((key) => caches.delete(key)));
+      // redirect to entry page
       window.location.href = "/";
     } catch (e) {
       console.error("Reset failed", e);
@@ -92,7 +97,8 @@ export default function SettingsPage() {
                   Reduce Dynamic Range
                 </h3>
                 <p className="text-sm text-zinc-500 mt-1">
-                  Compresses the volume differences within a song to make loud and quiet parts more balanced.
+                  Compresses the volume differences within a song to make loud
+                  and quiet parts more balanced.
                 </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
