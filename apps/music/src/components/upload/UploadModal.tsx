@@ -243,7 +243,7 @@ export default function UploadModal({
         artist,
         genre,
         duration: finalDuration,
-        url: blobResult.url,
+        path: blobResult.pathname,
       });
 
       onClose();

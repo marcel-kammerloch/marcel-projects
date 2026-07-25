@@ -47,7 +47,7 @@ export async function createSong(data: {
   artist: string;
   genre: Genre;
   duration: number; // in seconds
-  url: string; // Vercel Blob URL
+  path: string; // the path after the Vercel Blob URL
 }) {
   const hasAccess = await validateAccess({ admin: true });
 
@@ -82,8 +82,8 @@ export async function deleteSong(id: string) {
 
   try {
     const song = await prisma.song.findUnique({ where: { id } });
-    if (song?.url) {
-      await del(song.url);
+    if (song?.path) {
+      await del(song.path);
     }
     await prisma.song.delete({ where: { id } });
     revalidatePath("/");
@@ -113,7 +113,7 @@ export async function updateSong(
     if (typeof data.speed !== "number" || isNaN(data.speed)) {
       return { data: null, error: "Speed must be a number" };
     }
-    if (data.speed < 0.50 || data.speed > 1.50) {
+    if (data.speed < 0.5 || data.speed > 1.5) {
       return { data: null, error: "Speed must be between 0.50 and 1.50" };
     }
     if (Number(data.speed.toFixed(2)) !== data.speed) {

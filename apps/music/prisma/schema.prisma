@@ -21,7 +21,7 @@ model Song {
   artist   String?
   genre    Genre // Restricted genres
   duration Int // in seconds
-  url      String // Vercel Blob URL
+  path     String // The path after the Vercel Blob URL
   order    Int     @default(0)
   speed    Float   @default(1.00)
 
