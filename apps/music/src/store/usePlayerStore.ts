@@ -10,6 +10,7 @@ export type Settings = {
   shuffle: boolean;
   highContrast: boolean;
   keepScreenOn: boolean;
+  reduceDynamicRange: boolean;
 };
 
 const normalizeLoopMode = (value: unknown): LoopMode => {
@@ -59,6 +60,7 @@ export const usePlayerStore = create<PlayerState>()(
         shuffle: false,
         highContrast: false,
         keepScreenOn: false,
+        reduceDynamicRange: false,
       },
 
       setSettings: (newSettings) =>

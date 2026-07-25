@@ -24,10 +24,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Slider } from "@/components/ui/slider";
 
+let globalAudioContext: AudioContext | null = null;
+let globalSourceNode: MediaElementAudioSourceNode | null = null;
+let globalCompressorNode: DynamicsCompressorNode | null = null;
+let globalGainNode: GainNode | null = null;
+let globalAudioElement: HTMLAudioElement | null = null;
+
 export default function Player() {
   const {
     currentSong,
-    playlistName,
     playbackSourceType,
     playbackSourceName,
     isPlaying,
@@ -51,6 +56,117 @@ export default function Player() {
 
   const [progress, setProgress] = useState(0);
 
+  // Helper to configure the compressor smoothly
+  const configureCompressor = (
+    compressor: DynamicsCompressorNode,
+    gainNode: GainNode,
+    reduceRange: boolean,
+    ctx: AudioContext,
+  ) => {
+    const time = ctx.currentTime;
+    if (reduceRange) {
+      // Noticeable but musical compression for classical/dynamic music.
+      // Threshold at -30dB catches most of the dynamic range.
+      // Ratio 4:1 meaningfully reduces loud peaks.
+      // Soft knee of 20dB keeps the transition smooth and artefact-free.
+      // Makeup gain of +6dB compensates for the gain reduction on loud parts,
+      // which in turn lifts quiet passages relative to the original.
+      compressor.threshold.setTargetAtTime(-30, time, 0.05);
+      compressor.knee.setTargetAtTime(20, time, 0.05);
+      compressor.ratio.setTargetAtTime(4.0, time, 0.05);
+      compressor.attack.setTargetAtTime(0.005, time, 0.05);
+      compressor.release.setTargetAtTime(0.15, time, 0.05);
+      gainNode.gain.setTargetAtTime(2.0, time, 0.05); // +6 dB makeup gain
+    } else {
+      // Transparent bypass: ratio 1:1 and unity gain
+      compressor.threshold.setTargetAtTime(0, time, 0.05);
+      compressor.knee.setTargetAtTime(0, time, 0.05);
+      compressor.ratio.setTargetAtTime(1.0, time, 0.05);
+      compressor.attack.setTargetAtTime(0.003, time, 0.05);
+      compressor.release.setTargetAtTime(0.25, time, 0.05);
+      gainNode.gain.setTargetAtTime(1.0, time, 0.05); // unity gain
+    }
+  };
+
+  // Initialize Web Audio engine lazily
+  const initAudioEngine = () => {
+    if (typeof window === "undefined" || !audioRef.current) return;
+
+    try {
+      if (!globalAudioContext) {
+        const AudioContextClass =
+          window.AudioContext || (window as any).webkitAudioContext;
+        globalAudioContext = new AudioContextClass();
+      }
+
+      if (!globalCompressorNode || !globalGainNode) {
+        globalCompressorNode = globalAudioContext.createDynamicsCompressor();
+        globalGainNode = globalAudioContext.createGain();
+        configureCompressor(
+          globalCompressorNode,
+          globalGainNode,
+          settings.reduceDynamicRange,
+          globalAudioContext,
+        );
+      }
+
+      // Connect source to compressor only if it's a new audio element
+      if (globalAudioElement !== audioRef.current) {
+        if (globalSourceNode) {
+          globalSourceNode.disconnect();
+        }
+        globalAudioElement = audioRef.current;
+        globalSourceNode = globalAudioContext.createMediaElementSource(
+          audioRef.current,
+        );
+
+        // Chain: Source -> Compressor -> Gain (makeup) -> Destination
+        globalSourceNode.connect(globalCompressorNode);
+        globalCompressorNode.connect(globalGainNode);
+        globalGainNode.connect(globalAudioContext.destination);
+      }
+    } catch (error) {
+      console.error("Failed to initialize Web Audio API:", error);
+    }
+  };
+
+  // Initialize the audio engine when the player mounts/renders a song
+  useEffect(() => {
+    if (currentSong) {
+      initAudioEngine();
+    }
+  }, [currentSong?.id]);
+
+  // Update compressor configuration when setting changes
+  useEffect(() => {
+    if (globalAudioContext && globalCompressorNode && globalGainNode) {
+      configureCompressor(
+        globalCompressorNode,
+        globalGainNode,
+        settings.reduceDynamicRange,
+        globalAudioContext,
+      );
+    }
+  }, [settings.reduceDynamicRange]);
+
+  // Resume AudioContext on user interaction if suspended
+  useEffect(() => {
+    const resumeAudioContext = () => {
+      if (globalAudioContext && globalAudioContext.state === "suspended") {
+        globalAudioContext
+          .resume()
+          .catch((e) => console.error("Failed to resume AudioContext:", e));
+      }
+    };
+
+    window.addEventListener("click", resumeAudioContext);
+    window.addEventListener("touchstart", resumeAudioContext);
+    return () => {
+      window.removeEventListener("click", resumeAudioContext);
+      window.removeEventListener("touchstart", resumeAudioContext);
+    };
+  }, []);
+
   // Reset volume and playback speed when the song changes
   useEffect(() => {
     setPlaybackRate(currentSong?.speed ?? 1.0);
@@ -70,6 +186,14 @@ export default function Player() {
       audioRef.current.volume = volume;
 
       if (isPlaying) {
+        if (globalAudioContext && globalAudioContext.state === "suspended") {
+          globalAudioContext
+            .resume()
+            .catch((e) =>
+              console.error("Failed to resume AudioContext on play:", e),
+            );
+        }
+
         audioRef.current
           .play()
           .catch((e) => console.error("Playback failed:", e));
@@ -309,7 +433,7 @@ export default function Player() {
     <>
       <audio
         ref={audioRef}
-        src={getProxiedUrl(currentSong.url)}
+        src={`/storage/${currentSong.path}`}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
         onPlay={() => {
@@ -606,10 +730,3 @@ const MusicIcon = ({ className }: { className: string }) => (
     <circle cx="18" cy="16" r="3"></circle>
   </svg>
 );
-
-const getProxiedUrl = (url: string) => {
-  return url.replace(
-    "https://ad0nzrqxbs7k6ri0.public.blob.vercel-storage.com/",
-    "/storage/",
-  );
-};
