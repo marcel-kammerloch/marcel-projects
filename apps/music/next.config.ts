@@ -46,6 +46,7 @@ const nextConfig: NextConfig = {
   experimental: {
     useTypeScriptCli: true,
   },
+  cacheComponents: true
 };
 
 export default nextConfig;

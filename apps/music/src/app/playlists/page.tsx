@@ -2,8 +2,6 @@ import { getPlaylists } from "@/actions/playlist";
 import PlaylistsView from "@/components/playlist/PlaylistsView";
 import UploadModalBtn from "@/components/upload/UploadModalBtn";
 
-export const dynamic = "force-dynamic";
-
 export default async function PlaylistsPage() {
   const { data: playlists } = await getPlaylists();
 

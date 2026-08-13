@@ -2,8 +2,6 @@ import { getSongs } from "@/actions/song";
 import SongList from "@/components/song/SongList";
 import UploadModalBtn from "@/components/upload/UploadModalBtn";
 
-export const dynamic = "force-dynamic";
-
 export default async function Home() {
   const { data: songs } = await getSongs();
 

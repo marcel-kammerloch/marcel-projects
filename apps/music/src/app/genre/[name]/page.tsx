@@ -12,8 +12,6 @@ import {
   Piano,
 } from "lucide-react";
 
-export const dynamic = "force-dynamic";
-
 const GENRE_LABELS: Record<string, string> = {
   film_score: "Film Score",
   piano: "Piano",
