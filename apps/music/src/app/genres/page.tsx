@@ -2,8 +2,6 @@ import { getSongs } from "@/actions/song";
 import GenreView from "@/components/genre/GenreView";
 import UploadModalBtn from "@/components/upload/UploadModalBtn";
 
-export const dynamic = "force-dynamic";
-
 export default async function GenresPage() {
   const { data: songs } = await getSongs();
 

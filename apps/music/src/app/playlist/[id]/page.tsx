@@ -8,8 +8,6 @@ import AddSongButton from "@/components/playlist/AddSongButton";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import AdminOnly from "@/components/AdminOnly";
 
-export const dynamic = "force-dynamic";
-
 export default async function PlaylistPage({
   params,
 }: {
