@@ -13,6 +13,7 @@ import {
   Menu as MenuIcon,
   Volume2,
   Gauge,
+  Disc3,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -23,11 +24,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Slider } from "@/components/ui/slider";
+import AudioVisualizer from "@/components/player/AudioVisualizer";
 
 let globalAudioContext: AudioContext | null = null;
 let globalSourceNode: MediaElementAudioSourceNode | null = null;
 let globalCompressorNode: DynamicsCompressorNode | null = null;
 let globalGainNode: GainNode | null = null;
+let globalAnalyserNode: AnalyserNode | null = null;
 let globalAudioElement: HTMLAudioElement | null = null;
 
 export default function Player() {
@@ -41,6 +44,8 @@ export default function Player() {
     setIsPlaying,
     isFullView,
     setIsFullView,
+    playOnlyThisSong,
+    setPlayOnlyThisSong,
     settings,
     setSettings,
   } = usePlayerStore();
@@ -48,6 +53,7 @@ export default function Player() {
   const [playbackRate, setPlaybackRate] = useState(1);
   const [volume, setVolume] = useState(1);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [loopedOnceForCurrentSong, setLoopedOnceForCurrentSong] =
     useState(false);
 
@@ -99,9 +105,12 @@ export default function Player() {
         globalAudioContext = new AudioContextClass();
       }
 
-      if (!globalCompressorNode || !globalGainNode) {
+      if (!globalCompressorNode || !globalGainNode || !globalAnalyserNode) {
         globalCompressorNode = globalAudioContext.createDynamicsCompressor();
         globalGainNode = globalAudioContext.createGain();
+        globalAnalyserNode = globalAudioContext.createAnalyser();
+        globalAnalyserNode.fftSize = 128;
+        globalAnalyserNode.smoothingTimeConstant = 0.8;
         configureCompressor(
           globalCompressorNode,
           globalGainNode,
@@ -110,7 +119,9 @@ export default function Player() {
         );
       }
 
-      // Connect source to compressor only if it's a new audio element
+      setAnalyser(globalAnalyserNode);
+
+      // Connect source to compressor and analyser only if it's a new audio element
       if (globalAudioElement !== audioRef.current) {
         if (globalSourceNode) {
           globalSourceNode.disconnect();
@@ -120,10 +131,11 @@ export default function Player() {
           audioRef.current,
         );
 
-        // Chain: Source -> Compressor -> Gain (makeup) -> Destination
+        // Chain: Source -> Compressor -> Gain (makeup) -> Analyser -> Destination
         globalSourceNode.connect(globalCompressorNode);
         globalCompressorNode.connect(globalGainNode);
-        globalGainNode.connect(globalAudioContext.destination);
+        globalGainNode.connect(globalAnalyserNode);
+        globalAnalyserNode.connect(globalAudioContext.destination);
       }
     } catch (error) {
       console.error("Failed to initialize Web Audio API:", error);
@@ -172,7 +184,14 @@ export default function Player() {
     setPlaybackRate(currentSong?.speed ?? 1.0);
     setVolume(1);
     setLoopedOnceForCurrentSong(false);
-  }, [currentSong?.id]);
+    setPlayOnlyThisSong(false);
+  }, [currentSong?.id, setPlayOnlyThisSong]);
+
+  useEffect(() => {
+    if (settings.loop !== "off") {
+      setPlayOnlyThisSong(false);
+    }
+  }, [settings.loop, setPlayOnlyThisSong]);
 
   useEffect(() => {
     if (settings.loop !== "once") {
@@ -295,6 +314,12 @@ export default function Player() {
   const handleEnded = () => {
     if (!audioRef.current) {
       playNext();
+      return;
+    }
+
+    if (playOnlyThisSong) {
+      setPlayOnlyThisSong(false);
+      setIsPlaying(false);
       return;
     }
 
@@ -511,7 +536,7 @@ export default function Player() {
         onTouchEnd={handleTouchEnd}
       >
         <div className="flex-1 flex flex-col p-6 max-w-md mx-auto w-full">
-          <div className="flex justify-between items-center mb-8 pt-4">
+          <div className="flex justify-between items-center mb-6 pt-4">
             <button
               onClick={() => {
                 setIsFullView(false);
@@ -594,6 +619,24 @@ export default function Player() {
                       }
                     />
                   </div>
+                  <DropdownMenuSeparator />
+                  <button
+                    type="button"
+                    onClick={() => setPlayOnlyThisSong(!playOnlyThisSong)}
+                    className={`w-full flex items-center justify-between px-2 py-2 rounded-lg text-xs font-medium transition ${
+                      playOnlyThisSong
+                        ? "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold"
+                        : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Disc3 className="w-4 h-4" />
+                      Play only this song
+                    </span>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${playOnlyThisSong ? "bg-blue-600 text-white" : "bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400"}`}>
+                      {playOnlyThisSong ? "ON" : "OFF"}
+                    </span>
+                  </button>
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -601,25 +644,57 @@ export default function Player() {
 
           <div className="flex-1 flex flex-col items-center justify-center">
             <div
-              className="w-64 h-64 sm:w-80 sm:h-80 rounded-3xl shadow-2xl flex items-center justify-center relative overflow-hidden group"
+              className="w-60 h-60 sm:w-72 sm:h-72 rounded-3xl shadow-2xl flex items-center justify-center relative overflow-hidden group"
               style={{ background: getGradient(currentSong.id) }}
             >
               {/* Cover Image Placeholder */}
               <div className="absolute inset-0 bg-black/20 mix-blend-overlay"></div>
-              <MusicIcon className="w-24 h-24 text-white/50 relative z-10" />
+              <MusicIcon className="w-20 h-20 text-white/50 relative z-10" />
             </div>
           </div>
 
-          <div className="mt-8 mb-4">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white truncate">
-              {currentSong.title}
-            </h2>
-            <p className="text-lg text-zinc-500 dark:text-zinc-400 truncate mt-1">
-              {currentSong.artist || "Unknown Artist"}
-            </p>
+          {/* Real-Time Audio Visualizer */}
+          <div className="mt-3 mb-1">
+            <AudioVisualizer
+              analyser={analyser}
+              isPlaying={isPlaying}
+              className="max-w-xs mx-auto"
+            />
           </div>
 
-          <div className="mb-8">
+          <div className="mt-2 mb-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white truncate">
+                  {currentSong.title}
+                </h2>
+                <p className="text-base text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                  {currentSong.artist || "Unknown Artist"}
+                </p>
+              </div>
+
+              {/* Play Only This Song Mode Toggle */}
+              <button
+                type="button"
+                onClick={() => setPlayOnlyThisSong(!playOnlyThisSong)}
+                aria-pressed={playOnlyThisSong}
+                className={`shrink-0 flex items-center px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  playOnlyThisSong
+                    ? "bg-blue-600 text-white shadow-md shadow-blue-500/25 ring-2 ring-blue-500/50"
+                    : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"
+                }`}
+                title={
+                  playOnlyThisSong
+                    ? "Active: Playback will stop after this song"
+                    : "Enable to stop playback after this song finishes"
+                }
+              >
+                <span>{playOnlyThisSong ? "Play 1x (Active)" : "Play 1x"}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="mb-6">
             <input
               type="range"
               min={0}

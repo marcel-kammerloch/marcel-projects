@@ -26,10 +26,12 @@ interface PlayerState {
   playbackSourceName: string | null;
   isPlaying: boolean;
   isFullView: boolean;
+  playOnlyThisSong: boolean;
   settings: Settings;
 
   // Actions
   setIsFullView: (isFullView: boolean) => void;
+  setPlayOnlyThisSong: (playOnlyThisSong: boolean) => void;
   setSettings: (settings: Partial<Settings>) => void;
   playSong: (
     song: Song,
@@ -54,6 +56,7 @@ export const usePlayerStore = create<PlayerState>()(
       playbackSourceName: null,
       isPlaying: false,
       isFullView: false,
+      playOnlyThisSong: false,
       settings: {
         skipDuration: 15,
         loop: "off",
@@ -72,6 +75,8 @@ export const usePlayerStore = create<PlayerState>()(
           },
         })),
 
+      setPlayOnlyThisSong: (playOnlyThisSong) => set({ playOnlyThisSong }),
+
       playSong: (
         song,
         queue,
@@ -82,6 +87,7 @@ export const usePlayerStore = create<PlayerState>()(
         set((state) => ({
           currentSong: song,
           isPlaying: true,
+          playOnlyThisSong: false,
           queue: queue ?? state.queue,
           playlistName:
             playlistName !== undefined ? playlistName : state.playlistName,
@@ -98,6 +104,8 @@ export const usePlayerStore = create<PlayerState>()(
       playNext: () => {
         const { currentSong, queue, settings } = get();
         if (!currentSong || queue.length === 0) return;
+
+        set({ playOnlyThisSong: false });
 
         if (settings.shuffle) {
           const randomIndex = Math.floor(Math.random() * queue.length);
@@ -122,6 +130,8 @@ export const usePlayerStore = create<PlayerState>()(
       playPrevious: () => {
         const { currentSong, queue } = get();
         if (!currentSong || queue.length === 0) return;
+
+        set({ playOnlyThisSong: false });
 
         const currentIndex = queue.findIndex((s) => s.id === currentSong.id);
         if (currentIndex <= 0) {
