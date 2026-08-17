@@ -37,7 +37,12 @@ import {
 } from "@dnd-kit/sortable";
 import { useAuth } from "@repo/auth/client";
 
-type SortMode = "custom" | "date" | "name" | "duration";
+export type SortMode =
+  | "manual"
+  | "duration"
+  | "date-desc"
+  | "date-asc"
+  | "name";
 
 interface SongListBaseProps {
   songs: Song[];
@@ -47,6 +52,7 @@ interface SongListBaseProps {
   genreKey?: Genre;
   playbackSourceType?: "playlist" | "genre" | null;
   playbackSourceName?: string | null;
+  showSortSelector?: boolean;
 }
 
 export default function SongListBase({
@@ -57,6 +63,7 @@ export default function SongListBase({
   genreKey,
   playbackSourceType,
   playbackSourceName,
+  showSortSelector = true,
 }: SongListBaseProps) {
   const { playSong } = usePlayerStore();
   const { isAdmin } = useAuth();
@@ -168,16 +175,16 @@ export default function SongListBase({
     setActiveMenu(activeMenu === songId ? null : songId);
   };
 
-  const [sortBy, setSortBy] = useState<SortMode>("custom");
-
-  // Whether to show the sort selector (playlist or genre pages)
-  const showSortSelector = !!(playlistId || genreKey);
+  const [sortBy, setSortBy] = useState<SortMode>("manual");
 
   const displayedSongs = [...localSongs].sort((a, b) => {
     if (sortBy === "name") {
       return a.title.localeCompare(b.title);
     }
-    if (sortBy === "date") {
+    if (sortBy === "date-desc") {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    if (sortBy === "date-asc") {
       return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     }
     if (sortBy === "duration") {
@@ -198,7 +205,7 @@ export default function SongListBase({
   return (
     <div className="flex flex-col gap-2 pb-6 touch-manipulation">
       {(title || subtitle || showSortSelector) && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 mt-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 mt-2">
           <div>
             {title && (
               <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-1">
@@ -210,21 +217,22 @@ export default function SongListBase({
 
           {showSortSelector && (
             <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-              <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                 Sort:
               </span>
               <Select
                 value={sortBy}
                 onValueChange={(value) => setSortBy(value as SortMode)}
               >
-                <SelectTrigger size="sm" className="min-w-32.5">
+                <SelectTrigger size="sm" className="min-w-44 bg-zinc-100 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="custom">Custom Order</SelectItem>
-                  <SelectItem value="date">Date Added</SelectItem>
-                  <SelectItem value="name">Name (A–Z)</SelectItem>
+                  <SelectItem value="manual">Manual</SelectItem>
                   <SelectItem value="duration">Duration</SelectItem>
+                  <SelectItem value="date-desc">Date added – newest first</SelectItem>
+                  <SelectItem value="date-asc">Date added – oldest first</SelectItem>
+                  <SelectItem value="name">Name (A–Z)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -234,7 +242,7 @@ export default function SongListBase({
 
       {/* Column Headers */}
       <div className="flex px-4 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
-        {sortBy === "custom" && isAdmin && <div className="w-10"></div>}
+        {sortBy === "manual" && isAdmin && <div className="w-10"></div>}
         <div className="w-10 flex items-center justify-start">#</div>
         <div className="flex-1 pr-4">Title</div>
         <div className="hidden sm:block flex-1 pr-4">Artist</div>
@@ -261,7 +269,7 @@ export default function SongListBase({
               onPlay={handlePlay}
               onMenuClick={toggleMenu}
               activeMenuId={activeMenu}
-              dragDisabled={sortBy !== "custom" || !isAdmin}
+              dragDisabled={sortBy !== "manual" || !isAdmin}
               actions={{
                 onEdit: () => setEditingSong(song),
                 onDelete: () => handleDeleteRequest(song.id),
