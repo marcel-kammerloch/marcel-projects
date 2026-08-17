@@ -121,21 +121,32 @@ export default function Player() {
 
       setAnalyser(globalAnalyserNode);
 
-      // Connect source to compressor and analyser only if it's a new audio element
-      if (globalAudioElement !== audioRef.current) {
-        if (globalSourceNode) {
-          globalSourceNode.disconnect();
-        }
-        globalAudioElement = audioRef.current;
-        globalSourceNode = globalAudioContext.createMediaElementSource(
-          audioRef.current,
-        );
+      // Connect source to compressor and analyser only once per HTMLMediaElement
+      const mediaElement = audioRef.current as HTMLAudioElement & {
+        _sourceNodeConnected?: boolean;
+      };
 
-        // Chain: Source -> Compressor -> Gain (makeup) -> Analyser -> Destination
-        globalSourceNode.connect(globalCompressorNode);
-        globalCompressorNode.connect(globalGainNode);
-        globalGainNode.connect(globalAnalyserNode);
-        globalAnalyserNode.connect(globalAudioContext.destination);
+      if (!mediaElement._sourceNodeConnected) {
+        try {
+          if (globalSourceNode) {
+            try {
+              globalSourceNode.disconnect();
+            } catch {}
+          }
+          globalAudioElement = mediaElement;
+          globalSourceNode =
+            globalAudioContext.createMediaElementSource(mediaElement);
+          mediaElement._sourceNodeConnected = true;
+
+          // Chain: Source -> Compressor -> Gain (makeup) -> Analyser -> Destination
+          globalSourceNode.connect(globalCompressorNode);
+          globalCompressorNode.connect(globalGainNode);
+          globalGainNode.connect(globalAnalyserNode);
+          globalAnalyserNode.connect(globalAudioContext.destination);
+        } catch (sourceErr) {
+          mediaElement._sourceNodeConnected = true;
+          console.warn("Audio element source node already attached:", sourceErr);
+        }
       }
     } catch (error) {
       console.error("Failed to initialize Web Audio API:", error);
