@@ -17,7 +17,7 @@ export const authClient: ReactAuthClient<BetterAuthClientOptions> =
   });
 
 export const useAuth = () => {
-  if (process.env.NODE_ENV !== "production") return { isAdmin: false };
+  if (process.env.NODE_ENV !== "production") return { isAdmin: true };
 
   const { data } = authClient.useSession();
   const user = data?.user as { role?: string } | undefined;
