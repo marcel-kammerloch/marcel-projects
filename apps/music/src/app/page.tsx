@@ -1,8 +1,10 @@
 import { getSongs } from "@/actions/song";
 import SongList from "@/components/song/SongList";
 import UploadModalBtn from "@/components/upload/UploadModalBtn";
+import { connection } from "next/server";
 
 export default async function Home() {
+  await connection();
   const { data: songs } = await getSongs();
 
   return (

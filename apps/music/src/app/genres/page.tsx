@@ -1,8 +1,10 @@
 import { getSongs } from "@/actions/song";
 import GenreView from "@/components/genre/GenreView";
 import UploadModalBtn from "@/components/upload/UploadModalBtn";
+import { connection } from "next/server";
 
 export default async function GenresPage() {
+  await connection();
   const { data: songs } = await getSongs();
 
   return (

@@ -1,8 +1,10 @@
 import { getPlaylists } from "@/actions/playlist";
 import PlaylistsView from "@/components/playlist/PlaylistsView";
 import UploadModalBtn from "@/components/upload/UploadModalBtn";
+import { connection } from "next/server";
 
 export default async function PlaylistsPage() {
+  await connection();
   const { data: playlists } = await getPlaylists();
 
   return (

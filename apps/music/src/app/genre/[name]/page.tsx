@@ -36,11 +36,14 @@ const GENRE_ICONS: Record<GenreType, LucideIcon> = {
   VIOLIN: Guitar,
 };
 
+import { connection } from "next/server";
+
 export default async function GenrePage({
   params,
 }: {
   params: Promise<{ name: string }>;
 }) {
+  await connection();
   const { name } = await params;
   const genreKey = name.toLowerCase();
 

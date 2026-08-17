@@ -7,12 +7,14 @@ import RenamePlaylistButton from "@/components/playlist/RenamePlaylistButton";
 import AddSongButton from "@/components/playlist/AddSongButton";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import AdminOnly from "@/components/AdminOnly";
+import { connection } from "next/server";
 
 export default async function PlaylistPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
   const { id } = await params;
   const { data: playlist, error } = await getPlaylist(id);
 
