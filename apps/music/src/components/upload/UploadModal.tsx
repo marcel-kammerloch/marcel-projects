@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { upload } from "@vercel/blob/client";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
@@ -21,6 +21,7 @@ export default function UploadModal({
   onClose: () => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -40,6 +41,28 @@ export default function UploadModal({
   const { setIsPlaying: setMainIsPlaying } = usePlayerStore();
   const snippetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const resetForm = useCallback(() => {
+    setFile(null);
+    setTitle("");
+    setArtist("");
+    setGenre("CLASSICAL");
+    setStartTime("");
+    setEndTime("");
+    setDuration(0);
+    setCurrentTime(0);
+    setSpeed(1.0);
+    setIsDraggingOver(false);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsPlayingPreview(false);
+    setUploadStatus("");
+    if (snippetTimeoutRef.current) {
+      clearTimeout(snippetTimeoutRef.current);
+    }
+  }, []);
+
   useEffect(() => {
     ffmpegRef.current = new FFmpeg();
     return () => {
@@ -52,11 +75,13 @@ export default function UploadModal({
   }, []);
 
   useEffect(() => {
-    if (!isOpen && audioRef.current) {
-      audioRef.current.pause();
-      setIsPlayingPreview(false);
-      if (snippetTimeoutRef.current) clearTimeout(snippetTimeoutRef.current);
-    } else if (isOpen) {
+    if (!isOpen) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setIsPlayingPreview(false);
+        if (snippetTimeoutRef.current) clearTimeout(snippetTimeoutRef.current);
+      }
+    } else {
       setMainIsPlaying(false);
     }
   }, [isOpen, setMainIsPlaying]);
@@ -68,27 +93,41 @@ export default function UploadModal({
     }
   }, [speed]);
 
+  const loadAudioFile = (selectedFile: File) => {
+    setMainIsPlaying(false);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      setIsPlayingPreview(false);
+    }
+    setFile(selectedFile);
+    setTitle(selectedFile.name.replace(/\.[^/.]+$/, ""));
+    setCurrentTime(0);
+    setStartTime("");
+    setEndTime("");
+    setSpeed(1.0);
+
+    const audio = new Audio(URL.createObjectURL(selectedFile));
+    audio.onloadedmetadata = () => {
+      const preciseDuration = Math.round(audio.duration * 10) / 10;
+      setDuration(preciseDuration);
+    };
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setMainIsPlaying(false);
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-        setIsPlayingPreview(false);
-      }
-      const selectedFile = e.target.files[0];
-      setFile(selectedFile);
-      setTitle(selectedFile.name.replace(/\.[^/.]+$/, ""));
-      setCurrentTime(0);
-      setStartTime("");
-      setEndTime("");
-      setSpeed(1.0);
+      loadAudioFile(e.target.files[0]);
+    }
+  };
 
-      const audio = new Audio(URL.createObjectURL(selectedFile));
-      audio.onloadedmetadata = () => {
-        const preciseDuration = Math.round(audio.duration * 10) / 10;
-        setDuration(preciseDuration);
-      };
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const droppedFile = e.dataTransfer.files[0];
+      loadAudioFile(droppedFile);
     }
   };
 
@@ -281,6 +320,7 @@ export default function UploadModal({
       });
 
       toast.success("Song uploaded successfully!");
+      resetForm();
       onClose();
     } catch (error) {
       console.error("Upload error:", error);
@@ -291,12 +331,17 @@ export default function UploadModal({
     }
   };
 
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
     <div
       className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-3 sm:p-6 backdrop-blur-md overflow-y-auto"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl border border-zinc-200 dark:border-zinc-800 my-auto max-h-[92vh] flex flex-col"
@@ -318,7 +363,7 @@ export default function UploadModal({
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1 rounded-full transition cursor-pointer"
           >
             <X className="w-6 h-6" />
@@ -328,9 +373,31 @@ export default function UploadModal({
         {/* Scrollable Form Body */}
         <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-5">
           <form id="upload-audio-form" onSubmit={handleSubmit} className="space-y-5">
-            {/* File Drop / Select Area */}
+            {/* File Drop / Select Area with Interactive Drag Border */}
             {!file ? (
-              <div className="relative border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl p-6 text-center transition bg-zinc-50/50 dark:bg-zinc-950/20">
+              <div
+                onDragEnter={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingOver(true);
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingOver(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingOver(false);
+                }}
+                onDrop={handleDrop}
+                className={`relative border-2 border-dashed rounded-2xl p-6 text-center transition-all duration-200 ${
+                  isDraggingOver
+                    ? "border-blue-500 bg-blue-50/80 dark:bg-blue-950/50 ring-4 ring-blue-500/25 shadow-lg shadow-blue-500/10 scale-[1.01]"
+                    : "border-zinc-300 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 bg-zinc-50/50 dark:bg-zinc-950/20"
+                }`}
+              >
                 <input
                   id="audio-upload"
                   type="file"
@@ -339,13 +406,21 @@ export default function UploadModal({
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   required
                 />
-                <div className="flex flex-col items-center gap-2">
-                  <div className="p-3 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-2xl">
+                <div className="flex flex-col items-center gap-2 pointer-events-none">
+                  <div
+                    className={`p-3 rounded-2xl transition-all ${
+                      isDraggingOver
+                        ? "bg-blue-600 text-white scale-110 shadow-md"
+                        : "bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400"
+                    }`}
+                  >
                     <FileAudio className="w-8 h-8" />
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                      Choose an audio file or drag & drop
+                      {isDraggingOver
+                        ? "Drop your audio file right here!"
+                        : "Choose an audio file or drag & drop"}
                     </span>
                     <p className="text-xs text-zinc-400 mt-0.5">
                       Supports MP3, M4A, AAC
@@ -439,7 +514,7 @@ export default function UploadModal({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={isUploading}
               className="px-4 py-2.5 rounded-xl font-medium text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
             >
