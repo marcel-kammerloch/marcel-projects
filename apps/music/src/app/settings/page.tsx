@@ -48,11 +48,11 @@ export default function SettingsPage() {
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">
             Playback
           </h2>
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
-            <label className="text-base font-medium text-zinc-900 dark:text-zinc-100 block mb-4">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm space-y-6">
+            <label className="text-base font-medium text-zinc-900 dark:text-zinc-100 block mb-4" htmlFor="duration-btns">
               Fast-Forward & Rewind Duration
             </label>
-            <div className="flex gap-2 bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl">
+            <div className="flex gap-2 bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl" id="duration-btns">
               {[10, 15, 30].map((val) => (
                 <button
                   key={val}
@@ -86,6 +86,27 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setSettings({ keepScreenOn: e.target.checked })
                   }
+                />
+                <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+              </label>
+            </div>
+
+            <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-medium text-zinc-900 dark:text-zinc-100 block">
+                  Save battery
+                </h3>
+                <p className="text-sm text-zinc-500 mt-1">
+                  When enabled, the visualizer stays off and the next song is not
+                  preloaded in advance.
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={settings.saveBattery}
+                  onChange={(e) => setSettings({ saveBattery: e.target.checked })}
                 />
                 <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
               </label>
@@ -177,7 +198,7 @@ export default function SettingsPage() {
         </section>
 
         {/* Data Management */}
-        <section className="w-full max-w-4xl mb-16">
+        <section className="w-full max-w-4xl mb-12">
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">
             Data Management
           </h2>
