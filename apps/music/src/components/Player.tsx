@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Slider } from "@/components/ui/slider";
 import AudioVisualizer from "@/components/player/AudioVisualizer";
+import { STORAGE_URL } from "@/lib/constants";
 
 let globalAudioContext: AudioContext | null = null;
 let globalSourceNode: MediaElementAudioSourceNode | null = null;
@@ -469,7 +470,8 @@ export default function Player() {
     <>
       <audio
         ref={audioRef}
-        src={`/storage/${currentSong.path}`}
+        crossOrigin="anonymous"
+        src={`${STORAGE_URL}/${currentSong.path}`}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
         onPlay={() => {

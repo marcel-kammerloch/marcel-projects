@@ -1,0 +1,1 @@
+export const STORAGE_URL = "https://ad0nzrqxbs7k6ri0.public.blob.vercel-storage.com"

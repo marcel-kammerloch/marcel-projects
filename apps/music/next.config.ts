@@ -1,3 +1,4 @@
+import { STORAGE_URL } from "@/lib/constants";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -8,12 +9,12 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: `default-src 'self';
+            value: `default-src 'self' ${STORAGE_URL};
               script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js;
               style-src 'self' 'unsafe-inline';
               img-src 'self';
-              connect-src 'self' https://auth.marcel-projects.vercel.app https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm https://vercel.com/api/blob/;
-              media-src 'self' blob:;`
+              connect-src 'self' ${STORAGE_URL} https://auth.marcel-projects.vercel.app https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm https://vercel.com/api/blob/;
+              media-src 'self' blob: ${STORAGE_URL};`
               .replace(/\s{2,}/g, " ")
               .trim(),
           },
@@ -31,15 +32,6 @@ const nextConfig: NextConfig = {
           },
           { key: "X-Robots-Tag", value: "noindex, nofollow" },
         ],
-      },
-    ];
-  },
-  async rewrites() {
-    return [
-      {
-        source: "/storage/:path*",
-        destination:
-          "https://ad0nzrqxbs7k6ri0.public.blob.vercel-storage.com/:path*",
       },
     ];
   },
