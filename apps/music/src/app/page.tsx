@@ -15,7 +15,7 @@ export default async function Home() {
       </div>
 
       <div className="space-y-4">
-        <SongList initialSongs={songs || []} />;
+        <SongList initialSongs={songs || []} />
       </div>
     </main>
   );
