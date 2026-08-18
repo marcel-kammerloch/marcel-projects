@@ -1,10 +1,11 @@
+import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import Player from "@/components/player/Player";
 import BottomNav from "@/components/BottomNav";
-import { ClientProviders } from "@/components/ClientProviders";
-import "./globals.css";
+import { Suspense } from "react";
+import { ClientScripts } from "@/components/ClientScripts";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Music Player",
-  description: "A simple and modern music player",
+  description: "Modern music streaming service",
   applicationName: "Music",
   icons: {
     shortcut: {
@@ -73,12 +74,18 @@ export default function RootLayout({
       suppressHydrationWarning={process.env.NODE_ENV === "production"}
     >
       <body className="min-h-full flex flex-col pb-36 transition-colors duration-300">
-        {/* <ClientProviders> */}
-          {children}
-            <Player />
-            <BottomNav />
-          <Toaster  />
-        {/* </ClientProviders> */}
+        {children}
+
+        <Suspense>
+          <Player />
+        </Suspense>
+
+        <Suspense>
+          <BottomNav />
+        </Suspense>
+
+        <ClientScripts />
+        <Toaster />
       </body>
     </html>
   );
