@@ -7,14 +7,12 @@ import RenamePlaylistButton from "@/components/playlist/RenamePlaylistButton";
 import AddSongButton from "@/components/playlist/AddSongButton";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import AdminOnly from "@/components/AdminOnly";
-import { connection } from "next/server";
 
 export default async function PlaylistPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await connection();
   const { id } = await params;
   const { data: playlist, error } = await getPlaylist(id);
 
@@ -29,7 +27,7 @@ export default async function PlaylistPage({
   }).format(new Date(playlist.createdAt));
 
   return (
-    <main className="flex-1 w-full max-w-2xl mx-auto px-4 mt-8">
+    <main className="flex-1 w-full max-w-4xl mx-auto px-2 md:px-4 mt-8">
       <BackButton />
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8 mt-2 w-full">

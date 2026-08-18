@@ -36,14 +36,11 @@ const GENRE_ICONS: Record<GenreType, LucideIcon> = {
   VIOLIN: Guitar,
 };
 
-import { connection } from "next/server";
-
 export default async function GenrePage({
   params,
 }: {
   params: Promise<{ name: string }>;
 }) {
-  await connection();
   const { name } = await params;
   const genreKey = name.toLowerCase();
 
@@ -61,7 +58,7 @@ export default async function GenrePage({
   const Icon = GENRE_ICONS[genreEnum];
 
   return (
-    <main className="flex-1 w-full max-w-2xl mx-auto px-4 mt-8">
+    <main className="flex-1 w-full max-w-4xl mx-auto px-2 md:px-4 mt-8">
       <BackButton />
 
       <div
