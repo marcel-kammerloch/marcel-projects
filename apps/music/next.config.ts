@@ -46,6 +46,13 @@ const nextConfig: NextConfig = {
   experimental: {
     useTypeScriptCli: true,
   },
+  cacheLife: {
+    default: {
+      stale: 86400,  // 24 hours
+      revalidate: 604800,  // 7 days
+      expire: 2592000,  // 30 days
+    }
+  },
   cacheComponents: true
 };
 

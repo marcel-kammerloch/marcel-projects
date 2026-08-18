@@ -1,9 +1,9 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { cacheTag, updateTag } from "next/cache";
 import { del } from "@vercel/blob";
-import type { Genre, Prisma, Song } from "@db/client";
+import type { Genre, Song } from "@db/client";
 import { validateAccess } from "@repo/auth";
 
 type MinimalSong = Pick<Song, "id" | "title" | "artist">;
@@ -18,6 +18,13 @@ export async function getSongs({ min = false }: { min?: boolean } = {}) {
   const hasAccess = await validateAccess({ scope: "music" });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
+
+  return getSongsCached({ min });
+}
+
+async function getSongsCached({ min = false }: { min?: boolean } = {}) {
+  "use cache";
+  cacheTag("music:library", "music:songs");
 
   try {
     const songs = await prisma.song.findMany({
@@ -65,7 +72,11 @@ export async function createSong(data: {
         order: nextOrder,
       },
     });
-    revalidatePath("/");
+
+    updateTag("music:library");
+    updateTag("music:songs");
+    updateTag("music:genres");
+
     return { data: song, error: null };
   } catch (error: unknown) {
     return {
@@ -86,7 +97,11 @@ export async function deleteSong(id: string) {
       await del(song.path);
     }
     await prisma.song.delete({ where: { id } });
-    revalidatePath("/");
+
+    updateTag("music:library");
+    updateTag("music:songs");
+    updateTag("music:genres");
+
     return { success: true, error: null };
   } catch (error: unknown) {
     return {
@@ -126,7 +141,11 @@ export async function updateSong(
       where: { id },
       data,
     });
-    revalidatePath("/");
+
+    updateTag("music:library");
+    updateTag("music:songs");
+    updateTag("music:genres");
+    
     return { data: song, error: null };
   } catch (error: unknown) {
     return {
