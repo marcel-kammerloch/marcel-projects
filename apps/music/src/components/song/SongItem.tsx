@@ -59,7 +59,7 @@ export default function SongItem({
       className={`group flex items-center px-1 md:px-4 py-3 rounded-xl transition-colors ${
         isCurrent
           ? "bg-blue-900/30 text-blue-400"
-          : "hover:bg-zinc-800/50 xt-zinc-300"
+          : "hover:bg-zinc-800/50 text-zinc-300"
       } ${isDragging ? "opacity-50 z-50 bg-zinc-800" : ""}`}
     >
       {!dragDisabled && (
@@ -103,9 +103,7 @@ export default function SongItem({
         <div className="flex items-center gap-2">
           <p
             className={`text-base font-medium truncate ${
-              isCurrent
-                ? "text-white"
-                : "group-hover:text-white"
+              isCurrent ? "text-white" : "group-hover:text-white"
             }`}
           >
             {song.title}
