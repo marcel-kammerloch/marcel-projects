@@ -8,6 +8,7 @@ import { formatTime, getGradient, MusicIcon } from "@/components/player/playerUt
 import type { Song } from "@db/client";
 
 interface PlayerFullViewProps {
+  isFullView: boolean;
   currentSong: Song;
   progress: number;
   isPlaying: boolean;
@@ -42,6 +43,7 @@ interface PlayerFullViewProps {
 }
 
 export default function PlayerFullView({
+  isFullView,
   currentSong,
   progress,
   isPlaying,
@@ -71,7 +73,7 @@ export default function PlayerFullView({
 }: PlayerFullViewProps) {
   return (
     <div
-      className="fixed inset-0 bg-white dark:bg-zinc-950 z-50 flex flex-col transition-transform duration-500 ease-out translate-y-0"
+      className={`fixed inset-0 bg-white dark:bg-zinc-950 z-50 flex flex-col transition-transform duration-500 ease-out  ${isFullView ? "translate-y-0" : "translate-y-full"}`}
       style={{ touchAction: "none" }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}

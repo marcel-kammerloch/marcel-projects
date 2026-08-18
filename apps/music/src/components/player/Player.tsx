@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { STORAGE_URL } from "@/lib/constants";
 import { getNextLoopMode, getSongSource, isStandalonePwa } from "@/components/player/playerUtils";
 import PlayerFullView from "@/components/player/PlayerFullView";
 import PlayerMiniBar from "@/components/player/PlayerMiniBar";
@@ -465,8 +464,8 @@ export default function Player() {
         />
       )}
 
-      {isFullView && (
         <PlayerFullView
+        isFullView={isFullView}
           currentSong={currentSong}
           progress={progress}
           isPlaying={isPlaying}
@@ -497,7 +496,6 @@ export default function Player() {
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         />
-      )}
     </>
   );
 }
