@@ -56,7 +56,7 @@ export default function SongItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group flex items-center px-4 py-3 rounded-xl transition-colors ${
+      className={`group flex items-center px-1 md:px-4 py-3 rounded-xl transition-colors ${
         isCurrent
           ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
           : "hover:bg-zinc-100 dark:hover:bg-zinc-800/50 text-zinc-600 dark:text-zinc-300"

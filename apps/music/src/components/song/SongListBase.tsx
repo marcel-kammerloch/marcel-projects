@@ -241,7 +241,7 @@ export default function SongListBase({
       )}
 
       {/* Column Headers */}
-      <div className="flex px-4 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
+      <div className="flex px-1 md:px-4 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
         {sortBy === "manual" && isAdmin && <div className="w-10"></div>}
         <div className="w-10 flex items-center justify-start">#</div>
         <div className="flex-1 pr-4">Title</div>
