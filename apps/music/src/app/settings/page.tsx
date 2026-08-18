@@ -2,15 +2,9 @@
 
 import { useState } from "react";
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { useTheme } from "next-themes";
 import {
   ArrowLeft,
-  Monitor,
-  Moon,
-  Sun,
   Trash2,
-  Contrast,
-  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
@@ -20,6 +14,7 @@ import { toast } from "sonner";
 type ToggleSettingProps = {
   title: React.ReactNode;
   description: string;
+  border?: boolean;
   checked: boolean;
   onChange: (checked: boolean) => void;
 };
@@ -27,13 +22,14 @@ type ToggleSettingProps = {
 function ToggleSetting({
   title,
   description,
+  border,
   checked,
   onChange,
 }: ToggleSettingProps) {
   return (
-    <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+    <div className={`pt-6 border-zinc-800 flex items-center justify-between ${border ? "border-t" : ""}`}>
       <div>
-        <h3 className="text-base font-medium text-zinc-900 dark:text-zinc-100 block">
+        <h3 className="text-base font-medium text-zinc-100 block">
           {title}
         </h3>
         <p className="text-sm text-zinc-500 mt-1">{description}</p>
@@ -45,39 +41,14 @@ function ToggleSetting({
           checked={checked}
           onChange={(event) => onChange(event.target.checked)}
         />
-        <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500" />
+        <div className="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500" />
       </label>
     </div>
   );
 }
 
-type ThemeOptionProps = {
-  label: string;
-  icon: LucideIcon;
-  active: boolean;
-  onClick: () => void;
-};
-
-function ThemeOption({ label, icon: Icon, active, onClick }: ThemeOptionProps) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "flex flex-col items-center justify-center p-4 rounded-xl border transition",
-        active
-          ? "bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/50 text-blue-600 dark:text-blue-400"
-          : "bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400",
-      )}
-    >
-      <Icon className="w-6 h-6 mb-2" />
-      <span className="text-sm font-medium">{label}</span>
-    </button>
-  );
-}
-
 export default function SettingsPage() {
   const { settings, setSettings } = usePlayerStore();
-  const { theme, setTheme } = useTheme();
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
@@ -106,12 +77,6 @@ export default function SettingsPage() {
     },
   ];
 
-  const themeOptions = [
-    { label: "System", value: "system", icon: Monitor },
-    { label: "Light", value: "light", icon: Sun },
-    { label: "Dark", value: "dark", icon: Moon },
-  ] as const;
-
   const handleReset = () => {
     setShowResetConfirm(true);
   };
@@ -137,20 +102,20 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold text-zinc-100">Settings</h1>
       </div>
 
-      <div className="gap-8 my-4 flex items-center flex-col overflow-y-scroll">
+      <div className="gap-8 my-4 flex items-center flex-col">
         <section className="w-full max-w-4xl">
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">
             Playback
           </h2>
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm space-y-6">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 shadow-sm space-y-6">
             <label
-              className="text-base font-medium text-zinc-900 dark:text-zinc-100 block mb-4"
+              className="text-base font-medium text-zinc-100 block mb-4"
               htmlFor="duration-btns"
             >
               Fast-Forward & Rewind Duration
             </label>
             <div
-              className="flex gap-2 bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl"
+              className="flex gap-2 bg-zinc-950 p-1.5 rounded-xl"
               id="duration-btns"
             >
               {[10, 15, 30].map((val) => (
@@ -160,8 +125,8 @@ export default function SettingsPage() {
                   className={cn(
                     "flex-1 py-3 rounded-lg font-semibold text-sm transition",
                     settings.skipDuration === val
-                      ? "bg-white dark:bg-zinc-800 text-black dark:text-white shadow-sm border border-zinc-200 dark:border-zinc-700"
-                      : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white",
+                      ? "bg-zinc-800 text-white shadow-sm border border-zinc-700"
+                      : "text-zinc-400 hover:text-white",
                   )}
                 >
                   {val}s
@@ -176,6 +141,7 @@ export default function SettingsPage() {
                 description={setting.description}
                 checked={setting.checked}
                 onChange={setting.onChange}
+                border
               />
             ))}
           </div>
@@ -185,34 +151,19 @@ export default function SettingsPage() {
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">
             Appearance
           </h2>
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm space-y-6">
-            <div>
-              <label className="text-base font-medium text-zinc-900 dark:text-zinc-100 block mb-4">
-                Theme
-              </label>
-              <div className="grid grid-cols-3 gap-3">
-                {themeOptions.map(({ label, value, icon: Icon }) => (
-                  <ThemeOption
-                    key={value}
-                    label={label}
-                    icon={Icon}
-                    active={theme === value}
-                    onClick={() => setTheme(value)}
-                  />
-                ))}
-              </div>
-            </div>
-
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl px-5 pb-5 space-y-6 shadow-sm">
             <ToggleSetting
-              title={
-                <>
-                  <Contrast className="w-5 h-5 text-zinc-500" />
-                  High Contrast Mode
-                </>
-              }
+              title={"High Contrast Mode"}
               description="Enhances visibility of active elements."
               checked={settings.highContrast}
               onChange={(checked) => setSettings({ highContrast: checked })}
+            />
+            <ToggleSetting
+              title={"Reduce Animations"}
+              description="Turn off most of the animation."
+              border
+              checked={settings.reduceAnimations}
+              onChange={(checked) => setSettings({ reduceAnimations: checked })}
             />
           </div>
         </section>
@@ -221,10 +172,10 @@ export default function SettingsPage() {
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">
             Data Management
           </h2>
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 shadow-sm">
             <button
               onClick={handleReset}
-              className="w-full bg-red-50 hover:bg-red-100 dark:bg-red-600/10 dark:hover:bg-red-600/20 text-red-600 dark:text-red-500 border border-red-200 dark:border-red-500/20 font-semibold py-4 rounded-xl transition flex items-center justify-center gap-2"
+              className="w-full bg-red-600/10 hover:bg-red-600/20 text-red-500 border border-red-500/20 font-semibold py-4 rounded-xl transition flex items-center justify-center gap-2"
             >
               <Trash2 className="w-5 h-5" />
               Reset App

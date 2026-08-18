@@ -12,6 +12,7 @@ export type Settings = {
   keepScreenOn: boolean;
   reduceDynamicRange: boolean;
   saveBattery: boolean;
+  reduceAnimations: boolean;
 };
 
 const normalizeLoopMode = (value: unknown): LoopMode => {
@@ -66,6 +67,7 @@ export const usePlayerStore = create<PlayerState>()(
         keepScreenOn: false,
         reduceDynamicRange: false,
         saveBattery: false,
+        reduceAnimations: false,
       },
 
       setSettings: (newSettings) =>
@@ -161,7 +163,7 @@ export const usePlayerStore = create<PlayerState>()(
           mergedState.settings = {
             ...mergedState.settings,
             loop: normalizeLoopMode(mergedState.settings.loop),
-            saveBattery: mergedState.settings.saveBattery ?? false,
+            // saveBattery: mergedState.settings.saveBattery ?? false,
           };
         }
 

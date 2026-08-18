@@ -23,6 +23,7 @@ interface PlayerFullViewProps {
     shuffle: boolean;
     skipDuration: number;
     saveBattery: boolean;
+    reduceAnimations: boolean;
   };
   onClose: () => void;
   onTogglePlay: () => void;
@@ -73,7 +74,7 @@ export default function PlayerFullView({
 }: PlayerFullViewProps) {
   return (
     <div
-      className={`fixed inset-0 bg-white dark:bg-zinc-950 z-50 flex flex-col transition-transform duration-500 ease-out  ${isFullView ? "translate-y-0" : "translate-y-full"}`}
+      className={`fixed inset-0 bg-zinc-950 z-50 flex flex-col transition-transform duration-500 ease-out  ${isFullView ? "translate-y-0" : "translate-y-full"}`}
       style={{ touchAction: "none" }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
@@ -83,17 +84,17 @@ export default function PlayerFullView({
           <button
             type="button"
             onClick={onClose}
-            className="text-zinc-900 dark:text-white p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition"
+            className="text-white p-2 hover:bg-zinc-800 rounded-full transition"
           >
             <ChevronDown className="w-8 h-8" />
           </button>
 
           <div className="flex-1 min-w-0 px-2 text-center">
-            <p className="text-[10px] font-bold tracking-widest text-zinc-400 dark:text-zinc-500 uppercase">
+            <p className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
               Now Playing
             </p>
             {playbackSourceType && playbackSourceName && (
-              <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-0.5 wrap-break-word line-clamp-2 px-1">
+              <p className="text-xs font-semibold text-zinc-400 mt-0.5 wrap-break-word line-clamp-2 px-1">
                 Playing from {playbackSourceType} &ldquo;{playbackSourceName}&rdquo;
               </p>
             )}
@@ -121,7 +122,7 @@ export default function PlayerFullView({
           </div>
         </div>
 
-        {!settings.saveBattery && (
+        {!settings.reduceAnimations && (
           <div className="mt-3 mb-1">
             <AudioVisualizer
               analyser={analyser}
@@ -134,10 +135,10 @@ export default function PlayerFullView({
         <div className="mt-2 mb-2">
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white truncate">
+              <h2 className="text-2xl font-bold text-white truncate">
                 {currentSong.title}
               </h2>
-              <p className="text-base text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+              <p className="text-base text-zinc-400 truncate mt-0.5">
                 {currentSong.artist || "Unknown Artist"}
               </p>
             </div>
@@ -149,7 +150,7 @@ export default function PlayerFullView({
               className={`shrink-0 flex items-center px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 playOnlyThisSong
                   ? "bg-blue-600 text-white shadow-md shadow-blue-500/25 ring-2 ring-blue-500/50"
-                  : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"
+                  : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700"
               }`}
               title={
                 playOnlyThisSong
@@ -169,9 +170,9 @@ export default function PlayerFullView({
             max={currentSong.duration || 100}
             value={progress}
             onChange={(event) => onSeek(Number(event.target.value))}
-            className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             style={{
-              background: `linear-gradient(to right, #3b82f6 ${(progress / (currentSong.duration || 1)) * 100}%, ${typeof document !== "undefined" && document.documentElement.classList.contains("dark") ? "#27272a" : "#e4e4e7"} ${(progress / (currentSong.duration || 1)) * 100}%)`,
+              background: `linear-gradient(to right, #3b82f6 ${(progress / (currentSong.duration || 1)) * 100}%, #27272a ${(progress / (currentSong.duration || 1)) * 100}%)`,
             }}
           />
           <div className="flex justify-between text-xs text-zinc-500 font-medium mt-2">
