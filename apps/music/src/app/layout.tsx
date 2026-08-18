@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
-import Player from "@/components/Player";
+import Player from "@/components/player/Player";
 import BottomNav from "@/components/BottomNav";
 import { ClientProviders } from "@/components/ClientProviders";
 import "./globals.css";

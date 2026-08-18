@@ -5,6 +5,7 @@ import { deletePlaylist } from "@/actions/playlist";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import ActionIconButton from "@/components/ui/ActionIconButton";
 import { toast } from "sonner";
 
 export default function DeletePlaylistButton({
@@ -28,13 +29,12 @@ export default function DeletePlaylistButton({
 
   return (
     <>
-      <button
+      <ActionIconButton
+        icon={Trash2}
+        label="Delete Playlist"
         onClick={() => setIsOpen(true)}
-        className="p-3 bg-red-600/10 hover:bg-red-600/20 text-red-500 rounded-xl transition flex items-center justify-center border border-red-500/20 cursor-pointer"
-        title="Delete Playlist"
-      >
-        <Trash2 className="w-5 h-5 pointer-events-none" />
-      </button>
+        variant="danger"
+      />
 
       <ConfirmModal
         isOpen={isOpen}

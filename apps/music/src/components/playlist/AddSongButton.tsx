@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { AddSongModal } from "@/components/modals/AddSongModal";
+import ActionIconButton from "@/components/ui/ActionIconButton";
 
 interface AddSongButtonProps {
   playlistId: string;
@@ -17,13 +18,12 @@ export default function AddSongButton({
 
   return (
     <>
-      <button
+      <ActionIconButton
+        icon={Plus}
+        label="Add Song"
         onClick={() => setIsOpen(true)}
-        className="p-3 bg-blue-600/10 hover:bg-blue-600/20 text-blue-500 rounded-xl transition flex items-center justify-center border border-blue-500/20 cursor-pointer"
-        title="Add Song"
-      >
-        <Plus className="w-5 h-5 pointer-events-none" />
-      </button>
+        variant="primary"
+      />
 
       {isOpen && (
         <AddSongModal

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Edit2 } from "lucide-react";
 import { RenamePlaylistModal } from "@/components/modals/RenamePlaylistModal";
+import ActionIconButton from "@/components/ui/ActionIconButton";
 
 interface RenamePlaylistButtonProps {
   playlistId: string;
@@ -17,13 +18,11 @@ export default function RenamePlaylistButton({
 
   return (
     <>
-      <button
+      <ActionIconButton
+        icon={Edit2}
+        label="Rename Playlist"
         onClick={() => setIsOpen(true)}
-        className="p-2 text-zinc-400 hover:text-white transition rounded-full hover:bg-zinc-800/50 cursor-pointer"
-        title="Rename Playlist"
-      >
-        <Edit2 className="w-5 h-5 pointer-events-none" />
-      </button>
+      />
 
       {isOpen && (
         <RenamePlaylistModal

@@ -3,10 +3,77 @@
 import { useState } from "react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useTheme } from "next-themes";
-import { ArrowLeft, Monitor, Moon, Sun, Trash2, Contrast } from "lucide-react";
+import {
+  ArrowLeft,
+  Monitor,
+  Moon,
+  Sun,
+  Trash2,
+  Contrast,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+
+type ToggleSettingProps = {
+  title: React.ReactNode;
+  description: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+};
+
+function ToggleSetting({
+  title,
+  description,
+  checked,
+  onChange,
+}: ToggleSettingProps) {
+  return (
+    <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+      <div>
+        <h3 className="text-base font-medium text-zinc-900 dark:text-zinc-100 block">
+          {title}
+        </h3>
+        <p className="text-sm text-zinc-500 mt-1">{description}</p>
+      </div>
+      <label className="relative inline-flex items-center cursor-pointer">
+        <input
+          type="checkbox"
+          className="sr-only peer"
+          checked={checked}
+          onChange={(event) => onChange(event.target.checked)}
+        />
+        <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500" />
+      </label>
+    </div>
+  );
+}
+
+type ThemeOptionProps = {
+  label: string;
+  icon: LucideIcon;
+  active: boolean;
+  onClick: () => void;
+};
+
+function ThemeOption({ label, icon: Icon, active, onClick }: ThemeOptionProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex flex-col items-center justify-center p-4 rounded-xl border transition",
+        active
+          ? "bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/50 text-blue-600 dark:text-blue-400"
+          : "bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400",
+      )}
+    >
+      <Icon className="w-6 h-6 mb-2" />
+      <span className="text-sm font-medium">{label}</span>
+    </button>
+  );
+}
 
 export default function SettingsPage() {
   const { settings, setSettings } = usePlayerStore();
@@ -14,22 +81,50 @@ export default function SettingsPage() {
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
+  const playbackSettings = [
+    {
+      title: "Keep Screen On",
+      description:
+        "When enabled in the installed app, keep the screen awake while audio plays.",
+      checked: settings.keepScreenOn,
+      onChange: (checked: boolean) => setSettings({ keepScreenOn: checked }),
+    },
+    {
+      title: "Save battery",
+      description:
+        "When enabled, the visualizer stays off and the next song is not preloaded in advance.",
+      checked: settings.saveBattery,
+      onChange: (checked: boolean) => setSettings({ saveBattery: checked }),
+    },
+    {
+      title: "Reduce Dynamic Range",
+      description:
+        "Compresses the volume differences within a song to make loud and quiet parts more balanced.",
+      checked: settings.reduceDynamicRange,
+      onChange: (checked: boolean) =>
+        setSettings({ reduceDynamicRange: checked }),
+    },
+  ];
+
+  const themeOptions = [
+    { label: "System", value: "system", icon: Monitor },
+    { label: "Light", value: "light", icon: Sun },
+    { label: "Dark", value: "dark", icon: Moon },
+  ] as const;
+
   const handleReset = () => {
     setShowResetConfirm(true);
   };
 
   const confirmReset = async () => {
     try {
-      // delete local storage (settings)
       localStorage.clear();
-      // delete cache
       const keys = await caches.keys();
       await Promise.all(keys.map((key) => caches.delete(key)));
-      // redirect to entry page
       window.location.href = "/";
-    } catch (e) {
-      console.error("Reset failed", e);
-      toast.error("Reset failed: " + String(e));
+    } catch (error) {
+      console.error("Reset failed", error);
+      toast.error("Reset failed: " + String(error));
     }
   };
 
@@ -43,101 +138,49 @@ export default function SettingsPage() {
       </div>
 
       <div className="gap-8 my-4 flex items-center flex-col overflow-y-scroll">
-        {/* Playback Settings */}
         <section className="w-full max-w-4xl">
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">
             Playback
           </h2>
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm space-y-6">
-            <label className="text-base font-medium text-zinc-900 dark:text-zinc-100 block mb-4" htmlFor="duration-btns">
+            <label
+              className="text-base font-medium text-zinc-900 dark:text-zinc-100 block mb-4"
+              htmlFor="duration-btns"
+            >
               Fast-Forward & Rewind Duration
             </label>
-            <div className="flex gap-2 bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl" id="duration-btns">
+            <div
+              className="flex gap-2 bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl"
+              id="duration-btns"
+            >
               {[10, 15, 30].map((val) => (
                 <button
                   key={val}
                   onClick={() => setSettings({ skipDuration: val })}
-                  className={`flex-1 py-3 rounded-lg font-semibold text-sm transition ${
+                  className={cn(
+                    "flex-1 py-3 rounded-lg font-semibold text-sm transition",
                     settings.skipDuration === val
                       ? "bg-white dark:bg-zinc-800 text-black dark:text-white shadow-sm border border-zinc-200 dark:border-zinc-700"
-                      : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
-                  }`}
+                      : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white",
+                  )}
                 >
                   {val}s
                 </button>
               ))}
             </div>
 
-            <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-medium text-zinc-900 dark:text-zinc-100 block">
-                  Keep Screen On
-                </h3>
-                <p className="text-sm text-zinc-500 mt-1">
-                  When enabled in the installed app, keep the screen awake while
-                  audio plays.
-                </p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={settings.keepScreenOn}
-                  onChange={(e) =>
-                    setSettings({ keepScreenOn: e.target.checked })
-                  }
-                />
-                <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-              </label>
-            </div>
-
-            <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-medium text-zinc-900 dark:text-zinc-100 block">
-                  Save battery
-                </h3>
-                <p className="text-sm text-zinc-500 mt-1">
-                  When enabled, the visualizer stays off and the next song is not
-                  preloaded in advance.
-                </p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={settings.saveBattery}
-                  onChange={(e) => setSettings({ saveBattery: e.target.checked })}
-                />
-                <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-              </label>
-            </div>
-
-            <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-medium text-zinc-900 dark:text-zinc-100 block">
-                  Reduce Dynamic Range
-                </h3>
-                <p className="text-sm text-zinc-500 mt-1">
-                  Compresses the volume differences within a song to make loud
-                  and quiet parts more balanced.
-                </p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={settings.reduceDynamicRange}
-                  onChange={(e) =>
-                    setSettings({ reduceDynamicRange: e.target.checked })
-                  }
-                />
-                <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-              </label>
-            </div>
+            {playbackSettings.map((setting) => (
+              <ToggleSetting
+                key={setting.title}
+                title={setting.title}
+                description={setting.description}
+                checked={setting.checked}
+                onChange={setting.onChange}
+              />
+            ))}
           </div>
         </section>
 
-        {/* Appearance Settings */}
         <section className="w-full max-w-4xl">
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">
             Appearance
@@ -148,57 +191,33 @@ export default function SettingsPage() {
                 Theme
               </label>
               <div className="grid grid-cols-3 gap-3">
-                <button
-                  onClick={() => setTheme("system")}
-                  className={`flex flex-col items-center justify-center p-4 rounded-xl border transition ${theme === "system" ? "bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/50 text-blue-600 dark:text-blue-400" : "bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400"}`}
-                >
-                  <Monitor className="w-6 h-6 mb-2" />
-                  <span className="text-sm font-medium">System</span>
-                </button>
-                <button
-                  onClick={() => setTheme("light")}
-                  className={`flex flex-col items-center justify-center p-4 rounded-xl border transition ${theme === "light" ? "bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/50 text-blue-600 dark:text-blue-400" : "bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400"}`}
-                >
-                  <Sun className="w-6 h-6 mb-2" />
-                  <span className="text-sm font-medium">Light</span>
-                </button>
-                <button
-                  onClick={() => setTheme("dark")}
-                  className={`flex flex-col items-center justify-center p-4 rounded-xl border transition ${theme === "dark" ? "bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/50 text-blue-600 dark:text-blue-400" : "bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400"}`}
-                >
-                  <Moon className="w-6 h-6 mb-2" />
-                  <span className="text-sm font-medium">Dark</span>
-                </button>
+                {themeOptions.map(({ label, value, icon: Icon }) => (
+                  <ThemeOption
+                    key={value}
+                    label={label}
+                    icon={Icon}
+                    active={theme === value}
+                    onClick={() => setTheme(value)}
+                  />
+                ))}
               </div>
             </div>
 
-            <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+            <ToggleSetting
+              title={
+                <>
                   <Contrast className="w-5 h-5 text-zinc-500" />
                   High Contrast Mode
-                </h3>
-                <p className="text-sm text-zinc-500 mt-1">
-                  Enhances visibility of active elements.
-                </p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={settings.highContrast}
-                  onChange={(e) =>
-                    setSettings({ highContrast: e.target.checked })
-                  }
-                />
-                <div className="w-11 h-6 bg-zinc-200 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-              </label>
-            </div>
+                </>
+              }
+              description="Enhances visibility of active elements."
+              checked={settings.highContrast}
+              onChange={(checked) => setSettings({ highContrast: checked })}
+            />
           </div>
         </section>
 
-        {/* Data Management */}
-        <section className="w-full max-w-4xl mb-12">
+        <section className="w-full max-w-4xl md:mb-8">
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">
             Data Management
           </h2>
