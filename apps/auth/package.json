@@ -11,7 +11,7 @@
   "dependencies": {
     "@repo/auth": "workspace:*",
     "@repo/utils": "workspace:*",
-    "next": "16.3.0",
+    "next": "16.3.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
@@ -22,7 +22,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "eslint": "^10.8.1",
-    "eslint-config-next": "16.3.0",
+    "eslint-config-next": "16.3.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"
   }
