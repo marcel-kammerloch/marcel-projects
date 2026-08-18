@@ -75,9 +75,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col pb-36 transition-colors duration-300">
         <ClientProviders>
           {children}
-          <Player />
-          <BottomNav />
-          <Toaster position="top-center" />
+            <Player />
+            <BottomNav />
+          <Toaster  />
         </ClientProviders>
       </body>
     </html>
