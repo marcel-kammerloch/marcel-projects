@@ -38,15 +38,6 @@ export default function PlaylistsView({
 
   return (
     <div className="flex flex-col gap-6 mt-12 pb-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-          <div className="p-2 bg-blue-500/10 rounded-xl">
-            <ListMusic className="w-5 h-5 text-blue-500" />
-          </div>
-          Your Playlists
-        </h2>
-      </div>
-
       <AdminOnly>
         <form onSubmit={handleCreatePlaylist} className="flex gap-2">
           <input
