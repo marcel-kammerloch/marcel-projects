@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { validateAccess } from "@repo/auth";
-import { revalidatePath } from "next/cache";
+import {  updateTag } from "next/cache";
 
 export async function reorderSongs(songIds: string[]) {
   const hasAccess = await validateAccess({ admin: true });
@@ -20,7 +20,9 @@ export async function reorderSongs(songIds: string[]) {
       ),
     );
 
-    revalidatePath("/");
+    updateTag("music:library");
+    updateTag("music:songs");
+
     return { success: true, error: null };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -46,7 +48,9 @@ export async function reorderPlaylistSongs(
       ),
     );
 
-    revalidatePath(`/playlist/${playlistId}`);
+    updateTag("music:playlists");
+    updateTag(`music:playlist:${playlistId}`);
+    
     return { success: true, error: null };
   } catch (error: any) {
     return { success: false, error: error.message };

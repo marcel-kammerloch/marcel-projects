@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { cacheTag,  updateTag } from "next/cache";
 import type { Genre } from "@db/client";
 import { validateAccess } from "@repo/auth";
 
@@ -15,6 +15,13 @@ export async function getGenreSongs(genre: Genre) {
   const hasAccess = await validateAccess({ scope: "music" });
 
   if (!hasAccess) return { data: null, error: "Forbidden" };
+
+  return getGenreSongsCached(genre);
+}
+
+async function getGenreSongsCached(genre: Genre) {
+  "use cache";
+  cacheTag(`music:genre:${genre}`, "music:genres");
 
   try {
     // Find all songs of this genre
@@ -81,7 +88,9 @@ export async function reorderGenreSongs(genre: Genre, songIds: string[]) {
       ),
     );
 
-    revalidatePath(`/genre/${genre.toLowerCase()}`);
+    updateTag(`music:genre:${genre}`);
+    updateTag("music:genres");
+    
     return { success: true, error: null };
   } catch (error) {
     return {
