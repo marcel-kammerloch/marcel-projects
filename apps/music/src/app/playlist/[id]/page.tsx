@@ -7,17 +7,32 @@ import RenamePlaylistButton from "@/components/playlist/RenamePlaylistButton";
 import AddSongButton from "@/components/playlist/AddSongButton";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import AdminOnly from "@/components/AdminOnly";
+import { SongListBaseSkeleton } from "@/components/skeletons/song-list-base";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Suspense } from "react";
 
-export default async function PlaylistPage({
+export default function PlaylistPage({ params }: PageProps<"/playlist/[id]">) {
+  return (
+    <main className="flex-1 w-full max-w-4xl mx-auto px-2 md:px-4 mt-8">
+      <BackButton />
+
+      <Suspense fallback={<PageSkeleton />}>
+        <Playlist params={params} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function Playlist({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: PageProps<"/playlist/[id]">["params"];
 }) {
   const { id } = await params;
   const { data: playlist, error } = await getPlaylist(id);
 
   if (error || !playlist) {
-    notFound();
+    return notFound();
   }
 
   const formattedDate = new Intl.DateTimeFormat("en-US", {
@@ -27,9 +42,7 @@ export default async function PlaylistPage({
   }).format(new Date(playlist.createdAt));
 
   return (
-    <main className="flex-1 w-full max-w-4xl mx-auto px-2 md:px-4 mt-8">
-      <BackButton />
-
+    <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8 mt-2 w-full">
         {/* Cover Art and Metadata Container */}
         <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto flex-1 min-w-0">
@@ -79,6 +92,40 @@ export default async function PlaylistPage({
         playbackSourceType="playlist"
         playbackSourceName={playlist.name}
       />
-    </main>
+    </>
+  );
+}
+
+function PageSkeleton() {
+  return (
+    <>
+      {/* Cover Art and Metadata Container */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8 mt-2 w-full">
+        {/* Cover Art and Metadata Container */}
+        <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto flex-1 min-w-0">
+          {/* Cover Art */}
+          <div className="w-24 h-24 shrink-0">
+            <Skeleton className="w-full h-full rounded-lg" />
+          </div>
+
+          {/* Metadata */}
+          <div className="flex-1 min-w-0">
+            <Skeleton className="h-4 w-16 mb-2" />
+            <Skeleton className="h-8 w-40 mb-2" />
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <Skeleton className="h-4 w-48" />
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        {/* <div className="w-full sm:w-auto shrink-0 flex items-center gap-2 justify-start sm:justify-end mt-4 sm:mt-0">
+          <Skeleton className="h-10 w-28 rounded-lg" />
+          <Skeleton className="h-10 w-10 rounded-lg" />
+        </div> */}
+      </div>
+
+      <SongListBaseSkeleton title />
+    </>
   );
 }

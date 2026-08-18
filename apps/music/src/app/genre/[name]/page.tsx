@@ -11,6 +11,9 @@ import {
   Music,
   Piano,
 } from "lucide-react";
+import { Suspense } from "react";
+import { SongListBaseSkeleton } from "@/components/skeletons/song-list-base";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const GENRE_LABELS: Record<string, string> = {
   film_score: "Film Score",
@@ -36,31 +39,41 @@ const GENRE_ICONS: Record<GenreType, LucideIcon> = {
   VIOLIN: Guitar,
 };
 
-export default async function GenrePage({
+export default function GenrePage({ params }: PageProps<"/genre/[name]">) {
+  return (
+    <main className="flex-1 w-full max-w-4xl mx-auto px-2 md:px-4 mt-8">
+      <BackButton />
+
+      <Suspense fallback={<PageSkeleton />}>
+        <Genre params={params} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function Genre({
   params,
 }: {
-  params: Promise<{ name: string }>;
+  params: PageProps<"/genre/[name]">["params"];
 }) {
   const { name } = await params;
   const genreKey = name.toLowerCase();
 
   if (!GENRE_LABELS[genreKey]) {
-    notFound();
+    return notFound();
   }
 
   const genreEnum = genreKey.toUpperCase() as GenreType;
   const { data: genreSongs, error } = await getGenreSongs(genreEnum);
 
   if (error || !genreSongs) {
-    return <div>Error loading songs</div>;
+    return notFound();
   }
 
   const Icon = GENRE_ICONS[genreEnum];
 
   return (
-    <main className="flex-1 w-full max-w-4xl mx-auto px-2 md:px-4 mt-8">
-      <BackButton />
-
+    <>
       <div
         className={`p-8 rounded-3xl mb-8 bg-linear-to-br ${GENRE_COLORS[genreKey]} border flex flex-col gap-4 relative overflow-hidden backdrop-blur-md shadow-2xl`}
       >
@@ -94,6 +107,35 @@ export default async function GenrePage({
         playbackSourceType="genre"
         playbackSourceName={GENRE_LABELS[genreKey]}
       />
-    </main>
+    </>
+  );
+}
+
+function PageSkeleton() {
+  return (
+    <>
+      {/* Genre Header Skeleton */}
+      <div className="p-8 rounded-3xl mb-8 bg-linear-to-br from-slate-600/20 to-slate-900/40 border border-slate-500/20 flex flex-col gap-4 relative overflow-hidden backdrop-blur-md shadow-2xl">
+        <div className="flex items-center gap-4 relative z-10">
+          {/* Icon Skeleton */}
+          <Skeleton className="w-16 h-16 rounded-2xl shrink-0" />
+
+          <div className="flex-1">
+            {/* Genre Label Skeleton */}
+            <Skeleton className="h-4 w-12 mb-2" />
+            {/* Title Skeleton */}
+            <Skeleton className="h-10 w-48" />
+          </div>
+        </div>
+
+        {/* Description Skeleton */}
+        <div className="space-y-2 max-w-md">
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-5 w-3/4" />
+        </div>
+      </div>
+
+      <SongListBaseSkeleton />
+    </>
   );
 }
