@@ -38,7 +38,7 @@ export default function PlayerSettingsMenu({
           <button
             {...props}
             disabled={state.disabled}
-            className="text-zinc-900 dark:text-white p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition"
+            className="text-white p-2 hover:bg-zinc-800 rounded-full transition"
             type="button"
           >
             <MenuIcon className="w-6 h-6" />
@@ -95,8 +95,8 @@ export default function PlayerSettingsMenu({
             onClick={onTogglePlayOnlyThisSong}
             className={`w-full flex items-center justify-between px-2 py-2 rounded-lg text-xs font-medium transition ${
               playOnlyThisSong
-                ? "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold"
-                : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                ? "bg-blue-950/40 text-blue-400 font-semibold"
+                : "text-zinc-300 hover:bg-zinc-800"
             }`}
           >
             <span className="flex items-center gap-2">
@@ -107,7 +107,7 @@ export default function PlayerSettingsMenu({
               className={`text-[10px] px-1.5 py-0.5 rounded ${
                 playOnlyThisSong
                   ? "bg-blue-600 text-white"
-                  : "bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400"
+                  : "bg-zinc-700 text-zinc-400"
               }`}
             >
               {playOnlyThisSong ? "ON" : "OFF"}

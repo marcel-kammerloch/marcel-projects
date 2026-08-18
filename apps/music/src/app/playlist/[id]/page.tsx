@@ -42,7 +42,7 @@ export default async function PlaylistPage({
               Playlist
             </p>
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <h1 className="text-2xl sm:text-4xl font-bold text-zinc-900 dark:text-white wrap-break-word">
+              <h1 className="text-2xl sm:text-4xl font-bold text-white wrap-break-word">
                 {playlist.name}
               </h1>
               <AdminOnly>

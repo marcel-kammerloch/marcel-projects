@@ -36,7 +36,7 @@ export default function PlayerControls({
           className={`p-2 rounded-full transition ${
             settings.shuffle
               ? "text-blue-500"
-              : "text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
+              : "text-zinc-500 hover:text-white"
           }`}
         >
           <Shuffle className="w-6 h-6" />
@@ -46,7 +46,7 @@ export default function PlayerControls({
           <button
             type="button"
             onClick={onPlayPrevious}
-            className="text-zinc-900 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 transition"
+            className="text-white hover:text-blue-400 transition"
           >
             <SkipBack className="w-10 h-10" fill="currentColor" />
           </button>
@@ -54,7 +54,7 @@ export default function PlayerControls({
           <button
             type="button"
             onClick={onTogglePlay}
-            className="w-20 h-20 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black flex items-center justify-center hover:scale-105 transition-transform shadow-xl shadow-zinc-500/20 dark:shadow-white/15"
+            className="w-20 h-20 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shadow-xl shadow-white/15"
           >
             {isPlaying ? (
               <Pause className="w-10 h-10" fill="currentColor" />
@@ -66,7 +66,7 @@ export default function PlayerControls({
           <button
             type="button"
             onClick={onPlayNext}
-            className="text-zinc-900 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 transition"
+            className="text-white hover:text-blue-400 transition"
           >
             <SkipForward className="w-10 h-10" fill="currentColor" />
           </button>
@@ -79,7 +79,7 @@ export default function PlayerControls({
           className={`relative p-2 rounded-full transition ${
             settings.loop !== "off"
               ? "text-blue-500"
-              : "text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
+              : "text-zinc-500 hover:text-white"
           }`}
         >
           <Repeat className="w-6 h-6" />
@@ -95,14 +95,14 @@ export default function PlayerControls({
         <button
           type="button"
           onClick={onSkipBackward}
-          className="hover:text-zinc-900 dark:hover:text-white flex items-center transition bg-zinc-100 dark:bg-zinc-900 px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800"
+          className="hover:text-white flex items-center transition bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800"
         >
           -{settings.skipDuration}s
         </button>
         <button
           type="button"
           onClick={onSkipForward}
-          className="hover:text-zinc-900 dark:hover:text-white flex items-center transition bg-zinc-100 dark:bg-zinc-900 px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800"
+          className="hover:text-white flex items-center transition bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800"
         >
           +{settings.skipDuration}s
         </button>

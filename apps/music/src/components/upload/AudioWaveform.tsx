@@ -268,7 +268,7 @@ export default function AudioWaveform({
 
   return (
     <div className="w-full select-none">
-      <div className="relative w-full h-24 bg-zinc-900/90 dark:bg-zinc-950 rounded-xl p-2 border border-zinc-800 shadow-inner overflow-hidden cursor-crosshair">
+      <div className="relative w-full h-24 bg-zinc-950 rounded-xl p-2 border border-zinc-800 shadow-inner overflow-hidden cursor-crosshair">
         <canvas
           ref={canvasRef}
           onPointerDown={handlePointerDown}

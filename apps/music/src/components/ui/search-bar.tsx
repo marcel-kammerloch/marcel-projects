@@ -31,7 +31,7 @@ export function SearchBar({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="pl-9 bg-zinc-100 dark:bg-zinc-800/50 border-transparent focus-visible:ring-blue-500 rounded-xl"
+        className="pl-9 bg-zinc-800/50 border-transparent focus-visible:ring-blue-500 rounded-xl"
       />
     </div>
   );

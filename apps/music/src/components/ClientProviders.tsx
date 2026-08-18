@@ -1,9 +1,5 @@
 "use client";
 
-import {
-  ThemeProvider as NextThemesProvider,
-  type ThemeProviderProps,
-} from "next-themes";
 import { useEffect, useState } from "react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import OfflinePage from "@/app/offline/page";
@@ -63,8 +59,6 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // To prevent hydration mismatch, you could return null before mount,
-  // but next-themes handles hydration natively.
   // The highContrast class is handled purely on client after mount.
 
   if (!mounted) {
@@ -76,24 +70,6 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      {children}
-    </ThemeProvider>
-  );
-}
-
-function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  // React 19 / Next 16 fix: suppress the <script> tag warning by
-  // telling next-themes to use type="application/json" instead of
-  // type="text/javascript", which React won't try to execute
-  const scriptProps =
-    typeof window === "undefined"
-      ? undefined
-      : ({ type: "application/json" } as const);
-
-  return (
-    <NextThemesProvider {...props} scriptProps={scriptProps}>
-      {children}
-    </NextThemesProvider>
+    {children}
   );
 }

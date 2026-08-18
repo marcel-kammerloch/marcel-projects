@@ -208,7 +208,7 @@ export default function SongListBase({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 mt-2">
           <div>
             {title && (
-              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-1">
+              <h2 className="text-2xl font-bold text-white mb-1">
                 {title}
               </h2>
             )}
@@ -217,14 +217,14 @@ export default function SongListBase({
 
           {showSortSelector && (
             <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-              <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                 Sort:
               </span>
               <Select
                 value={sortBy}
                 onValueChange={(value) => setSortBy(value as SortMode)}
               >
-                <SelectTrigger size="sm" className="min-w-44 bg-zinc-100 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700">
+                <SelectTrigger size="sm" className="min-w-44 bg-zinc-800/80 border-zinc-700">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

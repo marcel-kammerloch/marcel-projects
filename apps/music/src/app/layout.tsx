@@ -73,12 +73,12 @@ export default function RootLayout({
       suppressHydrationWarning={process.env.NODE_ENV === "production"}
     >
       <body className="min-h-full flex flex-col pb-36 transition-colors duration-300">
-        <ClientProviders>
+        {/* <ClientProviders> */}
           {children}
             <Player />
             <BottomNav />
           <Toaster  />
-        </ClientProviders>
+        {/* </ClientProviders> */}
       </body>
     </html>
   );

@@ -119,11 +119,11 @@ export function AddSongModal({
                 {searchResults.map((song) => (
                   <li
                     key={song.id}
-                    className="flex justify-between items-center p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition cursor-pointer"
+                    className="flex justify-between items-center p-2 rounded-lg hover:bg-zinc-800/50 transition cursor-pointer"
                     onClick={() => handleAddSong(song.id)}
                   >
                     <div className="flex flex-col overflow-hidden">
-                      <span className="font-medium text-zinc-900 dark:text-white truncate">
+                      <span className="font-medium text-white truncate">
                         {song.title}
                       </span>
                       <span className="text-sm text-zinc-500 truncate">
