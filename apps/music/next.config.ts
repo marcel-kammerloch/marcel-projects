@@ -40,12 +40,13 @@ const nextConfig: NextConfig = {
   },
   cacheLife: {
     default: {
-      stale: 86400,  // 24 hours
-      revalidate: 604800,  // 7 days
-      expire: 2592000,  // 30 days
-    }
+      stale: 86400, // 24 hours
+      revalidate: 604800, // 7 days
+      expire: 2592000, // 30 days
+    },
   },
-  cacheComponents: true
+  partialPrefetching: true,
+  cacheComponents: true,
 };
 
 export default nextConfig;
