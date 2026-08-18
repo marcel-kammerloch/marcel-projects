@@ -37,6 +37,7 @@ let globalAudioElement: HTMLAudioElement | null = null;
 export default function Player() {
   const {
     currentSong,
+    queue,
     playbackSourceType,
     playbackSourceName,
     isPlaying,
@@ -59,9 +60,32 @@ export default function Player() {
     useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
+  const prefetchAudioRef = useRef<HTMLAudioElement | null>(null);
+  const prefetchedSongIdRef = useRef<string | null>(null);
   const wakeLockRef = useRef<any>(null);
 
   const [progress, setProgress] = useState(0);
+
+  const getNextSongCandidate = () => {
+    if (!currentSong || queue.length === 0) return null;
+
+    if (settings.shuffle) {
+      const randomIndex = Math.floor(Math.random() * queue.length);
+      return queue[randomIndex];
+    }
+
+    const currentIndex = queue.findIndex((song) => song.id === currentSong.id);
+    if (currentIndex === -1) return null;
+
+    if (currentIndex === queue.length - 1) {
+      if (settings.loop === "repeat") {
+        return queue[0];
+      }
+      return null;
+    }
+
+    return queue[currentIndex + 1];
+  };
 
   // Helper to configure the compressor smoothly
   const configureCompressor = (
@@ -233,6 +257,39 @@ export default function Player() {
       }
     }
   }, [isPlaying, currentSong, playbackRate, volume]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || settings.saveBattery || !isPlaying) {
+      if (prefetchAudioRef.current) {
+        prefetchAudioRef.current.removeAttribute("src");
+        prefetchAudioRef.current.load();
+      }
+      prefetchedSongIdRef.current = null;
+      return;
+    }
+
+    const nextSong = getNextSongCandidate();
+    if (!nextSong) {
+      prefetchedSongIdRef.current = null;
+      return;
+    }
+
+    const nextSongUrl = `${STORAGE_URL}/${nextSong.path}`;
+    const audio = prefetchAudioRef.current ?? new Audio();
+
+    if (
+      prefetchedSongIdRef.current === nextSong.id &&
+      (audio.currentSrc || audio.src) === nextSongUrl
+    ) {
+      return;
+    }
+
+    audio.src = nextSongUrl;
+    audio.preload = "auto";
+    audio.load();
+    prefetchAudioRef.current = audio;
+    prefetchedSongIdRef.current = nextSong.id;
+  }, [currentSong?.id, isPlaying, queue, settings.loop, settings.saveBattery, settings.shuffle]);
 
   const skipForward = () => {
     if (audioRef.current) {
@@ -666,14 +723,15 @@ export default function Player() {
             </div>
           </div>
 
-          {/* Real-Time Audio Visualizer */}
-          <div className="mt-3 mb-1">
-            <AudioVisualizer
-              analyser={analyser}
-              isPlaying={isPlaying}
-              className="max-w-xs mx-auto"
-            />
-          </div>
+          {!settings.saveBattery && (
+            <div className="mt-3 mb-1">
+              <AudioVisualizer
+                analyser={analyser}
+                isPlaying={isPlaying}
+                className="max-w-xs mx-auto"
+              />
+            </div>
+          )}
 
           <div className="mt-2 mb-2">
             <div className="flex items-center justify-between gap-2">
