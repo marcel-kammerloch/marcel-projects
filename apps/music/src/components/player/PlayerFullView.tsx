@@ -3,7 +3,11 @@ import { ChevronDown } from "lucide-react";
 import AudioVisualizer from "@/components/player/AudioVisualizer";
 import PlayerControls from "@/components/player/PlayerControls";
 import PlayerSettingsMenu from "@/components/player/PlayerSettingsMenu";
-import { formatTime, getGradient, MusicIcon } from "@/components/player/playerUtils";
+import {
+  formatTime,
+  getGradient,
+  MusicIcon,
+} from "@/components/player/playerUtils";
 
 import type { Song } from "@db/client";
 
@@ -95,7 +99,8 @@ export default function PlayerFullView({
             </p>
             {playbackSourceType && playbackSourceName && (
               <p className="text-xs font-semibold text-zinc-400 mt-0.5 wrap-break-word line-clamp-2 px-1">
-                Playing from {playbackSourceType} &ldquo;{playbackSourceName}&rdquo;
+                Playing from {playbackSourceType} &ldquo;{playbackSourceName}
+                &rdquo;
               </p>
             )}
           </div>
