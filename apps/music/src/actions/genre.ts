@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { cacheTag,  updateTag } from "next/cache";
+import { cacheTag, updateTag } from "next/cache";
 import type { Genre } from "@db/client";
 import { validateAccess } from "@repo/auth";
 
@@ -12,9 +12,9 @@ import { validateAccess } from "@repo/auth";
  * their current ordering context.
  */
 export async function getGenreSongs(genre: Genre) {
-  const hasAccess = await validateAccess({ scope: "music" });
+  // const hasAccess = await validateAccess({ scope: "music" });
 
-  if (!hasAccess) return { data: null, error: "Forbidden" };
+  // if (!hasAccess) return { data: null, error: "Forbidden" };
 
   return getGenreSongsCached(genre);
 }
@@ -90,7 +90,7 @@ export async function reorderGenreSongs(genre: Genre, songIds: string[]) {
 
     updateTag(`music:genre:${genre}`);
     updateTag("music:genres");
-    
+
     return { success: true, error: null };
   } catch (error) {
     return {

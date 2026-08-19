@@ -26,7 +26,7 @@ async function getPlaylistsCached() {
       },
       orderBy: { createdAt: "desc" },
     });
-    
+
     const mapped = playlists.map((p) => ({
       ...p,
       songs: p.songs.map((ps) => ps.song),
@@ -39,9 +39,9 @@ async function getPlaylistsCached() {
 }
 
 export async function getPlaylist(id: string) {
-  const hasAccess = await validateAccess({ scope: "music" });
+  // const hasAccess = await validateAccess({ scope: "music" });
 
-  if (!hasAccess) return { data: null, error: "Forbidden" };
+  // if (!hasAccess) return { data: null, error: "Forbidden" };
 
   return getPlaylistCached(id);
 }

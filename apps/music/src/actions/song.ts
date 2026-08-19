@@ -15,9 +15,9 @@ export async function getSongs(options?: {
   min?: false;
 }): Promise<{ data: Song[] | null; error: string | null }>;
 export async function getSongs({ min = false }: { min?: boolean } = {}) {
-  const hasAccess = await validateAccess({ scope: "music" });
+  // const hasAccess = await validateAccess({ scope: "music" });
 
-  if (!hasAccess) return { data: null, error: "Forbidden" };
+  // if (!hasAccess) return { data: null, error: "Forbidden" };
 
   return getSongsCached({ min });
 }
@@ -145,7 +145,7 @@ export async function updateSong(
     updateTag("music:library");
     updateTag("music:songs");
     updateTag("music:genres");
-    
+
     return { data: song, error: null };
   } catch (error: unknown) {
     return {
