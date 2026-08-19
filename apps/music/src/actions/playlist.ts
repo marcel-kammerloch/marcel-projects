@@ -5,9 +5,9 @@ import { validateAccess } from "@repo/auth";
 import { cacheTag, updateTag } from "next/cache";
 
 export async function getPlaylists() {
-  const hasAccess = await validateAccess({ scope: "music" });
+  // const hasAccess = await validateAccess({ scope: "music" });
 
-  if (!hasAccess) return { data: null, error: "Forbidden" };
+  // if (!hasAccess) return { data: null, error: "Forbidden" };
 
   return getPlaylistsCached();
 }
