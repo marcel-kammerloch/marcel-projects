@@ -92,6 +92,24 @@ export default function SongListBase({
     }),
   );
 
+  const [sortBy, setSortBy] = useState<SortMode>("manual");
+
+  const displayedSongs = [...localSongs].sort((a, b) => {
+    if (sortBy === "name") {
+      return a.title.localeCompare(b.title);
+    }
+    if (sortBy === "date-desc") {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    if (sortBy === "date-asc") {
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    }
+    if (sortBy === "duration") {
+      return a.duration - b.duration;
+    }
+    return 0;
+  });
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
@@ -121,7 +139,7 @@ export default function SongListBase({
   const handlePlay = (song: Song) => {
     playSong(
       song,
-      songs,
+      displayedSongs,
       playlistId && title ? title : null,
       playbackSourceType,
       playbackSourceName,
@@ -175,24 +193,6 @@ export default function SongListBase({
     setActiveMenu(activeMenu === songId ? null : songId);
   };
 
-  const [sortBy, setSortBy] = useState<SortMode>("manual");
-
-  const displayedSongs = [...localSongs].sort((a, b) => {
-    if (sortBy === "name") {
-      return a.title.localeCompare(b.title);
-    }
-    if (sortBy === "date-desc") {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    }
-    if (sortBy === "date-asc") {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    }
-    if (sortBy === "duration") {
-      return a.duration - b.duration;
-    }
-    return 0;
-  });
-
   if (displayedSongs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
@@ -208,9 +208,7 @@ export default function SongListBase({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 mt-2">
           <div>
             {title && (
-              <h2 className="text-2xl font-bold text-white mb-1">
-                {title}
-              </h2>
+              <h2 className="text-2xl font-bold text-white mb-1">{title}</h2>
             )}
             {subtitle && <p className="text-zinc-500 text-sm">{subtitle}</p>}
           </div>
@@ -224,14 +222,21 @@ export default function SongListBase({
                 value={sortBy}
                 onValueChange={(value) => setSortBy(value as SortMode)}
               >
-                <SelectTrigger size="sm" className="min-w-44 bg-zinc-800/80 border-zinc-700">
+                <SelectTrigger
+                  size="sm"
+                  className="min-w-44 bg-zinc-800/80 border-zinc-700"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="manual">Manual</SelectItem>
                   <SelectItem value="duration">Duration</SelectItem>
-                  <SelectItem value="date-desc">Date added – newest first</SelectItem>
-                  <SelectItem value="date-asc">Date added – oldest first</SelectItem>
+                  <SelectItem value="date-desc">
+                    Date added – newest first
+                  </SelectItem>
+                  <SelectItem value="date-asc">
+                    Date added – oldest first
+                  </SelectItem>
                   <SelectItem value="name">Name (A–Z)</SelectItem>
                 </SelectContent>
               </Select>
@@ -253,6 +258,7 @@ export default function SongListBase({
       </div>
 
       <DndContext
+        id="song-list-dnd"
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
