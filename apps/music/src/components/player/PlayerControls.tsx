@@ -1,4 +1,11 @@
-import { Pause, Play, SkipBack, SkipForward, Shuffle, Repeat } from "lucide-react";
+import {
+  Pause,
+  Play,
+  SkipBack,
+  SkipForward,
+  Shuffle,
+  Repeat,
+} from "lucide-react";
 
 interface PlayerControlsProps {
   isPlaying: boolean;
@@ -35,8 +42,8 @@ export default function PlayerControls({
           onClick={onToggleShuffle}
           className={`p-2 rounded-full transition ${
             settings.shuffle
-              ? "text-blue-500"
-              : "text-zinc-500 hover:text-white"
+              ? "text-blue-500 hc:bg-blue-500/20 hc:ring-2 hc:ring-blue-500/50 hc:text-blue-400"
+              : "text-zinc-500 hover:text-white hc:text-zinc-400"
           }`}
         >
           <Shuffle className="w-6 h-6" />
@@ -78,8 +85,8 @@ export default function PlayerControls({
           aria-label={`Loop ${settings.loop}`}
           className={`relative p-2 rounded-full transition ${
             settings.loop !== "off"
-              ? "text-blue-500"
-              : "text-zinc-500 hover:text-white"
+              ? "text-blue-500 hc:bg-blue-500/20 hc:ring-2 hc:ring-blue-500/50 hc:text-blue-400"
+              : "text-zinc-500 hover:text-white hc:text-zinc-400"
           }`}
         >
           <Repeat className="w-6 h-6" />
@@ -107,7 +114,6 @@ export default function PlayerControls({
           +{settings.skipDuration}s
         </button>
       </div>
-
     </>
   );
 }

@@ -58,7 +58,7 @@ export default function SongItem({
       style={style}
       className={`group flex items-center px-1 md:px-4 py-3 rounded-xl transition-colors ${
         isCurrent
-          ? "bg-blue-900/30 text-blue-400"
+          ? "bg-blue-900/30 text-blue-400 hc:ring-2 hc:ring-zinc-400"
           : "hover:bg-zinc-800/50 text-zinc-300"
       } ${isDragging ? "opacity-50 z-50 bg-zinc-800" : ""}`}
     >
