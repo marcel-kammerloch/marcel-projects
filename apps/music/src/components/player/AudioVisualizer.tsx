@@ -95,11 +95,16 @@ export default function AudioVisualizer({
           const weightedFreq = Math.min(255, rawFreq * eqBoost);
 
           // Blend frequency peak with general track pulse for lively response everywhere
-          const blendedValue = (weightedFreq * 0.75 + avgEnergy * 0.45) / normFactor;
+          const blendedValue =
+            (weightedFreq * 0.75 + avgEnergy * 0.45) / normFactor;
           const subtleWave =
-            0.08 * Math.sin(phase + i * 0.3) + 0.04 * Math.cos(phase * 1.5 - i * 0.2);
+            0.08 * Math.sin(phase + i * 0.3) +
+            0.04 * Math.cos(phase * 1.5 - i * 0.2);
 
-          rawValues[i] = Math.max(0.08, Math.min(1.0, blendedValue + subtleWave));
+          rawValues[i] = Math.max(
+            0.08,
+            Math.min(1.0, blendedValue + subtleWave),
+          );
         }
 
         phase += 0.06;
@@ -113,7 +118,9 @@ export default function AudioVisualizer({
             0.2 +
             0.35 *
               centerArch *
-              Math.abs(Math.sin(phase + i * 0.35) * Math.cos(phase * 0.7 + i * 0.15));
+              Math.abs(
+                Math.sin(phase + i * 0.35) * Math.cos(phase * 0.7 + i * 0.15),
+              );
         }
       }
 
