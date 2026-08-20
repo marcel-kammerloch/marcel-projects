@@ -5,3 +5,7 @@ body {
   color: #171717;
   font-family: var(--font-geist), system-ui, sans-serif;
 }
+
+::selection {
+  @apply bg-blue-500 text-white;
+}

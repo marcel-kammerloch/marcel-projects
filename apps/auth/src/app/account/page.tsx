@@ -12,7 +12,9 @@ export default async function AccountPage() {
       description={`You are signed in as ${user.name} (${user.email})`}
       icon={
         <svg
-          className="h-8 w-8"
+          className="size-8"
+          width="32"
+          height="32"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -45,7 +47,9 @@ export default async function AccountPage() {
       description="Your account is ready, but it still needs an administrator to approve it before you can access any applications."
       icon={
         <svg
-          className="h-8 w-8"
+          className="size-8"
+          width="32"
+          height="32"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

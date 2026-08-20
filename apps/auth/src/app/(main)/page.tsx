@@ -100,10 +100,10 @@ export default function AuthPage() {
                 key={provider.id}
                 onClick={() => handleSignIn(provider.id)}
                 disabled={!!loadingProviderId}
-                className="cursor-pointer w-full py-3 px-4 bg-zinc-100 hover:bg-white text-zinc-900 rounded-xl font-medium transition-all transform hover:scale-[1.015] active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-3"
+                className="cursor-pointer select-none w-full py-3 px-4 bg-zinc-100 hover:bg-white text-zinc-900 rounded-xl font-medium transition-all transform hover:scale-[1.015] active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-3"
               >
                 {loadingProviderId === provider.id ? (
-                  <span className="w-5 h-5 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin" />
+                  <span className="size-5 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin" />
                 ) : (
                   provider.icon
                 )}
