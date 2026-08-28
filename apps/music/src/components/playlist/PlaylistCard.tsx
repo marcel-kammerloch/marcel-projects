@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import type { Playlist, Song } from "@db/client";
-import { ListMusic, Play } from "lucide-react";
+import { ListMusic, Play, Heart } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { useFavoritesStore } from "@/store/useFavoritesStore";
+import { useTranslation } from "@/lib/i18n";
 
 type PlaylistWithSongs = Playlist & { songs: Song[] };
 
@@ -12,6 +14,8 @@ export default function PlaylistCardLink({
 }: {
   playlist: PlaylistWithSongs;
 }) {
+  const { t } = useTranslation();
+
   return (
     <Link
       href={`/playlist/${playlist.id}`}
@@ -19,7 +23,9 @@ export default function PlaylistCardLink({
     >
       <PlaylistCard playlist={playlist} />
       <h3 className="font-semibold text-white truncate">{playlist.name}</h3>
-      <p className="text-xs text-zinc-500">{playlist.songs.length} songs</p>
+      <p className="text-xs text-zinc-500">
+        {t.common.songsCount(playlist.songs.length)}
+      </p>
     </Link>
   );
 }
@@ -45,12 +51,63 @@ export function PlaylistCard({ playlist }: { playlist: PlaylistWithSongs }) {
     <div className="w-full aspect-square bg-zinc-900 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
       <div className="absolute inset-0 bg-linear-to-br from-blue-800/20 to-blue-800/20 opacity-50 group-hover:opacity-100 transition"></div>
       <ListMusic className="w-8 h-8 text-zinc-600 group-hover:text-blue-400 transition relative z-10" />
-      <button
-        onClick={handlePlay}
-        className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition shadow-lg hover:scale-105 active:scale-95"
-      >
-        <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
-      </button>
+      {playlist.songs.length > 0 && (
+        <button
+          onClick={handlePlay}
+          className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition shadow-lg hover:scale-105 active:scale-95 cursor-pointer"
+        >
+          <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
+        </button>
+      )}
     </div>
+  );
+}
+
+export function FavoritesCardLink({ allSongs }: { allSongs?: Song[] }) {
+  const { favoriteSongIds } = useFavoritesStore();
+  const { playSong } = usePlayerStore();
+  const { t } = useTranslation();
+
+  const count = favoriteSongIds.length;
+
+  const handlePlay = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!allSongs || allSongs.length === 0) return;
+
+    const favoriteSongs = allSongs.filter((s) =>
+      favoriteSongIds.includes(s.id),
+    );
+    if (favoriteSongs.length > 0) {
+      playSong(
+        favoriteSongs[0],
+        favoriteSongs,
+        t.favorites.title,
+        "playlist",
+        t.favorites.title,
+      );
+    }
+  };
+
+  return (
+    <Link
+      href="/playlist/favorites"
+      className="bg-zinc-800/50 hover:bg-zinc-800 transition rounded-xl p-4 flex flex-col group cursor-pointer border border-zinc-800 min-w-40 sm:min-w-50"
+    >
+      <div className="w-full aspect-square bg-zinc-900 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-rose-600/30 to-pink-900/30 opacity-70 group-hover:opacity-100 transition duration-300"></div>
+        <Heart className="w-8 h-8 text-rose-500/70 fill-rose-500/20 group-hover:text-rose-400 group-hover:scale-110 transition relative z-10" />
+        {count > 0 && allSongs && allSongs.length > 0 && (
+          <button
+            onClick={handlePlay}
+            className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-rose-500 text-white flex items-center justify-center translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition shadow-lg hover:scale-105 active:scale-95 cursor-pointer z-20"
+          >
+            <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
+          </button>
+        )}
+      </div>
+      <h3 className="font-semibold text-white truncate">{t.favorites.title}</h3>
+      <p className="text-xs text-zinc-500">{t.common.songsCount(count)}</p>
+    </Link>
   );
 }
