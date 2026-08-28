@@ -1,4 +1,5 @@
 import { getPlaylist } from "@/actions/playlist";
+import { getSongs } from "@/actions/song";
 import SongListBase from "@/components/song/SongListBase";
 import BackButton from "@/components/BackButton";
 import { notFound } from "next/navigation";
@@ -6,10 +7,12 @@ import DeletePlaylistButton from "@/components/playlist/DeletePlaylistButton";
 import RenamePlaylistButton from "@/components/playlist/RenamePlaylistButton";
 import AddSongButton from "@/components/playlist/AddSongButton";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
+import FavoritesView from "@/components/playlist/FavoritesView";
 import AdminOnly from "@/components/AdminOnly";
 import { SongListBaseSkeleton } from "@/components/skeletons/song-list-base";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
+import { getLocale, getTranslations } from "@/lib/i18n/server";
 
 export default function PlaylistPage({ params }: PageProps<"/playlist/[id]">) {
   return (
@@ -29,30 +32,43 @@ async function Playlist({
   params: PageProps<"/playlist/[id]">["params"];
 }) {
   const { id } = await params;
-  const { data: playlist, error } = await getPlaylist(id);
+
+  if (id === "favorites") {
+    const { data: allSongs } = await getSongs();
+    return <FavoritesView allSongs={allSongs || []} />;
+  }
+
+  const [{ data: playlist, error }, locale, t] = await Promise.all([
+    getPlaylist(id),
+    getLocale(),
+    getTranslations(),
+  ]);
 
   if (error || !playlist) {
     return notFound();
   }
 
-  const formattedDate = new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(playlist.createdAt));
+  const formattedDate = new Intl.DateTimeFormat(
+    locale === "de" ? "de-DE" : "en-US",
+    {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    },
+  ).format(new Date(playlist.createdAt));
 
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8 mt-2 w-full">
         {/* Cover Art and Metadata Container */}
         <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto flex-1 min-w-0">
-          <div className="w-24 h-24">
+          <div className="w-24 h-24 shrink-0">
             <PlaylistCard playlist={playlist} />
           </div>
 
           <div className="flex-1 min-w-0">
             <p className="text-blue-500 font-semibold text-xs sm:text-sm uppercase tracking-wider mb-1">
-              Playlist
+              {t.playlists.playlistType}
             </p>
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <h1 className="text-2xl sm:text-4xl font-bold text-white wrap-break-word">
@@ -66,9 +82,9 @@ async function Playlist({
               </AdminOnly>
             </div>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-zinc-400 text-xs sm:text-sm">
-              <span>{playlist.songs.length} songs</span>
+              <span>{t.common.songsCount(playlist.songs.length)}</span>
               <span>•</span>
-              <span>Created {formattedDate}</span>
+              <span>{t.playlists.createdDate(formattedDate)}</span>
             </div>
           </div>
         </div>
@@ -101,14 +117,11 @@ function PageSkeleton() {
     <>
       {/* Cover Art and Metadata Container */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8 mt-2 w-full">
-        {/* Cover Art and Metadata Container */}
         <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto flex-1 min-w-0">
-          {/* Cover Art */}
           <div className="w-24 h-24 shrink-0">
             <Skeleton className="w-full h-full rounded-lg" />
           </div>
 
-          {/* Metadata */}
           <div className="flex-1 min-w-0">
             <Skeleton className="h-4 w-16 mb-2" />
             <Skeleton className="h-8 w-40 mb-2" />
@@ -117,12 +130,6 @@ function PageSkeleton() {
             </div>
           </div>
         </div>
-
-        {/* Action Buttons */}
-        {/* <div className="w-full sm:w-auto shrink-0 flex items-center gap-2 justify-start sm:justify-end mt-4 sm:mt-0">
-          <Skeleton className="h-10 w-28 rounded-lg" />
-          <Skeleton className="h-10 w-10 rounded-lg" />
-        </div> */}
       </div>
 
       <SongListBaseSkeleton title />

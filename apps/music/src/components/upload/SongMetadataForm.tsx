@@ -8,13 +8,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "@/lib/i18n";
 
-const GENRE_OPTIONS: { value: GenreType; label: string }[] = [
-  { value: "FILM_SCORE", label: "Film Score" },
-  { value: "PIANO", label: "Piano" },
-  { value: "CLASSICAL", label: "Classical" },
-  { value: "POP", label: "Pop" },
-  { value: "VIOLIN", label: "Violin" },
+const GENRES: GenreType[] = [
+  "FILM_SCORE",
+  "PIANO",
+  "CLASSICAL",
+  "POP",
+  "VIOLIN",
 ];
 
 interface SongMetadataFormProps {
@@ -34,11 +35,13 @@ export default function SongMetadataForm({
   genre,
   setGenre,
 }: SongMetadataFormProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="col-span-2">
         <label htmlFor="song-title" className="text-xs text-zinc-400 font-medium mb-1 block">
-          Title *
+          {t.upload.titleLabel}
         </label>
         <input
           id="song-title"
@@ -52,7 +55,7 @@ export default function SongMetadataForm({
 
       <div>
         <label htmlFor="song-artist" className="text-xs text-zinc-400 font-medium mb-1 block">
-          Artist
+          {t.upload.artistLabel}
         </label>
         <input
           id="song-artist"
@@ -65,16 +68,16 @@ export default function SongMetadataForm({
 
       <div>
         <label className="text-xs text-zinc-400 font-medium mb-1 block">
-          Genre
+          {t.upload.genreLabel}
         </label>
         <Select value={genre} onValueChange={(value) => setGenre(value as GenreType)}>
           <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {GENRE_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
+            {GENRES.map((g) => (
+              <SelectItem key={g} value={g}>
+                {t.genres.names[g]}
               </SelectItem>
             ))}
           </SelectContent>

@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import SongContextMenu, { SongMenuActions } from "./SongContextMenu";
+import { useTranslation } from "@/lib/i18n";
 
 interface SongItemProps {
   song: Song;
@@ -28,6 +29,7 @@ export default function SongItem({
   dragDisabled = false,
 }: SongItemProps) {
   const { currentSong, isPlaying } = usePlayerStore();
+  const { t } = useTranslation();
   const isCurrent = currentSong?.id === song.id;
   const isOpen = activeMenuId === song.id;
   const [openUpwards, setOpenUpwards] = useState(false);
@@ -110,7 +112,7 @@ export default function SongItem({
           </p>
         </div>
         <p className="text-sm text-zinc-500 truncate sm:hidden">
-          {song.artist || "Unknown"}
+          {song.artist || t.common.unknown}
         </p>
       </div>
 
@@ -118,7 +120,7 @@ export default function SongItem({
         className="hidden sm:block flex-1 min-w-0 text-sm text-zinc-500 pr-4 truncate cursor-pointer"
         onClick={() => onPlay(song)}
       >
-        {song.artist || "Unknown Artist"}
+        {song.artist || t.common.unknownArtist}
       </div>
 
       <div
@@ -130,7 +132,7 @@ export default function SongItem({
 
       <div className="w-10 flex justify-end relative">
         <button
-          className={`p-2 hover:text-white transition-opacity focus:opacity-100 ${
+          className={`p-2 hover:text-white transition-opacity focus:opacity-100 cursor-pointer ${
             isOpen
               ? "text-white"
               : "text-zinc-500 opacity-0 group-hover:opacity-100"

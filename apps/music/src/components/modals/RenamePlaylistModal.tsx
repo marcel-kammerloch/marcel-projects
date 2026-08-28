@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { renamePlaylist } from "@/actions/playlist";
 import { toast } from "sonner";
+import { useTranslation } from "@/lib/i18n";
 
 interface RenamePlaylistModalProps {
   playlistId: string;
@@ -29,11 +30,12 @@ export function RenamePlaylistModal({
 }: RenamePlaylistModalProps) {
   const [name, setName] = useState(initialName);
   const [isPending, setIsPending] = useState(false);
+  const { t } = useTranslation();
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      toast.error("Playlist name cannot be empty");
+      toast.error(t.playlists.nameRequired);
       return;
     }
 
@@ -42,11 +44,11 @@ export function RenamePlaylistModal({
       const { error } = await renamePlaylist(playlistId, name.trim());
       if (error) throw new Error(error);
 
-      toast.success("Playlist renamed successfully");
+      toast.success(t.playlists.renameSuccess);
       onOpenChange(false);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to rename playlist");
+      toast.error(t.playlists.renameError);
     } finally {
       setIsPending(false);
     }
@@ -57,20 +59,20 @@ export function RenamePlaylistModal({
       <DialogContent showCloseButton={false}>
         <form onSubmit={handleSave}>
           <DialogHeader>
-            <DialogTitle>Rename Playlist</DialogTitle>
+            <DialogTitle>{t.playlists.renameTitle}</DialogTitle>
             <DialogDescription>
-              Enter a new name for this playlist.
+              {t.playlists.renameDescription}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <label htmlFor="playlist-name" className="sr-only">
-              Playlist Name
+              {t.playlists.renamePlaceholder}
             </label>
             <Input
               id="playlist-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Playlist name"
+              placeholder={t.playlists.renamePlaceholder}
               autoFocus
               required
             />
@@ -82,10 +84,10 @@ export function RenamePlaylistModal({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Cancel
+              {t.common.cancel}
             </Button>
             <Button type="submit" disabled={isPending || !name.trim()}>
-              {isPending ? "Saving..." : "Save"}
+              {isPending ? t.common.saving : t.common.save}
             </Button>
           </DialogFooter>
         </form>

@@ -7,8 +7,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Gauge, Volume2, Disc3, Menu as MenuIcon } from "lucide-react";
-
 import { Slider } from "@/components/ui/slider";
+import { useTranslation } from "@/lib/i18n";
 
 interface PlayerSettingsMenuProps {
   open: boolean;
@@ -31,6 +31,8 @@ export default function PlayerSettingsMenu({
   onVolumeChange,
   onTogglePlayOnlyThisSong,
 }: PlayerSettingsMenuProps) {
+  const { t } = useTranslation();
+
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger
@@ -38,7 +40,7 @@ export default function PlayerSettingsMenu({
           <button
             {...props}
             disabled={state.disabled}
-            className="text-white p-2 hover:bg-zinc-800 rounded-full transition"
+            className="text-white p-2 hover:bg-zinc-800 rounded-full transition cursor-pointer"
             type="button"
           >
             <MenuIcon className="w-6 h-6" />
@@ -47,7 +49,7 @@ export default function PlayerSettingsMenu({
       />
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Player Settings</DropdownMenuLabel>
+          <DropdownMenuLabel>{t.player.settingsTitle}</DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <div className="p-4 space-y-4">
@@ -55,7 +57,7 @@ export default function PlayerSettingsMenu({
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2 text-zinc-500">
                 <Gauge className="w-4 h-4" />
-                <span>Speed</span>
+                <span>{t.player.speed}</span>
               </div>
               <span className="font-medium">{playbackRate.toFixed(2)}x</span>
             </div>
@@ -74,7 +76,7 @@ export default function PlayerSettingsMenu({
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2 text-zinc-500">
                 <Volume2 className="w-4 h-4" />
-                <span>Volume</span>
+                <span>{t.player.volume}</span>
               </div>
               <span className="font-medium">{Math.round(volume * 100)}%</span>
             </div>
@@ -93,7 +95,7 @@ export default function PlayerSettingsMenu({
           <button
             type="button"
             onClick={onTogglePlayOnlyThisSong}
-            className={`w-full flex items-center justify-between px-2 py-2 rounded-lg text-xs font-medium transition ${
+            className={`w-full flex items-center justify-between px-2 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${
               playOnlyThisSong
                 ? "bg-blue-950/40 text-blue-400 font-semibold"
                 : "text-zinc-300 hover:bg-zinc-800"
@@ -101,7 +103,7 @@ export default function PlayerSettingsMenu({
           >
             <span className="flex items-center gap-2">
               <Disc3 className="w-4 h-4" />
-              Play only this song
+              {t.player.playOnlyThisSong}
             </span>
             <span
               className={`text-[10px] px-1.5 py-0.5 rounded ${
@@ -110,7 +112,7 @@ export default function PlayerSettingsMenu({
                   : "bg-zinc-700 text-zinc-400"
               }`}
             >
-              {playOnlyThisSong ? "ON" : "OFF"}
+              {playOnlyThisSong ? t.player.stateOn : t.player.stateOff}
             </span>
           </button>
         </div>

@@ -1,15 +1,19 @@
 import { getSongs } from "@/actions/song";
 import SongList from "@/components/song/SongList";
 import UploadModalBtn from "@/components/upload/UploadModalBtn";
+import { getTranslations } from "@/lib/i18n/server";
 
 export default async function Home() {
-  const { data: songs } = await getSongs();
+  const [{ data: songs }, t] = await Promise.all([
+    getSongs(),
+    getTranslations(),
+  ]);
 
   return (
     <main className="flex-1 w-full max-w-4xl mx-auto px-2 md:px-4 mt-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-white tracking-tight">
-          Music Library
+          {t.library.title}
         </h1>
         <UploadModalBtn />
       </div>

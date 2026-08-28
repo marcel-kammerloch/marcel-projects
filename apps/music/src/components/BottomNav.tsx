@@ -4,10 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Music, ListMusic, Tags, Settings } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { useTranslation } from "@/lib/i18n";
 
 export default function BottomNav() {
   const pathname = usePathname();
   const { isFullView } = usePlayerStore();
+  const { t } = useTranslation();
 
   if (isFullView) return null;
 
@@ -22,7 +24,9 @@ export default function BottomNav() {
         }`}
       >
         <Music className="w-6 h-6" />
-        <span className="text-[10px] font-medium tracking-wide">Songs</span>
+        <span className="text-[10px] font-medium tracking-wide">
+          {t.nav.songs}
+        </span>
       </Link>
 
       <Link
@@ -34,7 +38,9 @@ export default function BottomNav() {
         }`}
       >
         <ListMusic className="w-6 h-6" />
-        <span className="text-[10px] font-medium tracking-wide">Playlists</span>
+        <span className="text-[10px] font-medium tracking-wide">
+          {t.nav.playlists}
+        </span>
       </Link>
 
       <Link
@@ -46,7 +52,9 @@ export default function BottomNav() {
         }`}
       >
         <Tags className="w-6 h-6" />
-        <span className="text-[10px] font-medium tracking-wide">Genres</span>
+        <span className="text-[10px] font-medium tracking-wide">
+          {t.nav.genres}
+        </span>
       </Link>
 
       <Link
@@ -58,7 +66,9 @@ export default function BottomNav() {
         }`}
       >
         <Settings className="w-6 h-6" />
-        <span className="text-[10px] font-medium tracking-wide">Settings</span>
+        <span className="text-[10px] font-medium tracking-wide">
+          {t.nav.settings}
+        </span>
       </Link>
     </div>
   );

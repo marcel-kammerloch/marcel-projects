@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 interface SearchBarProps {
   onSearch: (value: string) => void;
@@ -12,10 +13,13 @@ interface SearchBarProps {
 
 export function SearchBar({
   onSearch,
-  placeholder = "Search...",
+  placeholder,
   className,
 }: SearchBarProps) {
   const [value, setValue] = useState("");
+  const { t } = useTranslation();
+
+  const effectivePlaceholder = placeholder || t.library.searchPlaceholder;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -30,7 +34,7 @@ export function SearchBar({
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder={placeholder}
+        placeholder={effectivePlaceholder}
         className="pl-9 bg-zinc-800/50 border-transparent focus-visible:ring-blue-500 rounded-xl"
       />
     </div>

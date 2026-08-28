@@ -6,6 +6,7 @@ import Player from "@/components/player/Player";
 import BottomNav from "@/components/BottomNav";
 import { Suspense } from "react";
 import { ClientScripts } from "@/components/ClientScripts";
+import { I18nProvider } from "@/lib/i18n";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -74,18 +75,20 @@ export default function RootLayout({
       suppressHydrationWarning={process.env.NODE_ENV === "production"}
     >
       <body className="min-h-full flex flex-col pb-36 transition-colors duration-300">
-        {children}
+        <I18nProvider>
+          {children}
 
-        <Suspense>
-          <Player />
-        </Suspense>
+          <Suspense>
+            <Player />
+          </Suspense>
 
-        <Suspense>
-          <BottomNav />
-        </Suspense>
+          <Suspense>
+            <BottomNav />
+          </Suspense>
 
-        <ClientScripts />
-        <Toaster />
+          <ClientScripts />
+          <Toaster />
+        </I18nProvider>
       </body>
     </html>
   );

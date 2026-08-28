@@ -3,7 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import type { Playlist, Song } from "@db/client";
 import { getPlaylists } from "@/actions/playlist";
-import { Trash2, Edit, ListPlus, Loader2 } from "lucide-react";
+import { Trash2, Edit, ListPlus, Loader2, Heart } from "lucide-react";
+import { useFavoritesStore } from "@/store/useFavoritesStore";
+import { useTranslation } from "@/lib/i18n";
+import { toast } from "sonner";
+import AdminOnly from "../AdminOnly";
 
 export interface SongMenuActions {
   onEdit: () => void;
@@ -21,6 +25,7 @@ interface SongContextMenuProps {
 }
 
 export default function SongContextMenu({
+  song,
   isOpen,
   onClose,
   actions,
@@ -30,6 +35,10 @@ export default function SongContextMenu({
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const { isFavorite, toggleFavorite } = useFavoritesStore();
+  const { t } = useTranslation();
+  const isFav = isFavorite(song.id);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -67,6 +76,16 @@ export default function SongContextMenu({
     onClose();
   };
 
+  const handleToggleFavorite = () => {
+    const newlyAdded = toggleFavorite(song.id);
+    if (newlyAdded) {
+      toast.success(t.favorites.addedToast);
+    } else {
+      toast.success(t.favorites.removedToast);
+    }
+    onClose();
+  };
+
   return (
     <div
       ref={menuRef}
@@ -79,13 +98,13 @@ export default function SongContextMenu({
         <div className="flex flex-col">
           <div className="px-4 py-2 border-b border-zinc-800 flex items-center justify-between">
             <span className="font-semibold text-zinc-400 text-xs">
-              Choose Playlist
+              {t.songMenu.choosePlaylist}
             </span>
             <button
               onClick={() => setShowPicker(false)}
-              className="text-zinc-500 hover:text-white text-xs"
+              className="text-zinc-500 hover:text-white text-xs cursor-pointer"
             >
-              Back
+              {t.common.back}
             </button>
           </div>
           <div className="max-h-60 overflow-y-auto">
@@ -95,14 +114,14 @@ export default function SongContextMenu({
               </div>
             ) : playlists.length === 0 ? (
               <div className="px-4 py-3 text-zinc-500 italic">
-                No playlists found
+                {t.songMenu.noPlaylists}
               </div>
             ) : (
               playlists.map((pl) => (
                 <button
                   key={pl.id}
                   onClick={() => handlePickPlaylist(pl.id)}
-                  className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center gap-3"
+                  className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center gap-3 cursor-pointer"
                 >
                   <ListPlus className="w-4 h-4" />
                   <span className="truncate">{pl.name}</span>
@@ -114,40 +133,57 @@ export default function SongContextMenu({
       ) : (
         <>
           <button
-            onClick={() => {
-              actions.onEdit();
-              onClose();
-            }}
-            className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center gap-3"
+            onClick={handleToggleFavorite}
+            className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center gap-3 cursor-pointer"
           >
-            <Edit className="w-4 h-4" /> Edit Song
+            <Heart
+              className={`w-4 h-4 transition ${
+                isFav ? "text-rose-500 fill-rose-500" : "text-zinc-400"
+              }`}
+            />
+            <span>
+              {isFav
+                ? t.favorites.removeFromFavorites
+                : t.favorites.addToFavorites}
+            </span>
           </button>
-          <button
-            onClick={handleShowPicker}
-            className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center gap-3"
-          >
-            <ListPlus className="w-4 h-4" /> Add to Playlist
-          </button>
-          {actions.onRemoveFromPlaylist && (
+          <AdminOnly>
             <button
               onClick={() => {
-                actions.onRemoveFromPlaylist!();
+                actions.onEdit();
                 onClose();
               }}
-              className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-red-400 hover:text-red-300 transition flex items-center gap-3"
+              className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center gap-3 cursor-pointer"
             >
-              <Trash2 className="w-4 h-4" /> Remove from Playlist
+              <Edit className="w-4 h-4" /> {t.songMenu.editSong}
             </button>
-          )}
-          <button
-            onClick={() => {
-              actions.onDelete();
-              onClose();
-            }}
-            className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-red-400 hover:text-red-300 transition flex items-center gap-3"
-          >
-            <Trash2 className="w-4 h-4" /> Delete Song
-          </button>
+            <button
+              onClick={handleShowPicker}
+              className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-zinc-300 hover:text-white transition flex items-center gap-3 cursor-pointer"
+            >
+              <ListPlus className="w-4 h-4" /> {t.songMenu.addToPlaylist}
+            </button>
+            {actions.onRemoveFromPlaylist && (
+              <button
+                onClick={() => {
+                  actions.onRemoveFromPlaylist!();
+                  onClose();
+                }}
+                className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-red-400 hover:text-red-300 transition flex items-center gap-3 cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4" /> {t.songMenu.removeFromPlaylist}
+              </button>
+            )}
+            <button
+              onClick={() => {
+                actions.onDelete();
+                onClose();
+              }}
+              className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-red-400 hover:text-red-300 transition flex items-center gap-3 cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4" /> {t.songMenu.deleteSong}
+            </button>
+          </AdminOnly>
         </>
       )}
     </div>

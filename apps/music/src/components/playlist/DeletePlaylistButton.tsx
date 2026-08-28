@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import ActionIconButton from "@/components/ui/ActionIconButton";
 import { toast } from "sonner";
+import { useTranslation } from "@/lib/i18n";
 
 export default function DeletePlaylistButton({
   playlistId,
@@ -15,15 +16,16 @@ export default function DeletePlaylistButton({
 }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleDelete = async () => {
     try {
       await deletePlaylist(playlistId);
-      toast.success("Playlist deleted");
+      toast.success(t.playlists.deleteSuccess);
       router.push("/playlists");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to delete playlist");
+      toast.error(t.playlists.deleteError);
     }
   };
 
@@ -31,7 +33,7 @@ export default function DeletePlaylistButton({
     <>
       <ActionIconButton
         icon={Trash2}
-        label="Delete Playlist"
+        label={t.playlists.deleteTitle}
         onClick={() => setIsOpen(true)}
         variant="danger"
       />
@@ -39,10 +41,10 @@ export default function DeletePlaylistButton({
       <ConfirmModal
         isOpen={isOpen}
         onOpenChange={setIsOpen}
-        title="Delete Playlist"
-        description="Are you sure you want to delete this playlist? This action cannot be undone."
+        title={t.playlists.deleteTitle}
+        description={t.playlists.deleteDescription}
         onConfirm={handleDelete}
-        confirmText="Delete"
+        confirmText={t.common.delete}
         isDestructive={true}
       />
     </>
