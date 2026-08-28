@@ -1,4 +1,3 @@
-import type { BetterAuthOptions } from "better-auth";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "./drizzle";
@@ -20,29 +19,6 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
-  // databaseHooks: {
-  //   session: {
-  //     create: {
-  //       before: async (session) => {
-  //         try {
-  //           const user = await prisma.user.findUnique({
-  //             where: { id: session.userId },
-  //             select: { isApproved: true },
-  //           });
-  //           if (!user?.isApproved) {
-  //             return false;
-  //           }
-  //         } catch (error) {
-  //           console.error(
-  //             "[auth.databaseHooks.session.create.before] error:",
-  //             error,
-  //           );
-  //           return false;
-  //         }
-  //       },
-  //     },
-  //   },
-  // },
   plugins: [
     customSession(async ({ user, session }) => {
       return {
@@ -62,7 +38,7 @@ export const auth = betterAuth({
   secret: process.env.MARCEL_PROJECTS_AUTH_SECRET,
   session: {
     freshAge: 0, // disabled
-    expiresIn: 60 * 60 * 24 * 30, // 30 days
+    expiresIn: 60 * 60 * 24 * 60, // 60 days
     updateAge: 60 * 60 * 24 * 7, // 7 days
     storeSessionInDatabase: true,
     cookieCache: {
