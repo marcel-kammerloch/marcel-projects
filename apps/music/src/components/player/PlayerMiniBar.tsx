@@ -1,8 +1,7 @@
 import { Pause, Play } from "lucide-react";
-
 import type { Song } from "@db/client";
-
 import { MusicIcon } from "@/components/player/playerUtils";
+import { useTranslation } from "@/lib/i18n";
 
 interface PlayerMiniBarProps {
   currentSong: Song;
@@ -23,6 +22,8 @@ export default function PlayerMiniBar({
   onTouchStart,
   onTouchEnd,
 }: PlayerMiniBarProps) {
+  const { t } = useTranslation();
+
   return (
     <div
       className="fixed bottom-16 sm:bottom-16 left-0 right-0 h-16 sm:h-20 bg-zinc-900/95 backdrop-blur-lg border-t border-zinc-800 px-4 flex items-center justify-between cursor-pointer z-40 transition-transform duration-300"
@@ -48,7 +49,7 @@ export default function PlayerMiniBar({
             {currentSong.title}
           </span>
           <span className="text-zinc-400 text-xs sm:text-sm truncate">
-            {currentSong.artist || "Unknown Artist"}
+            {currentSong.artist || t.common.unknownArtist}
           </span>
         </div>
       </div>
@@ -60,7 +61,7 @@ export default function PlayerMiniBar({
             event.stopPropagation();
             onTogglePlay();
           }}
-          className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center"
+          className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center cursor-pointer hover:scale-105 transition-transform"
         >
           {isPlaying ? (
             <Pause className="w-5 h-5" fill="currentColor" />

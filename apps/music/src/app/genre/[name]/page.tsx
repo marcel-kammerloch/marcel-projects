@@ -14,14 +14,9 @@ import {
 import { Suspense } from "react";
 import { SongListBaseSkeleton } from "@/components/skeletons/song-list-base";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getTranslations } from "@/lib/i18n/server";
 
-const GENRE_LABELS: Record<string, string> = {
-  film_score: "Film Score",
-  piano: "Piano",
-  classical: "Classical",
-  pop: "Pop",
-  violin: "Violin",
-} as const;
+const VALID_GENRES = ["FILM_SCORE", "PIANO", "CLASSICAL", "POP", "VIOLIN"] as const;
 
 const GENRE_COLORS: Record<string, string> = {
   film_score: "from-purple-600/20 to-purple-900/40 border-purple-500/20",
@@ -58,24 +53,28 @@ async function Genre({
 }) {
   const { name } = await params;
   const genreKey = name.toLowerCase();
+  const genreEnum = name.toUpperCase() as GenreType;
 
-  if (!GENRE_LABELS[genreKey]) {
+  if (!VALID_GENRES.includes(genreEnum as any)) {
     return notFound();
   }
 
-  const genreEnum = genreKey.toUpperCase() as GenreType;
-  const { data: genreSongs, error } = await getGenreSongs(genreEnum);
+  const [{ data: genreSongs, error }, t] = await Promise.all([
+    getGenreSongs(genreEnum),
+    getTranslations(),
+  ]);
 
   if (error || !genreSongs) {
     return notFound();
   }
 
   const Icon = GENRE_ICONS[genreEnum];
+  const genreLabel = t.genres.names[genreEnum];
 
   return (
     <>
       <div
-        className={`p-8 rounded-3xl mb-8 bg-linear-to-br ${GENRE_COLORS[genreKey]} border flex flex-col gap-4 relative overflow-hidden backdrop-blur-md shadow-2xl`}
+        className={`p-8 rounded-3xl mb-8 bg-linear-to-br ${GENRE_COLORS[genreKey] || GENRE_COLORS.pop} border flex flex-col gap-4 relative overflow-hidden backdrop-blur-md shadow-2xl`}
       >
         <div className="flex items-center gap-4 relative z-10">
           <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-md">
@@ -83,17 +82,16 @@ async function Genre({
           </div>
           <div>
             <p className="text-white/60 text-xs font-bold uppercase tracking-[0.2em] mb-1">
-              Genre
+              {t.genres.badge}
             </p>
             <h1 className="text-4xl font-black text-white tracking-tighter">
-              {GENRE_LABELS[genreKey]}
+              {genreLabel}
             </h1>
           </div>
         </div>
 
         <p className="text-white/80 text-sm max-w-md relative z-10">
-          Explore the best {GENRE_LABELS[genreKey]} tracks in your collection.
-          There are {genreSongs.length} songs available in this genre.
+          {t.genres.description(genreLabel, genreSongs.length)}
         </p>
 
         {/* Decorative elements */}
@@ -105,7 +103,7 @@ async function Genre({
         songs={genreSongs}
         genreKey={genreEnum}
         playbackSourceType="genre"
-        playbackSourceName={GENRE_LABELS[genreKey]}
+        playbackSourceName={genreLabel}
       />
     </>
   );

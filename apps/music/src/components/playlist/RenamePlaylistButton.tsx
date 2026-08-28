@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Edit2 } from "lucide-react";
 import { RenamePlaylistModal } from "@/components/modals/RenamePlaylistModal";
 import ActionIconButton from "@/components/ui/ActionIconButton";
+import { useTranslation } from "@/lib/i18n";
 
 interface RenamePlaylistButtonProps {
   playlistId: string;
@@ -15,12 +16,13 @@ export default function RenamePlaylistButton({
   initialName,
 }: RenamePlaylistButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <>
       <ActionIconButton
         icon={Edit2}
-        label="Rename Playlist"
+        label={t.playlists.renameTitle}
         onClick={() => setIsOpen(true)}
       />
 

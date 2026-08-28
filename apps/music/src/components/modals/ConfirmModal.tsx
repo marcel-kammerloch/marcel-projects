@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n";
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -27,10 +28,15 @@ export function ConfirmModal({
   title,
   description,
   onConfirm,
-  confirmText = "Confirm",
-  cancelText = "Cancel",
+  confirmText,
+  cancelText,
   isDestructive = false,
 }: ConfirmModalProps) {
+  const { t } = useTranslation();
+
+  const finalConfirmText = confirmText || t.common.confirm;
+  const finalCancelText = cancelText || t.common.cancel;
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false}>
@@ -40,7 +46,7 @@ export function ConfirmModal({
         </DialogHeader>
         <DialogFooter className="mt-4 gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {cancelText}
+            {finalCancelText}
           </Button>
           <Button
             variant={isDestructive ? "destructive" : "default"}
@@ -49,7 +55,7 @@ export function ConfirmModal({
               onOpenChange(false);
             }}
           >
-            {confirmText}
+            {finalConfirmText}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import UploadModal from "./UploadModal";
 import { Plus } from "lucide-react";
 import AdminOnly from "../AdminOnly";
+import { useTranslation } from "@/lib/i18n";
 
 export default function UploadModalBtn() {
   return (
@@ -15,6 +16,7 @@ export default function UploadModalBtn() {
 
 function UploadModalButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <>
@@ -25,7 +27,7 @@ function UploadModalButton() {
         <div className="bg-blue-600 rounded-full p-1 text-white">
           <Plus className="w-4 h-4" />
         </div>
-        Add Music
+        {t.library.addMusic}
       </button>
 
       <UploadModal isOpen={isOpen} onClose={() => setIsOpen(false)} />

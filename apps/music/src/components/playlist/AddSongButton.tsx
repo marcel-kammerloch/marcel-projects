@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { AddSongModal } from "@/components/modals/AddSongModal";
 import ActionIconButton from "@/components/ui/ActionIconButton";
+import { useTranslation } from "@/lib/i18n";
 
 interface AddSongButtonProps {
   playlistId: string;
@@ -15,12 +16,13 @@ export default function AddSongButton({
   existingSongIds,
 }: AddSongButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <>
       <ActionIconButton
         icon={Plus}
-        label="Add Song"
+        label={t.playlists.addSongTitle}
         onClick={() => setIsOpen(true)}
         variant="primary"
       />

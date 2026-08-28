@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import type { Song, Genre } from "@db/client";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { useFavoritesStore } from "@/store/useFavoritesStore";
+import { useTranslation } from "@/lib/i18n";
 import { Clock, Music } from "lucide-react";
 import { deleteSong } from "@/actions/song";
 import { addSongToPlaylist, removeSongFromPlaylist } from "@/actions/playlist";
@@ -66,6 +68,8 @@ export default function SongListBase({
   showSortSelector = true,
 }: SongListBaseProps) {
   const { playSong } = usePlayerStore();
+  const { removeFavorite } = useFavoritesStore();
+  const { t } = useTranslation();
   const { isAdmin } = useAuth();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [editingSong, setEditingSong] = useState<Song | null>(null);
@@ -119,6 +123,11 @@ export default function SongListBase({
       const newSongs = arrayMove(localSongs, oldIndex, newIndex);
       setLocalSongs(newSongs);
 
+      if (playlistId === "favorites") {
+        // Local only Favorites list - no db call
+        return;
+      }
+
       if (genreKey) {
         // Genre-specific order — does NOT touch Song.order
         await reorderGenreSongs(
@@ -155,37 +164,61 @@ export default function SongListBase({
     if (!songToDelete) return;
 
     try {
-      await deleteSong(songToDelete);
-      toast.success("Song deleted");
+      const { error, success } = await deleteSong(songToDelete);
+
+      if (success) {
+        toast.success(t.songMenu.deleteSuccess);
+      } else if (error) {
+        toast.error(t.songMenu.deleteError);
+      }
+
       setSongToDelete(null);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to delete song");
+      toast.error(t.songMenu.deleteError);
     }
   };
 
   const handleAddSongToPlaylist = async (
-    playlistId: string,
+    targetPlaylistId: string,
     songId: string,
   ) => {
     try {
-      await addSongToPlaylist(playlistId, songId);
-      toast.success("Added to playlist!");
+      const { error } = await addSongToPlaylist(targetPlaylistId, songId);
+
+      if (error) {
+        toast.error(t.songMenu.addedToPlaylistError);
+      } else {
+        toast.success(t.songMenu.addedToPlaylistSuccess);
+      }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to add to playlist");
+      toast.error(t.songMenu.addedToPlaylistError);
     }
   };
 
   const handleRemoveFromPlaylist = async (songId: string) => {
     if (!playlistId) return;
+
+    if (playlistId === "favorites") {
+      removeFavorite(songId);
+      toast.success(t.favorites.removedToast);
+      setActiveMenu(null);
+      return;
+    }
+
     try {
-      await removeSongFromPlaylist(playlistId, songId);
-      toast.success("Removed from playlist");
+      const { error } = await removeSongFromPlaylist(playlistId, songId);
+
+      if (error) {
+        toast.error(t.playlists.removeSongError);
+      } else {
+        toast.success(t.playlists.removeSongSuccess);
+      }
       setActiveMenu(null);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to remove from playlist");
+      toast.error(t.playlists.removeSongError);
     }
   };
 
@@ -197,10 +230,13 @@ export default function SongListBase({
     return (
       <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
         <Music className="w-12 h-12 mb-4 opacity-50" />
-        <p>No songs found.</p>
+        <p>{t.library.noSongsFound}</p>
       </div>
     );
   }
+
+  const isDragDisabled =
+    sortBy !== "manual" || (playlistId !== "favorites" && !isAdmin);
 
   return (
     <div className="flex flex-col gap-2 pb-6 touch-manipulation">
@@ -216,7 +252,7 @@ export default function SongListBase({
           {showSortSelector && (
             <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
               <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                Sort:
+                {t.library.sort.label}
               </span>
               <Select
                 value={sortBy}
@@ -229,15 +265,19 @@ export default function SongListBase({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="manual">Manual</SelectItem>
-                  <SelectItem value="duration">Duration</SelectItem>
+                  <SelectItem value="manual">
+                    {t.library.sort.manual}
+                  </SelectItem>
+                  <SelectItem value="duration">
+                    {t.library.sort.duration}
+                  </SelectItem>
                   <SelectItem value="date-desc">
-                    Date added – newest first
+                    {t.library.sort.dateDesc}
                   </SelectItem>
                   <SelectItem value="date-asc">
-                    Date added – oldest first
+                    {t.library.sort.dateAsc}
                   </SelectItem>
-                  <SelectItem value="name">Name (A–Z)</SelectItem>
+                  <SelectItem value="name">{t.library.sort.name}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -247,10 +287,16 @@ export default function SongListBase({
 
       {/* Column Headers */}
       <div className="flex px-1 md:px-4 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
-        {sortBy === "manual" && isAdmin && <div className="w-10"></div>}
-        <div className="w-10 flex items-center justify-start">#</div>
-        <div className="flex-1 pr-4">Title</div>
-        <div className="hidden sm:block flex-1 pr-4">Artist</div>
+        {sortBy === "manual" && (isAdmin || playlistId === "favorites") && (
+          <div className="w-10"></div>
+        )}
+        <div className="w-10 flex items-center justify-start">
+          {t.library.headers.number}
+        </div>
+        <div className="flex-1 pr-4">{t.library.headers.title}</div>
+        <div className="hidden sm:block flex-1 pr-4">
+          {t.library.headers.artist}
+        </div>
         <div className="w-16 flex justify-end">
           <Clock className="w-4 h-4" />
         </div>
@@ -275,7 +321,7 @@ export default function SongListBase({
               onPlay={handlePlay}
               onMenuClick={toggleMenu}
               activeMenuId={activeMenu}
-              dragDisabled={sortBy !== "manual" || !isAdmin}
+              dragDisabled={isDragDisabled}
               actions={{
                 onEdit: () => setEditingSong(song),
                 onDelete: () => handleDeleteRequest(song.id),
@@ -304,10 +350,10 @@ export default function SongListBase({
       <ConfirmModal
         isOpen={!!songToDelete}
         onOpenChange={(open) => !open && setSongToDelete(null)}
-        title="Delete Song"
-        description="Are you sure you want to delete this song? This action cannot be undone."
+        title={t.songMenu.deleteConfirmTitle}
+        description={t.songMenu.deleteConfirmDescription}
         onConfirm={handleConfirmDelete}
-        confirmText="Delete"
+        confirmText={t.common.delete}
         isDestructive={true}
       />
     </div>

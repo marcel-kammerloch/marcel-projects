@@ -6,6 +6,7 @@ import {
   Shuffle,
   Repeat,
 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 interface PlayerControlsProps {
   isPlaying: boolean;
@@ -34,13 +35,15 @@ export default function PlayerControls({
   onSkipBackward,
   onSkipForward,
 }: PlayerControlsProps) {
+  const { t } = useTranslation();
+
   return (
     <>
       <div className="flex items-center justify-between mb-8 max-w-[80%] w-full mx-auto">
         <button
           type="button"
           onClick={onToggleShuffle}
-          className={`p-2 rounded-full transition ${
+          className={`p-2 rounded-full transition cursor-pointer ${
             settings.shuffle
               ? "text-blue-500 hc:bg-blue-500/20 hc:ring-2 hc:ring-blue-500/50 hc:text-blue-400"
               : "text-zinc-500 hover:text-white hc:text-zinc-400"
@@ -53,7 +56,7 @@ export default function PlayerControls({
           <button
             type="button"
             onClick={onPlayPrevious}
-            className="text-white hover:text-blue-400 transition"
+            className="text-white hover:text-blue-400 transition cursor-pointer"
           >
             <SkipBack className="w-10 h-10" fill="currentColor" />
           </button>
@@ -61,7 +64,7 @@ export default function PlayerControls({
           <button
             type="button"
             onClick={onTogglePlay}
-            className="w-20 h-20 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shadow-xl shadow-white/15"
+            className="w-20 h-20 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shadow-xl shadow-white/15 cursor-pointer"
           >
             {isPlaying ? (
               <Pause className="w-10 h-10" fill="currentColor" />
@@ -73,7 +76,7 @@ export default function PlayerControls({
           <button
             type="button"
             onClick={onPlayNext}
-            className="text-white hover:text-blue-400 transition"
+            className="text-white hover:text-blue-400 transition cursor-pointer"
           >
             <SkipForward className="w-10 h-10" fill="currentColor" />
           </button>
@@ -82,8 +85,8 @@ export default function PlayerControls({
         <button
           type="button"
           onClick={onToggleLoop}
-          aria-label={`Loop ${settings.loop}`}
-          className={`relative p-2 rounded-full transition ${
+          aria-label={t.player.loopMode(settings.loop)}
+          className={`relative p-2 rounded-full transition cursor-pointer ${
             settings.loop !== "off"
               ? "text-blue-500 hc:bg-blue-500/20 hc:ring-2 hc:ring-blue-500/50 hc:text-blue-400"
               : "text-zinc-500 hover:text-white hc:text-zinc-400"
@@ -102,14 +105,14 @@ export default function PlayerControls({
         <button
           type="button"
           onClick={onSkipBackward}
-          className="hover:text-white flex items-center transition bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800"
+          className="hover:text-white flex items-center transition bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800 cursor-pointer"
         >
           -{settings.skipDuration}s
         </button>
         <button
           type="button"
           onClick={onSkipForward}
-          className="hover:text-white flex items-center transition bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800"
+          className="hover:text-white flex items-center transition bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800 cursor-pointer"
         >
           +{settings.skipDuration}s
         </button>

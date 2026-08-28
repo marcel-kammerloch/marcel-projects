@@ -11,14 +11,9 @@ import {
   Music,
   Piano,
 } from "lucide-react";
+import { getTranslations } from "@/lib/i18n/server";
 
-const GENRE_LABELS: Record<Genre, string> = {
-  FILM_SCORE: "Film Score",
-  PIANO: "Piano",
-  CLASSICAL: "Classical",
-  POP: "Pop",
-  VIOLIN: "Violin",
-};
+const GENRES: Genre[] = ["FILM_SCORE", "PIANO", "CLASSICAL", "POP", "VIOLIN"];
 
 const GENRE_COLORS: Record<Genre, string> = {
   FILM_SCORE: "bg-purple-500/20 text-purple-400 border-purple-500/50",
@@ -37,23 +32,29 @@ const GENRE_ICONS: Record<Genre, LucideIcon> = {
 };
 
 export default async function GenresPage() {
-  const { data: songs } = await getSongs();
+  const [{ data: songs }, t] = await Promise.all([
+    getSongs(),
+    getTranslations(),
+  ]);
 
   if (!songs) return notFound();
 
   return (
     <main className="flex-1 w-full max-w-4xl mx-auto px-2 md:px-4 mt-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-white tracking-tight">Genres</h1>
+        <h1 className="text-3xl font-bold text-white tracking-tight">
+          {t.genres.title}
+        </h1>
         <UploadModalBtn />
       </div>
 
       <div className="flex flex-col gap-6 mt-12 md:mt-16 pb-8">
         <div className="relative -mx-4">
           <div className="flex flex-col gap-5 px-4 pb-4">
-            {(Object.keys(GENRE_LABELS) as Genre[]).map((genre) => {
+            {GENRES.map((genre) => {
               const count = songs.filter((s) => s.genre === genre).length;
               const Icon = GENRE_ICONS[genre];
+              const genreLabel = t.genres.names[genre];
 
               return (
                 <Link
@@ -63,11 +64,11 @@ export default async function GenresPage() {
                 >
                   <div className="flex items-center gap-2">
                     <Icon className="w-6 h-6" />
-                    <span className="font-bold text-lg">
-                      {GENRE_LABELS[genre]}
-                    </span>
+                    <span className="font-bold text-lg">{genreLabel}</span>
                   </div>
-                  <span className="text-sm opacity-70">{count} songs</span>
+                  <span className="text-sm opacity-70">
+                    {t.common.songsCount(count)}
+                  </span>
                 </Link>
               );
             })}
