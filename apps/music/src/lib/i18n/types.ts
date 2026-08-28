@@ -3,7 +3,6 @@ export type Locale = "en" | "de";
 export interface Dictionary {
   common: {
     back: string;
-    loading: string;
     cancel: string;
     save: string;
     saving: string;

@@ -3,7 +3,6 @@ import type { Dictionary } from "../types";
 export const en: Dictionary = {
   common: {
     back: "Back",
-    loading: "Loading...",
     cancel: "Cancel",
     save: "Save",
     saving: "Saving...",

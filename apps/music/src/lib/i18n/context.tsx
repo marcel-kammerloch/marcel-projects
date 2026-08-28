@@ -55,9 +55,13 @@ export function I18nProvider({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+
   const [{ setting: languageSetting, locale }, setState] = useState(() => {
     if (initialLocale) {
-      return { setting: initialLocale as LanguageSetting, locale: initialLocale };
+      return {
+        setting: initialLocale as LanguageSetting,
+        locale: initialLocale,
+      };
     }
     return getInitialLocaleState();
   });
