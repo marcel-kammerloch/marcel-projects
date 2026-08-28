@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
 import { AUTH_URL, ALL_SCOPES } from "@repo/utils";
 import { auth } from "./server";
 
+const ADMIN_IN_DEV = false;
+
 type AuthUser = {
   id: string;
   createdAt: Date;
@@ -141,7 +143,7 @@ export async function validateAccess(
 export async function validateAccess(
   options: AuthHelperOptions & { redirect?: boolean } = {},
 ): Promise<void | boolean> {
-  if (!process.env.VERCEL) return options.redirect ? undefined : true;
+  if (!process.env.VERCEL) return options.redirect ? undefined : ADMIN_IN_DEV;
 
   const { admin, redirect: redir, scope } = options;
 

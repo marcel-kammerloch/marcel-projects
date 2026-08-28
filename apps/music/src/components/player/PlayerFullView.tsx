@@ -8,6 +8,7 @@ import {
   getGradient,
   MusicIcon,
 } from "@/components/player/playerUtils";
+import { useTranslation } from "@/lib/i18n";
 
 import type { Song } from "@db/client";
 
@@ -76,9 +77,18 @@ export default function PlayerFullView({
   onTouchStart,
   onTouchEnd,
 }: PlayerFullViewProps) {
+  const { t } = useTranslation();
+
+  const sourceTypeLabel =
+    playbackSourceType === "playlist"
+      ? t.player.sourceTypes.playlist
+      : playbackSourceType === "genre"
+        ? t.player.sourceTypes.genre
+        : "";
+
   return (
     <div
-      className={`fixed inset-0 bg-zinc-950 z-50 flex flex-col transition-transform duration-500 ease-out  ${isFullView ? "translate-y-0" : "translate-y-full"}`}
+      className={`fixed inset-0 bg-zinc-950 z-50 flex flex-col transition-transform duration-500 ease-out ${isFullView ? "translate-y-0" : "translate-y-full"}`}
       style={{ touchAction: "none" }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
@@ -88,19 +98,18 @@ export default function PlayerFullView({
           <button
             type="button"
             onClick={onClose}
-            className="text-white p-2 hover:bg-zinc-800 rounded-full transition"
+            className="text-white p-2 hover:bg-zinc-800 rounded-full transition cursor-pointer"
           >
             <ChevronDown className="w-8 h-8" />
           </button>
 
           <div className="flex-1 min-w-0 px-2 text-center">
             <p className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
-              Now Playing
+              {t.player.nowPlaying}
             </p>
             {playbackSourceType && playbackSourceName && (
               <p className="text-xs font-semibold text-zinc-400 mt-0.5 wrap-break-word line-clamp-2 px-1">
-                Playing from {playbackSourceType} &ldquo;{playbackSourceName}
-                &rdquo;
+                {t.player.playingFrom(sourceTypeLabel, playbackSourceName)}
               </p>
             )}
           </div>
@@ -144,7 +153,7 @@ export default function PlayerFullView({
                 {currentSong.title}
               </h2>
               <p className="text-base text-zinc-400 truncate mt-0.5">
-                {currentSong.artist || "Unknown Artist"}
+                {currentSong.artist || t.common.unknownArtist}
               </p>
             </div>
 
@@ -159,11 +168,13 @@ export default function PlayerFullView({
               }`}
               title={
                 playOnlyThisSong
-                  ? "Active: Playback will stop after this song"
-                  : "Enable to stop playback after this song finishes"
+                  ? t.player.play1xTooltipActive
+                  : t.player.play1xTooltipInactive
               }
             >
-              <span>{playOnlyThisSong ? "Play 1x (Active)" : "Play 1x"}</span>
+              <span>
+                {playOnlyThisSong ? t.player.play1xActive : t.player.play1x}
+              </span>
             </button>
           </div>
         </div>

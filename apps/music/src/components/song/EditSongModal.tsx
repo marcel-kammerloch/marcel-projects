@@ -4,6 +4,7 @@ import { useState } from "react";
 import { updateSong } from "@/actions/song";
 import { X, Save, Music, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "@/lib/i18n";
 
 const Genre = {
   FILM_SCORE: "FILM_SCORE",
@@ -41,6 +42,7 @@ export default function EditSongModal({
     song.speed !== undefined ? song.speed.toFixed(2) : "1.00",
   );
   const [isUpdating, setIsUpdating] = useState(false);
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,22 +50,33 @@ export default function EditSongModal({
 
     const speedNum = parseFloat(speed);
     if (isNaN(speedNum) || speedNum < 0.5 || speedNum > 1.5) {
-      toast.error("Speed must be between 0.50 and 1.50");
+      toast.error(t.editSong.speedRangeError);
       return;
     }
     if (Number(speedNum.toFixed(2)) !== speedNum) {
-      toast.error("Speed must have at most 2 decimal places");
+      toast.error(t.editSong.speedDecimalsError);
       return;
     }
 
     setIsUpdating(true);
 
     try {
-      await updateSong(song.id, { title, artist, genre, speed: speedNum });
+      const { error } = await updateSong(song.id, {
+        title,
+        artist,
+        genre,
+        speed: speedNum,
+      });
+
+      if (error) {
+        toast.error(t.editSong.updateError);
+      } else {
+        toast.success(t.editSong.updateSuccess);
+      }
       onClose();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to update song");
+      toast.error(t.editSong.updateError);
     } finally {
       setIsUpdating(false);
     }
@@ -76,11 +89,11 @@ export default function EditSongModal({
       <div className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-zinc-800">
         <div className="flex justify-between items-center p-4 border-b border-zinc-800">
           <h2 className="text-xl font-bold flex items-center gap-2 text-white">
-            <Music className="w-5 h-5 text-blue-500" /> Edit Song
+            <Music className="w-5 h-5 text-blue-500" /> {t.editSong.title}
           </h2>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-white transition"
+            className="text-zinc-400 hover:text-white transition cursor-pointer"
           >
             <X className="w-6 h-6" />
           </button>
@@ -89,7 +102,7 @@ export default function EditSongModal({
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           <div>
             <label className="text-xs text-zinc-400 font-medium mb-1 block">
-              Title *
+              {t.editSong.titleLabel}
             </label>
             <input
               type="text"
@@ -102,7 +115,7 @@ export default function EditSongModal({
 
           <div>
             <label className="text-xs text-zinc-400 font-medium mb-1 block">
-              Artist
+              {t.editSong.artistLabel}
             </label>
             <input
               type="text"
@@ -114,24 +127,28 @@ export default function EditSongModal({
 
           <div>
             <label className="text-xs text-zinc-400 font-medium mb-1 block">
-              Genre
+              {t.editSong.genreLabel}
             </label>
             <select
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 appearance-none"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer"
               value={genre}
               onChange={(e) => setGenre(e.target.value as Genre)}
             >
-              <option value={Genre.FILM_SCORE}>Film Score</option>
-              <option value={Genre.PIANO}>Piano</option>
-              <option value={Genre.CLASSICAL}>Classical</option>
-              <option value={Genre.POP}>Pop</option>
-              <option value={Genre.VIOLIN}>Violin</option>
+              <option value={Genre.FILM_SCORE}>
+                {t.genres.names.FILM_SCORE}
+              </option>
+              <option value={Genre.PIANO}>{t.genres.names.PIANO}</option>
+              <option value={Genre.CLASSICAL}>
+                {t.genres.names.CLASSICAL}
+              </option>
+              <option value={Genre.POP}>{t.genres.names.POP}</option>
+              <option value={Genre.VIOLIN}>{t.genres.names.VIOLIN}</option>
             </select>
           </div>
 
           <div>
             <label className="text-xs text-zinc-400 font-medium mb-1 block">
-              Playback Speed *
+              {t.editSong.speedLabel}
             </label>
             <input
               type="number"
@@ -149,24 +166,24 @@ export default function EditSongModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-medium py-3 rounded-lg transition"
+              className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-medium py-3 rounded-lg transition cursor-pointer"
             >
-              Cancel
+              {t.common.cancel}
             </button>
             <button
               type="submit"
               disabled={isUpdating}
-              className="flex-2 bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 rounded-lg transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-2 bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 rounded-lg transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
             >
               {isUpdating ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Saving...
+                  {t.common.saving}
                 </>
               ) : (
                 <>
                   <Save className="w-5 h-5" />
-                  Save Changes
+                  {t.editSong.saveChanges}
                 </>
               )}
             </button>

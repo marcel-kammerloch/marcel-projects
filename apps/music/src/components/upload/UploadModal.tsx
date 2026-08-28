@@ -9,6 +9,7 @@ import { X, Upload, Loader2, Music, Play, Square, Sliders, FileAudio } from "luc
 import { usePlayerStore } from "@/store/usePlayerStore";
 import type { Genre } from "@db/client";
 import { toast } from "sonner";
+import { useTranslation } from "@/lib/i18n";
 
 import SongMetadataForm from "./SongMetadataForm";
 import AudioPreviewSection from "./AudioPreviewSection";
@@ -20,6 +21,7 @@ export default function UploadModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [file, setFile] = useState<File | null>(null);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
@@ -225,7 +227,7 @@ export default function UploadModal({
     targetSpeed: number,
     inputFormat: string,
   ) => {
-    setUploadStatus("Loading FFmpeg audio engine...");
+    setUploadStatus(t.upload.statusLoadingFFmpeg);
     const ffmpeg = ffmpegRef.current;
     if (!ffmpeg) throw new Error("FFmpeg not initialized");
 
@@ -238,7 +240,7 @@ export default function UploadModal({
       });
     }
 
-    setUploadStatus("Processing audio with studio filter...");
+    setUploadStatus(t.upload.statusProcessing);
     const inputExt = inputFormat.includes("m4a") ? "m4a" : "mp3";
     const inputName = `input.${inputExt}`;
     await ffmpeg.writeFile(inputName, await fetchFile(inputBlob));
@@ -270,12 +272,12 @@ export default function UploadModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title) {
-      toast.error("Title is required");
+      toast.error(t.upload.titleRequired);
       return;
     }
 
     if (!file) {
-      toast.error("Please select an audio file to upload");
+      toast.error(t.upload.fileRequired);
       return;
     }
 
@@ -304,13 +306,13 @@ export default function UploadModal({
         finalDuration = Math.max(1, Math.round((end - start) / speed));
       }
 
-      setUploadStatus("Uploading to cloud storage...");
+      setUploadStatus(t.upload.statusUploading);
       const blobResult = await upload(filename, finalBlob, {
         access: "public",
         handleUploadUrl: "/api/upload",
       });
 
-      setUploadStatus("Saving track to library...");
+      setUploadStatus(t.upload.statusSaving);
       await createSong({
         title,
         artist,
@@ -319,12 +321,12 @@ export default function UploadModal({
         path: blobResult.pathname,
       });
 
-      toast.success("Song uploaded successfully!");
+      toast.success(t.upload.uploadSuccess);
       resetForm();
       onClose();
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("Upload failed: " + String(error));
+      toast.error(t.upload.uploadError(String(error)));
     } finally {
       setIsUploading(false);
       setUploadStatus("");
@@ -355,10 +357,10 @@ export default function UploadModal({
             </div>
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-white leading-tight">
-                Studio Audio Editor & Upload
+                {t.upload.modalTitle}
               </h2>
               <p className="text-xs text-zinc-400">
-                Trim with 0.1s precision and change tempo with pitch preservation
+                {t.upload.modalSubtitle}
               </p>
             </div>
           </div>
@@ -419,11 +421,11 @@ export default function UploadModal({
                   <div>
                     <span className="text-sm font-semibold text-zinc-200">
                       {isDraggingOver
-                        ? "Drop your audio file right here!"
-                        : "Choose an audio file or drag & drop"}
+                        ? t.upload.dropPromptActive
+                        : t.upload.dropPrompt}
                     </span>
                     <p className="text-xs text-zinc-400 mt-0.5">
-                      Supports MP3, M4A, AAC
+                      {t.upload.supportsHint}
                     </p>
                   </div>
                 </div>
@@ -445,7 +447,7 @@ export default function UploadModal({
                 </div>
 
                 <label className="text-xs font-semibold text-blue-400 hover:underline cursor-pointer shrink-0 ml-2">
-                  Change
+                  {t.upload.changeFile}
                   <input
                     type="file"
                     accept=".mp3,audio/mpeg,audio/mp3,.m4a,audio/x-m4a,audio/m4a,audio/mp4"
@@ -501,12 +503,12 @@ export default function UploadModal({
             {isPlayingPreview ? (
               <>
                 <Square className="w-4 h-4 fill-current" />
-                Stop Preview
+                {t.upload.stopPreview}
               </>
             ) : (
               <>
                 <Play className="w-4 h-4 fill-current" />
-                Preview Selection
+                {t.upload.previewSelection}
               </>
             )}
           </button>
@@ -518,7 +520,7 @@ export default function UploadModal({
               disabled={isUploading}
               className="px-4 py-2.5 rounded-xl font-medium text-sm text-zinc-400 hover:bg-zinc-800 transition cursor-pointer"
             >
-              Cancel
+              {t.common.cancel}
             </button>
 
             <button
@@ -530,12 +532,12 @@ export default function UploadModal({
               {isUploading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>{uploadStatus || "Processing..."}</span>
+                  <span>{uploadStatus || t.upload.statusGenericProcessing}</span>
                 </>
               ) : (
                 <>
                   <Upload className="w-4 h-4" />
-                  <span>Process & Save</span>
+                  <span>{t.upload.processAndSave}</span>
                 </>
               )}
             </button>

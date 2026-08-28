@@ -15,6 +15,7 @@ import { addSongToPlaylist } from "@/actions/playlist";
 import { getSongs } from "@/actions/song";
 import type { Song } from "@db/client";
 import { Plus, Loader2 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 interface AddSongModalProps {
   playlistId: string;
@@ -36,6 +37,7 @@ export function AddSongModal({
   );
   const [isLoading, setIsLoading] = useState(false);
   const [addingSongId, setAddingSongId] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isOpen && songs.length === 0) {
@@ -56,18 +58,18 @@ export function AddSongModal({
 
   const handleAddSong = async (songId: string) => {
     if (existingSongIds.includes(songId)) {
-      toast.error("Song is already in the playlist");
+      toast.error(t.playlists.addSongAlreadyIn);
       return;
     }
     setAddingSongId(songId);
     try {
       const { error } = await addSongToPlaylist(playlistId, songId);
       if (error) throw new Error(error);
-      toast.success("Song added to playlist");
+      toast.success(t.playlists.addSongSuccess);
       onOpenChange(false);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to add song");
+      toast.error(t.playlists.addSongError);
     } finally {
       setAddingSongId(null);
     }
@@ -88,16 +90,16 @@ export function AddSongModal({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={true}>
         <DialogHeader>
-          <DialogTitle>Add Song to Playlist</DialogTitle>
+          <DialogTitle>{t.playlists.addSongTitle}</DialogTitle>
           <DialogDescription>
-            Search your library to add a song to this playlist.
+            {t.playlists.addSongDescription}
           </DialogDescription>
         </DialogHeader>
         <div className="py-4 space-y-4">
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by title or artist..."
+            placeholder={t.playlists.addSongPlaceholder}
             autoFocus
           />
 
@@ -110,7 +112,7 @@ export function AddSongModal({
 
             {!isLoading && debouncedSearch && searchResults.length === 0 && (
               <p className="text-sm text-center py-8 text-zinc-500">
-                No songs found.
+                {t.playlists.addSongNoResults}
               </p>
             )}
 
@@ -127,7 +129,7 @@ export function AddSongModal({
                         {song.title}
                       </span>
                       <span className="text-sm text-zinc-500 truncate">
-                        {song.artist || "Unknown Artist"}
+                        {song.artist || t.common.unknownArtist}
                       </span>
                     </div>
                     <Button
@@ -147,7 +149,7 @@ export function AddSongModal({
             )}
             {!isLoading && !debouncedSearch && (
               <p className="text-sm text-center py-8 text-zinc-500">
-                Type to start searching
+                {t.playlists.addSongTypeToSearch}
               </p>
             )}
           </div>
