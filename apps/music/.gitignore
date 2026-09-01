@@ -53,6 +53,7 @@ android/captures/
 android/*.keystore
 android/*.jks
 android/*.pepk
+local.properties
 
 # Generated APKs, Bundles und Signatures
 android/*.apk
