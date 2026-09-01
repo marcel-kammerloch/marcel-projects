@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: `default-src 'self' ${STORAGE_URL};
               script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js;
+              worker-src 'self' blob:;
               style-src 'self' 'unsafe-inline';
               img-src 'self';
               connect-src 'self' ${STORAGE_URL} https://auth.marcel-projects.vercel.app https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm https://vercel.com/api/blob/;
