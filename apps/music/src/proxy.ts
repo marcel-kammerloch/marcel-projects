@@ -7,7 +7,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Skip images, audios and all static files, unless found in search params
-    "/((?!images|audios|_next|[^?]*\\.(?:png|svg|ico|webmanifest|mp3)).*)",
+    // Skip Next.js internals and all static files, unless found in search params
+    "/((?!_next|[^?]*\\.(?:css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|webmanifest|txt)).*)",
   ],
 };
