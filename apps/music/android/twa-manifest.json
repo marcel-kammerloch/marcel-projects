@@ -15,7 +15,7 @@
   "startUrl": "/",
   "iconUrl": "https://music.marcel-projects.vercel.app/icons/icon-512x512.png",
   "maskableIconUrl": "https://music.marcel-projects.vercel.app/icons/web-app-manifest-512x512.png",
-  "monochromeIconUrl": "https://music.marcel-projects.vercel.app/icons/icon-monochrome.jpg",
+  "monochromeIconUrl": "https://music.marcel-projects.vercel.app/icons/icon-monochrome.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "C:\\Users\\mkamm\\Documents\\Privat\\Programmieren\\projects\\marcel-projects\\apps\\music\\android\\android.keystore",
