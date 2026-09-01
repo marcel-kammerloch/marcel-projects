@@ -57,6 +57,7 @@ const nextConfig: NextConfig = {
   },
   partialPrefetching: true,
   cacheComponents: true,
+  poweredByHeader: false,
 };
 
 export default nextConfig;
