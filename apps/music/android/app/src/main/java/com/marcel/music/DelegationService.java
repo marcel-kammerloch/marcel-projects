@@ -62,7 +62,7 @@ public class DelegationService extends
             
             mediaSessionManager.addOnActiveSessionsChangedListener(
                     mediaSessionListener,
-                    new Intent(Intent.ACTION_MEDIA_BUTTON)
+                    null
             );
             
             Log.d(TAG, "MediaSession listener registered successfully");
