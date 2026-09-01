@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Song } from "@db/client";
-import { useSettingsStore } from "./useSettingsStore";
+import { audioEngine } from "@/lib/audio/audioEngine";
 
 export type LoopMode = "off" | "once" | "repeat";
 
@@ -14,11 +14,6 @@ export type Settings = {
   reduceDynamicRange: boolean;
   saveBattery: boolean;
   reduceAnimations: boolean;
-};
-
-const normalizeLoopMode = (value: unknown): LoopMode => {
-  if (value === "once" || value === "repeat") return value;
-  return "off";
 };
 
 interface PlayerState {
@@ -65,68 +60,59 @@ export const usePlayerStore = create<PlayerState>()(
         playlistName = null,
         playbackSourceType = null,
         playbackSourceName = null,
-      ) =>
-        set((state) => ({
-          currentSong: song,
-          isPlaying: true,
-          playOnlyThisSong: false,
-          queue: queue ?? state.queue,
-          playlistName:
-            playlistName !== undefined ? playlistName : state.playlistName,
-          playbackSourceType:
-            playbackSourceType !== undefined
-              ? playbackSourceType
-              : state.playbackSourceType,
-          playbackSourceName:
-            playbackSourceName !== undefined
-              ? playbackSourceName
-              : state.playbackSourceName,
-        })),
+      ) => {
+        if (typeof window !== "undefined") {
+          audioEngine.playSong(
+            song,
+            queue ?? get().queue,
+            playlistName,
+            playbackSourceType,
+            playbackSourceName,
+          );
+        } else {
+          set((state) => ({
+            currentSong: song,
+            isPlaying: true,
+            playOnlyThisSong: false,
+            queue: queue ?? state.queue,
+            playlistName:
+              playlistName !== undefined ? playlistName : state.playlistName,
+            playbackSourceType:
+              playbackSourceType !== undefined
+                ? playbackSourceType
+                : state.playbackSourceType,
+            playbackSourceName:
+              playbackSourceName !== undefined
+                ? playbackSourceName
+                : state.playbackSourceName,
+          }));
+        }
+      },
 
       playNext: () => {
-        const { currentSong, queue } = get();
-        const { settings } = useSettingsStore.getState();
-
-        if (!currentSong || queue.length === 0) return;
-
-        set({ playOnlyThisSong: false });
-
-        if (settings.shuffle) {
-          const randomIndex = Math.floor(Math.random() * queue.length);
-          set({ currentSong: queue[randomIndex], isPlaying: true });
-          return;
-        }
-
-        const currentIndex = queue.findIndex((s) => s.id === currentSong.id);
-        if (currentIndex === -1) return;
-
-        if (currentIndex === queue.length - 1) {
-          if (settings.loop === "repeat") {
-            set({ currentSong: queue[0], isPlaying: true });
-          } else {
-            set({ isPlaying: false });
-          }
-        } else {
-          set({ currentSong: queue[currentIndex + 1], isPlaying: true });
+        if (typeof window !== "undefined") {
+          audioEngine.next();
         }
       },
 
       playPrevious: () => {
-        const { currentSong, queue } = get();
-        if (!currentSong || queue.length === 0) return;
-
-        set({ playOnlyThisSong: false });
-
-        const currentIndex = queue.findIndex((s) => s.id === currentSong.id);
-        if (currentIndex <= 0) {
-          set({ currentSong: queue[0], isPlaying: true });
-        } else {
-          set({ currentSong: queue[currentIndex - 1], isPlaying: true });
+        if (typeof window !== "undefined") {
+          audioEngine.previous();
         }
       },
 
       setPlayOnlyThisSong: (playOnlyThisSong) => set({ playOnlyThisSong }),
-      setIsPlaying: (isPlaying) => set({ isPlaying }),
+      setIsPlaying: (isPlaying) => {
+        if (typeof window !== "undefined") {
+          if (isPlaying) {
+            audioEngine.resume();
+          } else {
+            audioEngine.pause();
+          }
+        } else {
+          set({ isPlaying });
+        }
+      },
       setIsFullView: (isFullView) => set({ isFullView }),
       setQueue: (queue) => set({ queue }),
     }),
