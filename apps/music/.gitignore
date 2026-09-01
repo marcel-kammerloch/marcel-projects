@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
@@ -43,3 +41,21 @@ next-env.d.ts
 # prisma
 /prisma/generated
 /prisma/migrations
+
+# Android Build Outputs & Temp Data
+android/.gradle/
+android/build/
+android/app/build/
+android/gradle/
+android/captures/
+
+# Keystore & Keys (Important: Never commit to Git-Repository!)
+android/*.keystore
+android/*.jks
+android/*.pepk
+
+# Generated APKs, Bundles und Signatures
+android/*.apk
+android/*.apk.idsig
+android/*.aab
+android/manifest-checksum.txt
