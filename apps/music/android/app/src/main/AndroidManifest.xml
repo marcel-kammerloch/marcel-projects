@@ -19,8 +19,7 @@
      application, the package attribute will need to reflect the correct path in order to use
      the abbreviated format. -->
 <manifest
-	xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.marcel.music">
+	xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 	<uses-permission android:name="android.permission.INTERNET" />
@@ -28,6 +27,7 @@
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+	<uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
 
 	<application
         android:name="Application"
@@ -113,7 +113,7 @@
 				<category android:name="android.intent.category.BROWSABLE"/>
 				<data android:scheme="https"
                     android:host="@string/hostName"
-                
+                    android:pathPrefix="/"
                 />
 			</intent-filter>
 
