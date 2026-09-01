@@ -50,6 +50,12 @@ def twaManifest = [
     orientation: 'portrait-primary',
 ]
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+}
+
 android {
     compileSdkVersion 36
     namespace "com.marcel.music"
@@ -71,20 +77,13 @@ android {
         resValue "string", "launchUrl", launchUrl
 
         
-
-        
-            // The URL the Web Manifest for the Progressive Web App that the TWA points to. This
-            // is used by Chrome OS and Meta Quest to open the Web version of the PWA instead of
-            // the TWA, as it will probably give a better user experience for non-mobile devices.
-            resValue "string", "webManifestUrl", 'https://music.marcel-projects.vercel.app/site.webmanifest'
-        
-
-        
-            // This is used by Meta Quest.
-            resValue "string", "fullScopeUrl", 'https://music.marcel-projects.vercel.app/'
-        
-
-        
+        // The URL the Web Manifest for the Progressive Web App that the TWA points to. This
+        // is used by Chrome OS and Meta Quest to open the Web version of the PWA instead of
+        // the TWA, as it will probably give a better user experience for non-mobile devices.
+        resValue "string", "webManifestUrl", 'https://music.marcel-projects.vercel.app/site.webmanifest'
+    
+        // This is used by Meta Quest.
+        resValue "string", "fullScopeUrl", 'https://music.marcel-projects.vercel.app/'        
 
         // The hostname is used when building the intent-filter, so the TWA is able to
         // handle Intents to open host url of the application.
@@ -150,9 +149,19 @@ android {
 
         
     }
+    signingConfigs {
+        release {
+            storeFile file("../android.keystore")
+            storePassword localProperties.getProperty('KEYSTORE_PASSWORD')
+            keyAlias "android"
+            keyPassword localProperties.getProperty('KEYSTORE_PASSWORD')
+        }
+    }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
