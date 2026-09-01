@@ -35,5 +35,5 @@
     }
   ],
   "id": "com.marcel.music",
-  "categories": ["music"]
+  "categories": ["music", "audio"]
 }
