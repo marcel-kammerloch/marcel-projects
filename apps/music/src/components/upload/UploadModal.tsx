@@ -5,7 +5,16 @@ import { upload } from "@vercel/blob/client";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
 import { createSong } from "@/actions/song";
-import { X, Upload, Loader2, Music, Play, Square, Sliders, FileAudio } from "lucide-react";
+import {
+  X,
+  Upload,
+  Loader2,
+  Music,
+  Play,
+  Square,
+  Sliders,
+  FileAudio,
+} from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import type { Genre } from "@db/client";
 import { toast } from "sonner";
@@ -302,7 +311,13 @@ export default function UploadModal({
         const end = endTime !== "" ? parseFloat(endTime) : duration;
         const inputFormat = isM4A ? "m4a" : "mp3";
 
-        finalBlob = await processAudio(finalBlob, start, end, speed, inputFormat);
+        finalBlob = await processAudio(
+          finalBlob,
+          start,
+          end,
+          speed,
+          inputFormat,
+        );
         finalDuration = Math.max(1, Math.round((end - start) / speed));
       }
 
@@ -359,9 +374,7 @@ export default function UploadModal({
               <h2 className="text-lg sm:text-xl font-bold text-white leading-tight">
                 {t.upload.modalTitle}
               </h2>
-              <p className="text-xs text-zinc-400">
-                {t.upload.modalSubtitle}
-              </p>
+              <p className="text-xs text-zinc-400">{t.upload.modalSubtitle}</p>
             </div>
           </div>
           <button
@@ -374,7 +387,11 @@ export default function UploadModal({
 
         {/* Scrollable Form Body */}
         <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-5">
-          <form id="upload-audio-form" onSubmit={handleSubmit} className="space-y-5">
+          <form
+            id="upload-audio-form"
+            onSubmit={handleSubmit}
+            className="space-y-5"
+          >
             {/* File Drop / Select Area with Interactive Drag Border */}
             {!file ? (
               <div
@@ -441,15 +458,20 @@ export default function UploadModal({
                       {file.name}
                     </p>
                     <p className="text-xs text-zinc-400">
-                      {(file.size / (1024 * 1024)).toFixed(2)} MB • {duration.toFixed(1)}s
+                      {(file.size / (1024 * 1024)).toFixed(2)} MB •{" "}
+                      {duration.toFixed(1)}s
                     </p>
                   </div>
                 </div>
 
-                <label className="text-xs font-semibold text-blue-400 hover:underline cursor-pointer shrink-0 ml-2">
+                <label
+                  className="text-xs font-semibold text-blue-400 hover:underline cursor-pointer shrink-0 ml-2"
+                  htmlFor="audio-upload"
+                >
                   {t.upload.changeFile}
                   <input
                     type="file"
+                    id="audio-upload"
                     accept=".mp3,audio/mpeg,audio/mp3,.m4a,audio/x-m4a,audio/m4a,audio/mp4"
                     onChange={handleFileUpload}
                     className="sr-only"
@@ -532,7 +554,9 @@ export default function UploadModal({
               {isUploading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>{uploadStatus || t.upload.statusGenericProcessing}</span>
+                  <span>
+                    {uploadStatus || t.upload.statusGenericProcessing}
+                  </span>
                 </>
               ) : (
                 <>

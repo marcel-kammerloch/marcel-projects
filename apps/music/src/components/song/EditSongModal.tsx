@@ -101,10 +101,14 @@ export default function EditSongModal({
 
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           <div>
-            <label className="text-xs text-zinc-400 font-medium mb-1 block">
+            <label
+              className="text-xs text-zinc-400 font-medium mb-1 block"
+              htmlFor="title-input"
+            >
               {t.editSong.titleLabel}
             </label>
             <input
+              id="title-input"
               type="text"
               className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
               value={title}
@@ -114,10 +118,14 @@ export default function EditSongModal({
           </div>
 
           <div>
-            <label className="text-xs text-zinc-400 font-medium mb-1 block">
+            <label
+              className="text-xs text-zinc-400 font-medium mb-1 block"
+              htmlFor="artist-input"
+            >
               {t.editSong.artistLabel}
             </label>
             <input
+              id="artist-input"
               type="text"
               className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
               value={artist}
@@ -126,10 +134,14 @@ export default function EditSongModal({
           </div>
 
           <div>
-            <label className="text-xs text-zinc-400 font-medium mb-1 block">
+            <label
+              className="text-xs text-zinc-400 font-medium mb-1 block"
+              htmlFor="genre-select"
+            >
               {t.editSong.genreLabel}
             </label>
             <select
+              id="genre-select"
               className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer"
               value={genre}
               onChange={(e) => setGenre(e.target.value as Genre)}
@@ -147,10 +159,14 @@ export default function EditSongModal({
           </div>
 
           <div>
-            <label className="text-xs text-zinc-400 font-medium mb-1 block">
+            <label
+              className="text-xs text-zinc-400 font-medium mb-1 block"
+              htmlFor="speed-input"
+            >
               {t.editSong.speedLabel}
             </label>
             <input
+              id="speed-input"
               type="number"
               min="0.50"
               max="1.50"

@@ -32,8 +32,12 @@ function ToggleSetting({
         <h3 className="text-base font-medium text-zinc-100 block">{title}</h3>
         <p className="text-sm text-zinc-500 mt-1">{description}</p>
       </div>
-      <label className="relative inline-flex items-center cursor-pointer">
+      <label
+        className="relative inline-flex items-center cursor-pointer"
+        htmlFor={String(title)}
+      >
         <input
+          id={String(title)}
           type="checkbox"
           className="sr-only peer"
           checked={checked}
