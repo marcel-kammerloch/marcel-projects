@@ -156,17 +156,14 @@ export default function SettingsPage() {
           </h2>
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-center gap-2 text-zinc-200">
-              <Globe className="w-5 h-5 text-blue-500" />
-              <div>
-                <h3 className="text-base font-medium text-zinc-100">
-                  {t.settings.language}
-                </h3>
-                <p className="text-sm text-zinc-500 mt-0.5">
-                  {t.settings.languageDesc}
-                </p>
-              </div>
+              <h3 className="text-base font-medium text-zinc-100">
+                {t.settings.language}
+              </h3>
+              <p className="text-sm text-zinc-500 mt-0.5">
+                {t.settings.languageDesc}
+              </p>
             </div>
-            <div className="flex gap-2 bg-zinc-950 p-1.5 rounded-xl mt-3">
+            <div className="flex gap-2 bg-zinc-950 py-1.5 rounded-xl mt-3">
               {(
                 [
                   { key: "auto", label: t.settings.languageOptions.auto },
@@ -179,7 +176,7 @@ export default function SettingsPage() {
                   type="button"
                   onClick={() => setLanguage(opt.key as LanguageSetting)}
                   className={cn(
-                    "flex-1 py-3 rounded-lg font-semibold text-sm transition cursor-pointer",
+                    "flex-1 p-3 rounded-lg font-semibold text-sm transition cursor-pointer",
                     languageSetting === opt.key
                       ? "bg-blue-600 text-white shadow-sm"
                       : "text-zinc-400 hover:text-white hover:bg-zinc-800/50",
