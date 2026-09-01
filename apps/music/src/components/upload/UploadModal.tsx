@@ -19,7 +19,7 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import type { Genre } from "@db/client";
 import { toast } from "sonner";
 import { useTranslation } from "@/lib/i18n";
-
+import slugify from "slugify";
 import SongMetadataForm from "./SongMetadataForm";
 import AudioPreviewSection from "./AudioPreviewSection";
 
@@ -299,7 +299,7 @@ export default function UploadModal({
     try {
       let finalBlob: Blob = file;
       let finalDuration = duration;
-      const filename = `${title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}-${artist.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.mp3`;
+      const filename = `${slugify(title, { locale: "de", lower: true, trim: true })}-${slugify(artist)}.mp3`;
 
       const hasStart = startTime !== "" && parseFloat(startTime) > 0;
       const hasEnd = endTime !== "" && parseFloat(endTime) < duration;
