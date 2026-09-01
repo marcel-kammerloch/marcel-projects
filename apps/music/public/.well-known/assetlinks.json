@@ -3,7 +3,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.marcel.music",
+      "package_name": "app.vercel.marcel_projects.music.twa",
       "sha256_cert_fingerprints": [
         "E2:64:A7:36:EA:28:17:AB:C2:31:F7:15:2E:96:93:DF:69:34:4F:C6:22:1C:34:A5:5B:5A:A5:90:40:73:2B:D8"
       ]
