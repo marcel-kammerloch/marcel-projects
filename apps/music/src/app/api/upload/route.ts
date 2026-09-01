@@ -25,7 +25,7 @@ export async function POST(request: Request): Promise<NextResponse> {
             "audio/webm",
           ],
           tokenPayload: JSON.stringify({}),
-          // addRandomSuffix: true,
+          addRandomSuffix: true,
           cacheControlMaxAge: 6 * 30 * 24 * 60 * 60, // 6 months
           allowOverwrite: true,
         };
