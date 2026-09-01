@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { getNextLoopMode, getSongSource, isStandalonePwa } from "@/components/player/playerUtils";
+import {
+  getNextLoopMode,
+  getSongSource,
+  isStandalonePwa,
+} from "@/components/player/playerUtils";
 import PlayerFullView from "@/components/player/PlayerFullView";
 import PlayerMiniBar from "@/components/player/PlayerMiniBar";
 
@@ -60,7 +64,8 @@ export default function Player() {
   const [volume, setVolume] = useState(1);
   const [menuOpen, setMenuOpen] = useState(false);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
-  const [loopedOnceForCurrentSong, setLoopedOnceForCurrentSong] = useState(false);
+  const [loopedOnceForCurrentSong, setLoopedOnceForCurrentSong] =
+    useState(false);
   const [progress, setProgress] = useState(0);
 
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -93,7 +98,12 @@ export default function Player() {
     try {
       if (!globalAudioContext) {
         const AudioContextClass =
-          window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+          window.AudioContext ||
+          (
+            window as typeof window & {
+              webkitAudioContext?: typeof AudioContext;
+            }
+          ).webkitAudioContext;
         if (!AudioContextClass) return;
 
         globalAudioContext = new AudioContextClass();
@@ -126,7 +136,8 @@ export default function Player() {
             globalSourceNode.disconnect();
           }
 
-          globalSourceNode = globalAudioContext.createMediaElementSource(mediaElement);
+          globalSourceNode =
+            globalAudioContext.createMediaElementSource(mediaElement);
           mediaElement._sourceNodeConnected = true;
 
           globalSourceNode.connect(globalCompressorNode);
@@ -135,7 +146,10 @@ export default function Player() {
           globalAnalyserNode.connect(globalAudioContext.destination);
         } catch (sourceErr) {
           mediaElement._sourceNodeConnected = true;
-          console.warn("Audio element source node already attached:", sourceErr);
+          console.warn(
+            "Audio element source node already attached:",
+            sourceErr,
+          );
         }
       }
     } catch (error) {
@@ -249,7 +263,14 @@ export default function Player() {
     audio.load();
     prefetchAudioRef.current = audio;
     prefetchedSongIdRef.current = nextSong.id;
-  }, [currentSong?.id, isPlaying, queue, settings.loop, settings.saveBattery, settings.shuffle]);
+  }, [
+    currentSong?.id,
+    isPlaying,
+    queue,
+    settings.loop,
+    settings.saveBattery,
+    settings.shuffle,
+  ]);
 
   const skipForward = () => {
     if (audioRef.current) {
@@ -276,16 +297,28 @@ export default function Player() {
       title: currentSong.title,
       artist: currentSong.artist || "Unknown Artist",
       album: currentSong.genre || "",
-      artwork: [{ src: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" }],
+      artwork: [
+        { src: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+      ],
     });
 
     navigator.mediaSession.setActionHandler("play", () => setIsPlaying(true));
     navigator.mediaSession.setActionHandler("pause", () => setIsPlaying(false));
-    navigator.mediaSession.setActionHandler("previoustrack", () => playPrevious());
+    navigator.mediaSession.setActionHandler("previoustrack", () =>
+      playPrevious(),
+    );
     navigator.mediaSession.setActionHandler("nexttrack", () => playNext());
     navigator.mediaSession.setActionHandler("seekforward", () => skipForward());
-    navigator.mediaSession.setActionHandler("seekbackward", () => skipBackward());
-  }, [currentSong, setIsPlaying, playNext, playPrevious, settings.skipDuration]);
+    navigator.mediaSession.setActionHandler("seekbackward", () =>
+      skipBackward(),
+    );
+  }, [
+    currentSong,
+    setIsPlaying,
+    playNext,
+    playPrevious,
+    settings.skipDuration,
+  ]);
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -330,14 +363,18 @@ export default function Player() {
       if (!loopedOnceForCurrentSong) {
         setLoopedOnceForCurrentSong(true);
         audioRef.current.currentTime = 0;
-        audioRef.current.play().catch((error) => console.error("Loop replay failed", error));
+        audioRef.current
+          .play()
+          .catch((error) => console.error("Loop replay failed", error));
         return;
       }
     }
 
     if (settings.loop === "repeat") {
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch((error) => console.error("Loop replay failed", error));
+      audioRef.current
+        .play()
+        .catch((error) => console.error("Loop replay failed", error));
       return;
     }
 
@@ -364,7 +401,16 @@ export default function Player() {
     }
 
     try {
-      wakeLockRef.current = await (navigator as Navigator & { wakeLock: { request: (type: string) => Promise<{ release: () => Promise<void>; addEventListener: (event: string, callback: () => void) => void }> } }).wakeLock.request("screen");
+      wakeLockRef.current = await (
+        navigator as Navigator & {
+          wakeLock: {
+            request: (type: string) => Promise<{
+              release: () => Promise<void>;
+              addEventListener: (event: string, callback: () => void) => void;
+            }>;
+          };
+        }
+      ).wakeLock.request("screen");
       wakeLockRef.current.addEventListener("release", () => {
         wakeLockRef.current = null;
       });
@@ -464,38 +510,38 @@ export default function Player() {
         />
       )}
 
-        <PlayerFullView
+      <PlayerFullView
         isFullView={isFullView}
-          currentSong={currentSong}
-          progress={progress}
-          isPlaying={isPlaying}
-          analyser={analyser}
-          playbackSourceType={playbackSourceType}
-          playbackSourceName={playbackSourceName}
-          playOnlyThisSong={playOnlyThisSong}
-          playbackRate={playbackRate}
-          volume={volume}
-          settings={settings}
-          onClose={() => {
-            setIsFullView(false);
-            setMenuOpen(false);
-          }}
-          onTogglePlay={handleTogglePlay}
-          onPlayPrevious={playPrevious}
-          onPlayNext={playNext}
-          onToggleShuffle={() => setSettings({ shuffle: !settings.shuffle })}
-          onToggleLoop={handleToggleLoop}
-          onSkipBackward={skipBackward}
-          onSkipForward={skipForward}
-          onSeek={handleSeek}
-          onTogglePlayOnlyThisSong={() => setPlayOnlyThisSong(!playOnlyThisSong)}
-          onPlaybackRateChange={setPlaybackRate}
-          onVolumeChange={setVolume}
-          onMenuOpenChange={setMenuOpen}
-          menuOpen={menuOpen}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        />
+        currentSong={currentSong}
+        progress={progress}
+        isPlaying={isPlaying}
+        analyser={analyser}
+        playbackSourceType={playbackSourceType}
+        playbackSourceName={playbackSourceName}
+        playOnlyThisSong={playOnlyThisSong}
+        playbackRate={playbackRate}
+        volume={volume}
+        settings={settings}
+        onClose={() => {
+          setIsFullView(false);
+          setMenuOpen(false);
+        }}
+        onTogglePlay={handleTogglePlay}
+        onPlayPrevious={playPrevious}
+        onPlayNext={playNext}
+        onToggleShuffle={() => setSettings({ shuffle: !settings.shuffle })}
+        onToggleLoop={handleToggleLoop}
+        onSkipBackward={skipBackward}
+        onSkipForward={skipForward}
+        onSeek={handleSeek}
+        onTogglePlayOnlyThisSong={() => setPlayOnlyThisSong(!playOnlyThisSong)}
+        onPlaybackRateChange={setPlaybackRate}
+        onVolumeChange={setVolume}
+        onMenuOpenChange={setMenuOpen}
+        menuOpen={menuOpen}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      />
     </>
   );
 }
