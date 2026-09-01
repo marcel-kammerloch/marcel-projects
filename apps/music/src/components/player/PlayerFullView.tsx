@@ -11,6 +11,7 @@ import {
 import { useTranslation } from "@/lib/i18n";
 
 import type { Song } from "@db/client";
+import { LoopMode } from "@/store/usePlayerStore";
 
 interface PlayerFullViewProps {
   isFullView: boolean;
@@ -24,7 +25,7 @@ interface PlayerFullViewProps {
   playbackRate: number;
   volume: number;
   settings: {
-    loop: "off" | "once" | "repeat";
+    loop: LoopMode;
     shuffle: boolean;
     skipDuration: number;
     saveBattery: boolean;

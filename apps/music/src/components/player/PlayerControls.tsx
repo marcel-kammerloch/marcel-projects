@@ -7,11 +7,12 @@ import {
   Repeat,
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
+import type { LoopMode } from "@/store/usePlayerStore";
 
 interface PlayerControlsProps {
   isPlaying: boolean;
   settings: {
-    loop: "off" | "once" | "repeat";
+    loop: LoopMode;
     shuffle: boolean;
     skipDuration: number;
   };

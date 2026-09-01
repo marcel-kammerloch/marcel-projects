@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { usePlayerStore } from "@/store/usePlayerStore";
 import { ArrowLeft, Trash2, Globe } from "lucide-react";
 import Link from "next/link";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useTranslation, LanguageSetting } from "@/lib/i18n";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 type ToggleSettingProps = {
   title: React.ReactNode;
@@ -46,7 +46,7 @@ function ToggleSetting({
 }
 
 export default function SettingsPage() {
-  const { settings, setSettings } = usePlayerStore();
+  const { settings, setSettings } = useSettingsStore();
   const { t, languageSetting, setLanguage } = useTranslation();
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);

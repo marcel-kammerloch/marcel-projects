@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Song } from "@db/client";
+import { useSettingsStore } from "./useSettingsStore";
 
 export type LoopMode = "off" | "once" | "repeat";
 
@@ -29,12 +30,10 @@ interface PlayerState {
   isPlaying: boolean;
   isFullView: boolean;
   playOnlyThisSong: boolean;
-  settings: Settings;
 
   // Actions
   setIsFullView: (isFullView: boolean) => void;
   setPlayOnlyThisSong: (playOnlyThisSong: boolean) => void;
-  setSettings: (settings: Partial<Settings>) => void;
   playSong: (
     song: Song,
     queue?: Song[],
@@ -59,27 +58,6 @@ export const usePlayerStore = create<PlayerState>()(
       isPlaying: false,
       isFullView: false,
       playOnlyThisSong: false,
-      settings: {
-        skipDuration: 15,
-        loop: "off",
-        shuffle: false,
-        highContrast: false,
-        keepScreenOn: false,
-        reduceDynamicRange: false,
-        saveBattery: false,
-        reduceAnimations: false,
-      },
-
-      setSettings: (newSettings) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            ...newSettings,
-            loop: normalizeLoopMode(newSettings.loop ?? state.settings.loop),
-          },
-        })),
-
-      setPlayOnlyThisSong: (playOnlyThisSong) => set({ playOnlyThisSong }),
 
       playSong: (
         song,
@@ -106,7 +84,9 @@ export const usePlayerStore = create<PlayerState>()(
         })),
 
       playNext: () => {
-        const { currentSong, queue, settings } = get();
+        const { currentSong, queue } = get();
+        const { settings } = useSettingsStore.getState();
+
         if (!currentSong || queue.length === 0) return;
 
         set({ playOnlyThisSong: false });
@@ -145,32 +125,14 @@ export const usePlayerStore = create<PlayerState>()(
         }
       },
 
+      setPlayOnlyThisSong: (playOnlyThisSong) => set({ playOnlyThisSong }),
       setIsPlaying: (isPlaying) => set({ isPlaying }),
-
       setIsFullView: (isFullView) => set({ isFullView }),
-
       setQueue: (queue) => set({ queue }),
     }),
     {
       name: "music-player-storage",
-      merge: (persistedState, currentState) => {
-        const mergedState = {
-          ...currentState,
-          ...(persistedState as Partial<PlayerState>),
-        } as PlayerState;
-
-        if (mergedState.settings) {
-          mergedState.settings = {
-            ...mergedState.settings,
-            loop: normalizeLoopMode(mergedState.settings.loop),
-            // saveBattery: mergedState.settings.saveBattery ?? false,
-          };
-        }
-
-        return mergedState;
-      },
       partialize: (state) => ({
-        settings: state.settings,
         currentSong: state.currentSong,
         queue: state.queue,
         playlistName: state.playlistName,

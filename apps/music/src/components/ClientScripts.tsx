@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePlayerStore } from "@/store/usePlayerStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 export function ClientScripts() {
-  const highContrast = usePlayerStore((state) => state.settings?.highContrast);
+  const highContrast = useSettingsStore((state) => state.settings.highContrast);
 
   useEffect(() => {
     // useEffect only runs on the client, eliminating the need for a separate `mounted` check

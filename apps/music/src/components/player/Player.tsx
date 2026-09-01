@@ -10,6 +10,7 @@ import {
 } from "@/components/player/playerUtils";
 import PlayerFullView from "@/components/player/PlayerFullView";
 import PlayerMiniBar from "@/components/player/PlayerMiniBar";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 let globalAudioContext: AudioContext | null = null;
 let globalSourceNode: MediaElementAudioSourceNode | null = null;
@@ -56,9 +57,9 @@ export default function Player() {
     setIsFullView,
     playOnlyThisSong,
     setPlayOnlyThisSong,
-    settings,
-    setSettings,
   } = usePlayerStore();
+
+  const { settings, setSettings } = useSettingsStore();
 
   const [playbackRate, setPlaybackRate] = useState(1);
   const [volume, setVolume] = useState(1);
@@ -248,7 +249,8 @@ export default function Player() {
     if (
       prefetchedSongIdRef.current === nextSong.id &&
       prefetchAudioRef.current &&
-      (prefetchAudioRef.current.currentSrc || prefetchAudioRef.current.src) === nextSongUrl
+      (prefetchAudioRef.current.currentSrc || prefetchAudioRef.current.src) ===
+        nextSongUrl
     ) {
       return;
     }
@@ -338,7 +340,10 @@ export default function Player() {
         const preloadThreshold = Math.min(10, duration / 2);
         if (remainingTime <= preloadThreshold && remainingTime > 0) {
           const nextCandidate = getNextSongCandidate();
-          if (nextCandidate && prefetchedSongIdRef.current !== nextCandidate.id) {
+          if (
+            nextCandidate &&
+            prefetchedSongIdRef.current !== nextCandidate.id
+          ) {
             preloadNextSong();
           }
         }
