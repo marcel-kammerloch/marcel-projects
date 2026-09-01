@@ -232,45 +232,45 @@ export default function Player() {
     }
   }, [isPlaying, currentSong, playbackRate, volume]);
 
-  useEffect(() => {
+  const preloadNextSong = () => {
     if (typeof window === "undefined" || settings.saveBattery || !isPlaying) {
-      if (prefetchAudioRef.current) {
-        prefetchAudioRef.current.removeAttribute("src");
-        prefetchAudioRef.current.load();
-      }
-      prefetchedSongIdRef.current = null;
       return;
     }
 
     const nextSong = getNextSongCandidate();
     if (!nextSong) {
-      prefetchedSongIdRef.current = null;
       return;
     }
 
     const nextSongUrl = getSongSource(nextSong);
-    const audio = prefetchAudioRef.current ?? new Audio();
+    if (!nextSongUrl) return;
 
     if (
       prefetchedSongIdRef.current === nextSong.id &&
-      (audio.currentSrc || audio.src) === nextSongUrl
+      prefetchAudioRef.current &&
+      (prefetchAudioRef.current.currentSrc || prefetchAudioRef.current.src) === nextSongUrl
     ) {
       return;
     }
 
+    const audio = prefetchAudioRef.current ?? new Audio();
     audio.src = nextSongUrl;
     audio.preload = "auto";
     audio.load();
     prefetchAudioRef.current = audio;
     prefetchedSongIdRef.current = nextSong.id;
-  }, [
-    currentSong?.id,
-    isPlaying,
-    queue,
-    settings.loop,
-    settings.saveBattery,
-    settings.shuffle,
-  ]);
+  };
+
+  useEffect(() => {
+    // Reset prefetched song tracking when current track changes
+    prefetchedSongIdRef.current = null;
+    if (settings.saveBattery || !isPlaying) {
+      if (prefetchAudioRef.current) {
+        prefetchAudioRef.current.removeAttribute("src");
+        prefetchAudioRef.current.load();
+      }
+    }
+  }, [currentSong?.id, settings.saveBattery, isPlaying]);
 
   const skipForward = () => {
     if (audioRef.current) {
@@ -312,6 +312,12 @@ export default function Player() {
     navigator.mediaSession.setActionHandler("seekbackward", () =>
       skipBackward(),
     );
+    navigator.mediaSession.setActionHandler("seekto", (details) => {
+      if (audioRef.current && details.seekTime !== undefined) {
+        audioRef.current.currentTime = details.seekTime;
+        setProgress(details.seekTime);
+      }
+    });
   }, [
     currentSong,
     setIsPlaying,
@@ -322,7 +328,38 @@ export default function Player() {
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
-      setProgress(audioRef.current.currentTime);
+      const currentTime = audioRef.current.currentTime;
+      const duration = audioRef.current.duration;
+      setProgress(currentTime);
+
+      // Preload next track ~10 seconds before current track ends (or halfway through if track is shorter than 20s)
+      if (duration && !isNaN(duration) && isPlaying && !settings.saveBattery) {
+        const remainingTime = duration - currentTime;
+        const preloadThreshold = Math.min(10, duration / 2);
+        if (remainingTime <= preloadThreshold && remainingTime > 0) {
+          const nextCandidate = getNextSongCandidate();
+          if (nextCandidate && prefetchedSongIdRef.current !== nextCandidate.id) {
+            preloadNextSong();
+          }
+        }
+      }
+
+      if (
+        "mediaSession" in navigator &&
+        "setPositionState" in navigator.mediaSession &&
+        duration &&
+        !isNaN(duration)
+      ) {
+        try {
+          navigator.mediaSession.setPositionState({
+            duration: duration,
+            playbackRate: audioRef.current.playbackRate || 1,
+            position: currentTime,
+          });
+        } catch {
+          // ignore setPositionState errors during rapid seek transitions
+        }
+      }
     }
   };
 
