@@ -19,7 +19,7 @@ export default function PlaylistCardLink({
   return (
     <Link
       href={`/playlist/${playlist.id}`}
-      className="bg-zinc-900/60 hover:bg-zinc-850 hover:border-zinc-700/80 transition-all rounded-2xl p-3.5 sm:p-4 flex flex-col group cursor-pointer border border-zinc-800 shadow-sm min-w-40 sm:min-w-48"
+      className="w-full bg-zinc-900/60 hover:bg-zinc-850 hover:border-zinc-700/80 transition-all rounded-2xl p-3.5 sm:p-4 flex flex-col group cursor-pointer border border-zinc-800 shadow-sm"
     >
       <PlaylistCard playlist={playlist} />
       <h3 className="font-semibold text-white group-hover:text-blue-400 transition-colors truncate">
@@ -80,9 +80,10 @@ export function FavoritesCardLink({ allSongs }: { allSongs?: Song[] }) {
     e.stopPropagation();
     if (!allSongs || allSongs.length === 0) return;
 
-    const favoriteSongs = allSongs.filter((s) =>
-      favoriteSongIds.includes(s.id),
-    );
+    const songMap = new Map(allSongs.map((s) => [s.id, s]));
+    const favoriteSongs = favoriteSongIds
+      .map((id) => songMap.get(id))
+      .filter((song): song is Song => song !== undefined);
     if (favoriteSongs.length > 0) {
       playSong(
         favoriteSongs[0],

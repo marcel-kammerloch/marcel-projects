@@ -74,19 +74,13 @@ export default function PlaylistsView({
         </form>
       </AdminOnly>
 
-      <div className="relative -mx-4">
-        <div className="flex gap-4 overflow-x-auto px-4 pb-4 no-scrollbar snap-x scroll-smooth">
-          {/* Favorites Special Playlist Card always shown */}
-          <div className="snap-start">
-            <FavoritesCardLink allSongs={allSongs} />
-          </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        {/* Favorites Special Playlist Card always shown */}
+        <FavoritesCardLink allSongs={allSongs} />
 
-          {playlists.map((playlist) => (
-            <div key={playlist.id} className="snap-start last:pr-4">
-              <PlaylistCardLink playlist={playlist} />
-            </div>
-          ))}
-        </div>
+        {playlists.map((playlist) => (
+          <PlaylistCardLink key={playlist.id} playlist={playlist} />
+        ))}
       </div>
     </div>
   );
