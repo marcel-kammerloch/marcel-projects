@@ -7,6 +7,7 @@ interface FavoritesState {
   removeFavorite: (songId: string) => void;
   toggleFavorite: (songId: string) => boolean;
   isFavorite: (songId: string) => boolean;
+  reorderFavorites: (newOrder: string[]) => void;
 }
 
 const safeStorage = {
@@ -74,6 +75,18 @@ export const useFavoritesStore = create<FavoritesState>()(
 
       isFavorite: (songId: string) => {
         return get().favoriteSongIds.includes(songId);
+      },
+
+      reorderFavorites: (newOrder: string[]) => {
+        set((state) => {
+          const newOrderSet = new Set(newOrder);
+          const remaining = state.favoriteSongIds.filter(
+            (id) => !newOrderSet.has(id),
+          );
+          return {
+            favoriteSongIds: [...newOrder, ...remaining],
+          };
+        });
       },
     }),
     {

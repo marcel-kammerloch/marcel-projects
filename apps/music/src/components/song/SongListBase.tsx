@@ -68,7 +68,7 @@ export default function SongListBase({
   showSortSelector = true,
 }: SongListBaseProps) {
   const { playSong } = usePlayerStore();
-  const { removeFavorite } = useFavoritesStore();
+  const { removeFavorite, reorderFavorites } = useFavoritesStore();
   const { t } = useTranslation();
   const { isAdmin } = useAuth();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -174,7 +174,8 @@ export default function SongListBase({
       setLocalSongs(newSongs);
 
       if (playlistId === "favorites") {
-        // Local only Favorites list - no db call
+        // Local only Favorites list - persist new order to localStorage, no db call
+        reorderFavorites(newSongs.map((s) => s.id));
         return;
       }
 
