@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import type { Song } from "@db/client";
 import { useFavoritesStore } from "@/store/useFavoritesStore";
 import { usePlayerStore } from "@/store/usePlayerStore";
@@ -16,9 +17,12 @@ export default function FavoritesView({ allSongs }: FavoritesViewProps) {
   const { playSong } = usePlayerStore();
   const { t } = useTranslation();
 
-  const favoriteSongs = allSongs.filter((song) =>
-    favoriteSongIds.includes(song.id),
-  );
+  const favoriteSongs = useMemo(() => {
+    const songMap = new Map(allSongs.map((song) => [song.id, song]));
+    return favoriteSongIds
+      .map((id) => songMap.get(id))
+      .filter((song): song is Song => song !== undefined);
+  }, [allSongs, favoriteSongIds]);
 
   const handlePlayFavorites = () => {
     if (favoriteSongs.length > 0) {
