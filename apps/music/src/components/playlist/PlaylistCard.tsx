@@ -48,7 +48,7 @@ export function PlaylistCard({ playlist }: { playlist: PlaylistWithSongs }) {
   };
 
   return (
-    <div className="w-full aspect-square bg-zinc-900 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+    <div className="group w-full aspect-square bg-zinc-900 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
       <div className="absolute inset-0 bg-linear-to-br from-blue-800/20 to-blue-800/20 opacity-50 group-hover:opacity-100 transition"></div>
       <ListMusic className="w-8 h-8 text-zinc-600 group-hover:text-blue-400 transition relative z-10" />
       {playlist.songs.length > 0 && (
