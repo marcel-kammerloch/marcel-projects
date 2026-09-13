@@ -39,35 +39,5 @@
       "type": "image/png",
       "purpose": "monochrome"
     }
-  ],
-  "screenshots": [
-    {
-      "sizes": "586x1041",
-      "type": "image/png"
-    },
-    {
-      "sizes": "586x1041",
-      "type": "image/png"
-    },
-    {
-      "sizes": "586x1041",
-      "type": "image/png"
-    }
-  ],
-  "id": "com.marcel.music",
-  "android_package_name": "com.marcel.music",
-  "prefer_related_applications": true,
-  "related_applications": [
-    {
-      "platform": "webapp",
-      "url": "https://music.marcel-projects.vercel.app",
-      "id": "com.marcel.music"
-    }
-  ],
-  "protocol_handlers": [
-    {
-      "protocol": "web+music",
-      "url": "/?track=%s"
-    }
   ]
 }
