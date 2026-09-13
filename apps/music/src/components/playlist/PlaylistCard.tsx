@@ -19,11 +19,13 @@ export default function PlaylistCardLink({
   return (
     <Link
       href={`/playlist/${playlist.id}`}
-      className="bg-zinc-800/50 hover:bg-zinc-800 transition rounded-xl p-4 flex flex-col group cursor-pointer border border-zinc-800 min-w-40 sm:min-w-50"
+      className="bg-zinc-900/60 hover:bg-zinc-850 hover:border-zinc-700/80 transition-all rounded-2xl p-3.5 sm:p-4 flex flex-col group cursor-pointer border border-zinc-800 shadow-sm min-w-40 sm:min-w-48"
     >
       <PlaylistCard playlist={playlist} />
-      <h3 className="font-semibold text-white truncate">{playlist.name}</h3>
-      <p className="text-xs text-zinc-500">
+      <h3 className="font-semibold text-white group-hover:text-blue-400 transition-colors truncate">
+        {playlist.name}
+      </h3>
+      <p className="text-xs text-zinc-400 mt-0.5">
         {t.common.songsCount(playlist.songs.length)}
       </p>
     </Link>
@@ -48,13 +50,16 @@ export function PlaylistCard({ playlist }: { playlist: PlaylistWithSongs }) {
   };
 
   return (
-    <div className="group w-full aspect-square bg-zinc-900 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
-      <div className="absolute inset-0 bg-linear-to-br from-blue-800/20 to-blue-800/20 opacity-50 group-hover:opacity-100 transition"></div>
-      <ListMusic className="w-8 h-8 text-zinc-600 group-hover:text-blue-400 transition relative z-10" />
+    <div className="group w-full aspect-square bg-zinc-900 rounded-xl mb-3 flex items-center justify-center relative overflow-hidden border border-zinc-800/80">
+      <div className="absolute inset-0 bg-linear-to-br from-blue-700/25 to-indigo-900/25 opacity-60 group-hover:opacity-100 transition duration-300"></div>
+      <ListMusic className="w-9 h-9 text-zinc-500 group-hover:text-blue-400 transition relative z-10" />
       {playlist.songs.length > 0 && (
         <button
+          type="button"
           onClick={handlePlay}
-          className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition shadow-lg hover:scale-105 active:scale-95 cursor-pointer"
+          title={`Play ${playlist.name}`}
+          aria-label={`Play ${playlist.name}`}
+          className="absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-400 text-white flex items-center justify-center translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-200 shadow-lg shadow-black/50 hover:scale-105 active:scale-95 cursor-pointer z-20"
         >
           <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
         </button>
@@ -92,22 +97,27 @@ export function FavoritesCardLink({ allSongs }: { allSongs?: Song[] }) {
   return (
     <Link
       href="/playlist/favorites"
-      className="bg-zinc-800/50 hover:bg-zinc-800 transition rounded-xl p-4 flex flex-col group cursor-pointer border border-zinc-800 min-w-40 sm:min-w-50"
+      className="bg-zinc-900/60 hover:bg-zinc-850 hover:border-zinc-700/80 transition-all rounded-2xl p-3.5 sm:p-4 flex flex-col group cursor-pointer border border-zinc-800 shadow-sm min-w-40 sm:min-w-48"
     >
-      <div className="w-full aspect-square bg-zinc-900 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+      <div className="w-full aspect-square bg-zinc-900 rounded-xl mb-3 flex items-center justify-center relative overflow-hidden border border-zinc-800/80 shadow-inner">
         <div className="absolute inset-0 bg-linear-to-br from-rose-600/30 to-pink-900/30 opacity-70 group-hover:opacity-100 transition duration-300"></div>
-        <Heart className="w-8 h-8 text-rose-500/70 fill-rose-500/20 group-hover:text-rose-400 group-hover:scale-110 transition relative z-10" />
+        <Heart className="w-9 h-9 text-rose-500/70 fill-rose-500/20 group-hover:text-rose-400 group-hover:scale-110 transition relative z-10" />
         {count > 0 && allSongs && allSongs.length > 0 && (
           <button
+            type="button"
             onClick={handlePlay}
-            className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-rose-500 text-white flex items-center justify-center translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition shadow-lg hover:scale-105 active:scale-95 cursor-pointer z-20"
+            title={t.favorites.title}
+            aria-label={t.favorites.title}
+            className="absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full bg-rose-500 hover:bg-rose-400 text-white flex items-center justify-center translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-200 shadow-lg shadow-black/50 hover:scale-105 active:scale-95 cursor-pointer z-20"
           >
             <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
           </button>
         )}
       </div>
-      <h3 className="font-semibold text-white truncate">{t.favorites.title}</h3>
-      <p className="text-xs text-zinc-500">{t.common.songsCount(count)}</p>
+      <h3 className="font-semibold text-white group-hover:text-rose-400 transition-colors truncate">
+        {t.favorites.title}
+      </h3>
+      <p className="text-xs text-zinc-400 mt-0.5">{t.common.songsCount(count)}</p>
     </Link>
   );
 }

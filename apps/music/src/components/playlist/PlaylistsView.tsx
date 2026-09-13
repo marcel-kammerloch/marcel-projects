@@ -49,7 +49,7 @@ export default function PlaylistsView({
   };
 
   return (
-    <div className="flex flex-col gap-6 mt-12 pb-8">
+    <div className="flex flex-col gap-6 mt-2 pb-8">
       <AdminOnly>
         <form onSubmit={handleCreatePlaylist} className="flex gap-2">
           <input

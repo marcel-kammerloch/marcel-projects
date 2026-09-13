@@ -1,4 +1,6 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Heart } from "lucide-react";
+import { toast } from "sonner";
+import { useFavoritesStore } from "@/store/useFavoritesStore";
 
 import AudioVisualizer from "@/components/player/AudioVisualizer";
 import PlayerControls from "@/components/player/PlayerControls";
@@ -80,6 +82,20 @@ export default function PlayerFullView({
 }: PlayerFullViewProps) {
   const { t } = useTranslation();
 
+  const isFav = useFavoritesStore((state) =>
+    state.favoriteSongIds.includes(currentSong.id),
+  );
+  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+
+  const handleToggleFavorite = () => {
+    const newlyAdded = toggleFavorite(currentSong.id);
+    if (newlyAdded) {
+      toast.success(t.favorites.addedToast);
+    } else {
+      toast.success(t.favorites.removedToast);
+    }
+  };
+
   const sourceTypeLabel =
     playbackSourceType === "playlist"
       ? t.player.sourceTypes.playlist
@@ -99,7 +115,9 @@ export default function PlayerFullView({
           <button
             type="button"
             onClick={onClose}
-            className="text-white p-2 hover:bg-zinc-800 rounded-full transition cursor-pointer"
+            title="Close player"
+            aria-label="Close player"
+            className="text-white p-2 hover:bg-zinc-800 active:scale-95 rounded-full transition cursor-pointer"
           >
             <ChevronDown className="w-8 h-8" />
           </button>
@@ -127,13 +145,17 @@ export default function PlayerFullView({
           />
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="flex-1 flex flex-col items-center justify-center py-2 sm:py-4">
           <div
-            className="w-60 h-60 sm:w-72 sm:h-72 rounded-3xl shadow-2xl flex items-center justify-center relative overflow-hidden group"
-            style={{ background: getGradient(currentSong.id) }}
+            className="w-60 h-60 sm:w-72 sm:h-72 rounded-3xl shadow-2xl flex items-center justify-center relative overflow-hidden group ring-1 ring-white/10 transition-transform duration-300"
+            style={{
+              background: getGradient(currentSong.id),
+              boxShadow:
+                "0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 35px -10px rgba(59, 130, 246, 0.2)",
+            }}
           >
             <div className="absolute inset-0 bg-black/20 mix-blend-overlay"></div>
-            <MusicIcon className="w-20 h-20 text-white/50 relative z-10" />
+            <MusicIcon className="w-20 h-20 text-white/50 relative z-10 transition-transform duration-300 group-hover:scale-105" />
           </div>
         </div>
 
@@ -147,10 +169,10 @@ export default function PlayerFullView({
           </div>
         )}
 
-        <div className="mt-2 mb-2">
-          <div className="flex items-center justify-between gap-2">
+        <div className="mt-2 mb-3">
+          <div className="flex items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h2 className="text-2xl font-bold text-white truncate">
+              <h2 className="text-2xl font-bold text-white truncate tracking-tight">
                 {currentSong.title}
               </h2>
               <p className="text-base text-zinc-400 truncate mt-0.5">
@@ -158,25 +180,51 @@ export default function PlayerFullView({
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={onTogglePlayOnlyThisSong}
-              aria-pressed={playOnlyThisSong}
-              className={`shrink-0 flex items-center px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                playOnlyThisSong
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-500/25 ring-2 ring-blue-500/50"
-                  : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700"
-              }`}
-              title={
-                playOnlyThisSong
-                  ? t.player.play1xTooltipActive
-                  : t.player.play1xTooltipInactive
-              }
-            >
-              <span>
-                {playOnlyThisSong ? t.player.play1xActive : t.player.play1x}
-              </span>
-            </button>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={handleToggleFavorite}
+                aria-label={
+                  isFav
+                    ? t.favorites.removeFromFavorites
+                    : t.favorites.addToFavorites
+                }
+                title={
+                  isFav
+                    ? t.favorites.removeFromFavorites
+                    : t.favorites.addToFavorites
+                }
+                className="p-2.5 rounded-full hover:bg-zinc-850 active:scale-90 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/50"
+              >
+                <Heart
+                  className={`w-6 h-6 transition-all duration-200 ${
+                    isFav
+                      ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.4)]"
+                      : "text-zinc-400 hover:text-white"
+                  }`}
+                />
+              </button>
+
+              <button
+                type="button"
+                onClick={onTogglePlayOnlyThisSong}
+                aria-pressed={playOnlyThisSong}
+                className={`flex items-center px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  playOnlyThisSong
+                    ? "bg-blue-600 text-white shadow-md shadow-blue-500/25 ring-2 ring-blue-500/50"
+                    : "bg-zinc-850 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/80"
+                }`}
+                title={
+                  playOnlyThisSong
+                    ? t.player.play1xTooltipActive
+                    : t.player.play1xTooltipInactive
+                }
+              >
+                <span>
+                  {playOnlyThisSong ? t.player.play1xActive : t.player.play1x}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -192,7 +240,7 @@ export default function PlayerFullView({
               background: `linear-gradient(to right, #3b82f6 ${(progress / (currentSong.duration || 1)) * 100}%, #27272a ${(progress / (currentSong.duration || 1)) * 100}%)`,
             }}
           />
-          <div className="flex justify-between text-xs text-zinc-500 font-medium mt-2">
+          <div className="flex justify-between text-xs text-zinc-400 font-medium tabular-nums mt-2">
             <span>{formatTime(progress)}</span>
             <span>{formatTime(currentSong.duration)}</span>
           </div>
