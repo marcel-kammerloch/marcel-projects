@@ -47,6 +47,12 @@ class AudioEngine {
     this.setupMediaSession();
     this.setupUserGestureUnlock();
 
+    useSettingsStore.subscribe((state, prevState) => {
+      if (state.settings.loop !== prevState.settings.loop) {
+        this.loopedOnceForCurrentSong = false;
+      }
+    });
+
     this.isInitialized = true;
   }
 
@@ -213,27 +219,33 @@ class AudioEngine {
       return;
     }
 
+    if (settings.loop === "repeat") {
+      this.audio.currentTime = 0;
+      this.notifyProgress(0, this.audio.duration || 0);
+      this.audio
+        .play()
+        .catch((err) =>
+          console.error("[AudioEngine] Repeat track failed:", err),
+        );
+      return;
+    }
+
     if (settings.loop === "once") {
       if (!this.loopedOnceForCurrentSong) {
         this.loopedOnceForCurrentSong = true;
         this.audio.currentTime = 0;
+        this.notifyProgress(0, this.audio.duration || 0);
         this.audio
           .play()
           .catch((err) =>
             console.error("[AudioEngine] Replay once failed:", err),
           );
         return;
+      } else {
+        // One additional replay finished -> switch loop back to off and proceed normally
+        this.loopedOnceForCurrentSong = false;
+        useSettingsStore.getState().setSettings({ loop: "off" });
       }
-    }
-
-    if (settings.loop === "repeat" && queue.length === 1) {
-      this.audio.currentTime = 0;
-      this.audio
-        .play()
-        .catch((err) =>
-          console.error("[AudioEngine] Repeat single failed:", err),
-        );
-      return;
     }
 
     const nextSong = this.getNextSongCandidate();
@@ -454,6 +466,13 @@ class AudioEngine {
 
     const { settings } = useSettingsStore.getState();
     if (settings.saveBattery) return;
+
+    if (
+      settings.loop === "repeat" ||
+      (settings.loop === "once" && !this.loopedOnceForCurrentSong)
+    ) {
+      return;
+    }
 
     const nextSong = this.getNextSongCandidate();
     if (!nextSong || nextSong.id === this.prefetchedSongId) return;
