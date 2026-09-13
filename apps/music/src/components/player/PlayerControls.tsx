@@ -40,7 +40,7 @@ export default function PlayerControls({
 
   return (
     <>
-      <div className="flex items-center justify-between mb-8 max-w-[80%] w-full mx-auto">
+      <div className="flex items-center justify-between mb-8 mx-2">
         <button
           type="button"
           onClick={onToggleShuffle}
