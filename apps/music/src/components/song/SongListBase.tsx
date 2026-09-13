@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Song, Genre } from "@db/client";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useFavoritesStore } from "@/store/useFavoritesStore";
@@ -96,23 +96,73 @@ export default function SongListBase({
     }),
   );
 
-  const [sortBy, setSortBy] = useState<SortMode>("manual");
+  const isFavorites = playlistId === "favorites";
 
-  const displayedSongs = [...localSongs].sort((a, b) => {
-    if (sortBy === "name") {
-      return a.title.localeCompare(b.title);
+  const sortOptions = useMemo(() => {
+    if (isFavorites) {
+      return [
+        { value: "duration" as const, label: t.library.sort.duration },
+        { value: "manual" as const, label: t.library.sort.manual },
+        { value: "name" as const, label: t.library.sort.name },
+      ];
     }
-    if (sortBy === "date-desc") {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    return [
+      { value: "manual" as const, label: t.library.sort.manual },
+      { value: "duration" as const, label: t.library.sort.duration },
+      { value: "date-desc" as const, label: t.library.sort.dateDesc },
+      { value: "date-asc" as const, label: t.library.sort.dateAsc },
+      { value: "name" as const, label: t.library.sort.name },
+    ];
+  }, [isFavorites, t]);
+
+  const sortLabels = useMemo(
+    () => ({
+      manual: t.library.sort.manual,
+      duration: t.library.sort.duration,
+      "date-desc": t.library.sort.dateDesc,
+      "date-asc": t.library.sort.dateAsc,
+      name: t.library.sort.name,
+    }),
+    [t],
+  );
+
+  const [sortBy, setSortBy] = useState<SortMode>(
+    isFavorites ? "manual" : "manual",
+  );
+
+  // If on Favorites and a date sort mode was selected, fallback to manual
+  useEffect(() => {
+    if (isFavorites && (sortBy === "date-desc" || sortBy === "date-asc")) {
+      setSortBy("manual");
     }
-    if (sortBy === "date-asc") {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    }
-    if (sortBy === "duration") {
-      return a.duration - b.duration;
-    }
-    return 0;
-  });
+  }, [isFavorites, sortBy]);
+
+  const displayedSongs = useMemo(() => {
+    const activeSort =
+      isFavorites && (sortBy === "date-desc" || sortBy === "date-asc")
+        ? "manual"
+        : sortBy;
+
+    return [...localSongs].sort((a, b) => {
+      if (activeSort === "name") {
+        return a.title.localeCompare(b.title);
+      }
+      if (activeSort === "date-desc") {
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      }
+      if (activeSort === "date-asc") {
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      }
+      if (activeSort === "duration") {
+        return a.duration - b.duration;
+      }
+      return 0;
+    });
+  }, [localSongs, sortBy, isFavorites]);
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
@@ -250,34 +300,37 @@ export default function SongListBase({
           </div>
 
           {showSortSelector && (
-            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+            <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-auto">
               <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                 {t.library.sort.label}
               </span>
               <Select
+                items={sortOptions}
                 value={sortBy}
-                onValueChange={(value) => setSortBy(value as SortMode)}
+                onValueChange={(value) => {
+                  if (value) setSortBy(value as SortMode);
+                }}
               >
                 <SelectTrigger
                   size="sm"
-                  className="min-w-44 bg-zinc-800/80 border-zinc-700"
+                  className="min-w-48 bg-zinc-900/90 hover:bg-zinc-800 border-zinc-700/70 text-zinc-200 rounded-xl transition-all shadow-sm cursor-pointer"
                 >
-                  <SelectValue />
+                  <SelectValue>
+                    {(val: SortMode | null) =>
+                      val ? sortLabels[val] || val : ""
+                    }
+                  </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="manual">
-                    {t.library.sort.manual}
-                  </SelectItem>
-                  <SelectItem value="duration">
-                    {t.library.sort.duration}
-                  </SelectItem>
-                  <SelectItem value="date-desc">
-                    {t.library.sort.dateDesc}
-                  </SelectItem>
-                  <SelectItem value="date-asc">
-                    {t.library.sort.dateAsc}
-                  </SelectItem>
-                  <SelectItem value="name">{t.library.sort.name}</SelectItem>
+                <SelectContent className="bg-zinc-900 border-zinc-800 rounded-xl shadow-2xl p-1">
+                  {sortOptions.map((opt) => (
+                    <SelectItem
+                      key={opt.value}
+                      value={opt.value}
+                      className="cursor-pointer hover:bg-zinc-800 focus:bg-zinc-800 text-zinc-200 focus:text-white rounded-lg transition-colors py-2 px-3 text-sm"
+                    >
+                      {opt.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -303,38 +356,49 @@ export default function SongListBase({
         <div className="w-10"></div>
       </div>
 
-      <DndContext
-        id="song-list-dnd"
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={displayedSongs.map((s) => s.id)}
-          strategy={verticalListSortingStrategy}
+      {displayedSongs.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center px-4 rounded-2xl bg-zinc-900/30 border border-zinc-800/60 my-4">
+          <div className="p-4 bg-zinc-900/90 rounded-full mb-3 border border-zinc-800">
+            <Music className="w-8 h-8 text-zinc-500" />
+          </div>
+          <p className="text-zinc-400 text-sm font-medium">
+            {t.library.noSongsFound}
+          </p>
+        </div>
+      ) : (
+        <DndContext
+          id="song-list-dnd"
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
         >
-          {displayedSongs.map((song, index) => (
-            <SongItem
-              key={song.id}
-              song={song}
-              index={index}
-              onPlay={handlePlay}
-              onMenuClick={toggleMenu}
-              activeMenuId={activeMenu}
-              dragDisabled={isDragDisabled}
-              actions={{
-                onEdit: () => setEditingSong(song),
-                onDelete: () => handleDeleteRequest(song.id),
-                onAddSongToPlaylist: (plId) =>
-                  handleAddSongToPlaylist(plId, song.id),
-                onRemoveFromPlaylist: playlistId
-                  ? () => handleRemoveFromPlaylist(song.id)
-                  : undefined,
-              }}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
+          <SortableContext
+            items={displayedSongs.map((s) => s.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {displayedSongs.map((song, index) => (
+              <SongItem
+                key={song.id}
+                song={song}
+                index={index}
+                onPlay={handlePlay}
+                onMenuClick={toggleMenu}
+                activeMenuId={activeMenu}
+                dragDisabled={isDragDisabled}
+                actions={{
+                  onEdit: () => setEditingSong(song),
+                  onDelete: () => handleDeleteRequest(song.id),
+                  onAddSongToPlaylist: (plId) =>
+                    handleAddSongToPlaylist(plId, song.id),
+                  onRemoveFromPlaylist: playlistId
+                    ? () => handleRemoveFromPlaylist(song.id)
+                    : undefined,
+                }}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
+      )}
 
       {editingSong && (
         <EditSongModal
