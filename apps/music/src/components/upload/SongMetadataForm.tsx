@@ -70,9 +70,17 @@ export default function SongMetadataForm({
         <label className="text-xs text-zinc-400 font-medium mb-1 block">
           {t.upload.genreLabel}
         </label>
-        <Select value={genre} onValueChange={(value) => setGenre(value as GenreType)}>
+        <Select
+          items={GENRES.map((g) => ({ value: g, label: t.genres.names[g] }))}
+          value={genre}
+          onValueChange={(value) => {
+            if (value) setGenre(value as GenreType);
+          }}
+        >
           <SelectTrigger className="w-full">
-            <SelectValue />
+            <SelectValue>
+              {(val: GenreType | null) => (val ? t.genres.names[val] || val : "")}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {GENRES.map((g) => (
