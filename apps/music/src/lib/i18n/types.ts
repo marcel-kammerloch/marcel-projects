@@ -178,6 +178,11 @@ export interface Dictionary {
     stateOn: string;
     stateOff: string;
     loopMode: (mode: string) => string;
+    play: string;
+    pause: string;
+    previousTrack: string;
+    nextTrack: string;
+    shuffle: string;
   };
   settings: {
     title: string;
